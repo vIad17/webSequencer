@@ -1,0 +1,19 @@
+.instrument-page {
+  height: 93vh;
+  overflow: auto;
+  padding-top: 20px;
+
+  &__drawable-field {
+    display: flex;
+  }
+
+  &__tacts-number {
+    margin: 0 0 3px 60px;
+  }
+
+  background-color: #DCDCDC;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}

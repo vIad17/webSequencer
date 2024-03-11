@@ -1,0 +1,56 @@
+body {
+  margin: 0;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+  background-color: #E9F4FF;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+@font-face {
+  font-family: roboto-regular;
+  src: url("/fonts/roboto/roboto-regular.woff2");
+  font-display: fallback;
+}
+
+@font-face {
+  font-family: roboto-medium;
+  src: url("/fonts/roboto/roboto-medium.woff2");
+  font-display: fallback;
+}
+
+:root {
+  /* Fonts */
+  --roboto-regular: roboto-regular, sans-serif;
+  --roboto-medium: roboto-medium, sans-serif;
+}
+
+* {
+  font-family: var(--roboto-regular);
+  margin: 0;
+  font-size: 20px;
+}
+
+h1 {
+  font-weight: 400;
+  font-family: var(--roboto-medium);
+  font-size: 50px;
+}
+
+h2 {
+  font-weight: 400;
+  font-family: var(--roboto-medium);
+  font-size: 32px;
+}
+
+h3 {
+  font-weight: 400;
+  font-family: var(--roboto-medium);
+  font-size: 28px;
+}
+
+ul {
+  list-style: none;
+  padding: 0;
+}

@@ -1,0 +1,30 @@
+.draggable-note {
+  display: flex;
+  align-items: center;
+  justify-content: end;
+  border: none;
+  outline: none;
+  background-color: #00BFFF;
+  font-size: 16px;
+  box-shadow: 0 0 0 1px #191970;
+  overflow:hidden;
+  position: absolute;
+  top: 0;
+  z-index: 2;
+  padding: 0;
+
+  width: var(--width);
+  height: var(--height);
+
+  &--active {
+    box-shadow: 0 0 0 3px #191970;
+  }
+
+  &__resizible-button {
+    padding: 0;
+    height: 40px;
+    width: 10px;
+    margin-left: 15px;
+  }
+}
+  

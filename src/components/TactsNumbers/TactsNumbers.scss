@@ -1,0 +1,10 @@
+.tacts-number {
+  display: flex;
+  width: fit-content;
+
+  $width: var(--width);
+
+  &__tact {
+    width: $width;
+  }
+}

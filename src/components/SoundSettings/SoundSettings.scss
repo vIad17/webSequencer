@@ -1,0 +1,138 @@
+.sound-settings__list {
+  list-style: none;
+  padding: 10px 10%;
+}
+
+.sound-settings__label {
+  display: flex;
+}
+
+.sound-settings__range {
+  width: 100%;
+}
+
+.sound-settings__range-value {
+  font-size: 20px;
+  margin-left: 10px;
+  width: 3em;
+}
+
+.sound-settings input[type="range"] {
+  height: 26px;
+  appearance: none;
+  -webkit-appearance: none;
+  margin: 0 0 15px;
+  background: none;
+
+  &:focus {
+    outline: none;
+
+    &::-ms-fill-lower, &::-ms-fill-upper, &::-webkit-slider-runnable-track {
+      background: #50555C;
+    }
+  }
+  
+  &::-webkit-slider-runnable-track {
+    width: 100%;
+    height: 14px;
+    cursor: pointer;
+    box-shadow: 1px 1px 1px #50555C;
+    background: #50555C;
+    border-radius: 14px;
+  }
+  
+  &::-webkit-slider-thumb {
+    height: 20px;
+    width: 40px;
+    border-radius: 12px;
+    background: #529DE1;
+    cursor: pointer;
+    -webkit-appearance: none;
+    margin-top: -3px;
+  }
+  
+  &::-moz-range-track {
+    width: 100%;
+    height: 14px;
+    cursor: pointer;
+    box-shadow: 1px 1px 1px #50555C;
+    background: #50555C;
+    border-radius: 14px;
+  }
+  
+  &::-moz-range-thumb {
+    height: 20px;
+    width: 40px;
+    border-radius: 12px;
+    background: #529DE1;
+    cursor: pointer;
+  }
+  
+  &::-ms-track {
+    width: 100%;
+    height: 14px;
+    cursor: pointer;
+    background: transparent;
+    border-color: transparent;
+    color: transparent;
+  }
+  
+  &::-ms-fill-lower {
+    background: #50555C;
+    border-radius: 28px;
+    box-shadow: 1px 1px 1px #50555C;
+  }
+  
+  &::-ms-fill-upper {
+    background: #50555C;
+    border-radius: 28px;
+    box-shadow: 1px 1px 1px #50555C;
+  }
+  
+  &::-ms-thumb {
+    margin-top: 1px;
+    height: 20px;
+    width: 40px;
+    border-radius: 12px;
+    background: #529DE1;
+    cursor: pointer;
+  }
+}
+
+.sound-settings__element-radio * {
+  margin-top: 5px;
+}
+
+.sound-settings__radio {
+  appearance: none;
+  position: absolute;
+}
+
+.sound-settings__fake-radio {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  width: 24px;
+  height: 24px;
+  margin-right: 4px;
+  border: 1px solid #529DE1;
+  border-radius: 100%;
+
+
+&::before {
+  position: absolute;
+  display: block;
+  content: "";
+  background-color: #529DE1;
+  border-radius: 100%;
+  width: 0;
+  height: 0;
+  transition: 0.1s;
+}
+}
+
+.sound-settings__radio:checked + .sound-settings__fake-radio::before {
+  width: 26px;
+   height: 26px;
+}

@@ -1,0 +1,14 @@
+.note-button {
+  background-color: #f8f8ff;
+  height: 35px;
+  width: 75px;
+  border: 1px solid;
+
+  &--active {
+    background-color: #ffa500;
+  }
+  
+  &--gray:not(&--active)  {
+    background-color: #c9d8e7;
+  }
+}

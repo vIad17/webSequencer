@@ -1,0 +1,44 @@
+
+image: node:18.16-slim
+variables:
+  # system
+  FF_USE_FASTZIP: "true"
+  ARTIFACT_COMPRESSION_LEVEL: "fast"
+  CACHE_COMPRESSION_LEVEL: "fast"
+  # app
+  USERNAME: root
+stages:
+  - install
+  - lint
+  - build
+install:
+  stage: install
+  only:
+    - merge_request
+    - main
+    - master
+    - develop
+  script:
+    - yarn install
+lint:
+  stage: lint
+  script:
+    - yarn install
+    - yarn stylelint
+    - yarn eslint
+  only:
+    - merge_request
+    - main
+    - master
+    - develop
+  needs: ["install"]
+.build:
+  stage: build
+build:develop:
+  extends: .build
+  script:
+    - yarn install
+    - yarn build
+  only:
+    - develop
+  needs: ["install"]
