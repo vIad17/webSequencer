@@ -6,7 +6,7 @@ import tsconfigPaths from 'vite-tsconfig-paths';
 import svgr from 'vite-plugin-svgr';
 
 export default defineConfig(() => ({
-  base: '',
+  base: '/',
   plugins: [react(), tsconfigPaths(), svgr()],
   test: {
     exclude: [],
