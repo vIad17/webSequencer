@@ -8,9 +8,9 @@ import Main from 'src/pages/Main/OldMain';
 const Router = () => (
   <BrowserRouter>
     <Routes>
-      <Route path="/" element={<Layout />}>
-        <Route path="/old" element={<Main />} />
-        <Route path="/" element={<InstrumentPage />} />
+      <Route path="/webSequencer" element={<Layout />}>
+        <Route path="old" element={<Main />} />
+        <Route path="" element={<InstrumentPage />} />
       </Route>
     </Routes>
   </BrowserRouter>
