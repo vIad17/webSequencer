@@ -1,5 +1,6 @@
-import NoteNames from 'src/components/NoteNames/NoteNames';
+// import NoteNames from 'src/components/NoteNames/NoteNames';
 import TactsNumbers from 'src/components/TactsNumbers/TactsNumbers';
+import VerticalPiano from 'src/components/VerticalPiano/VerticalPiano';
 
 import DrawableField from 'src/features/DrawableField/DrawableField';
 
@@ -14,7 +15,8 @@ const InstrumentPage = ({ className = '' }: InstrumentPageProps) => {
     <main className={`instrument-page ${className}`}>
       <TactsNumbers className="instrument-page__tacts-number" />
       <div className="instrument-page__drawable-field">
-        <NoteNames className="instrument-page__note-names" />
+        {/* <NoteNames className="instrument-page__note-names" /> */}
+        <VerticalPiano />
         <DrawableField />
       </div>
     </main>

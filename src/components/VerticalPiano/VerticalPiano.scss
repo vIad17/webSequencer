@@ -1,0 +1,22 @@
+.vertical-piano {
+  height: 100%;
+
+  &__key {
+    height: var(--height);
+    width: 100px;
+    text-align: left;
+    padding-left: 15px;
+
+    &-black {
+      background-color: #000;
+      color: #fff;
+
+      &:active, &--active {
+        background-color: #555;
+      }
+    }
+    &-white:active, &-white--active {
+      background-color: #bbb;
+    }
+  }
+}

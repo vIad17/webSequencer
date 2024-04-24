@@ -20,11 +20,15 @@ export interface ChangeActiveType {
 
 interface NotesArrayState {
   notesArray: Note[];
+  playingNotes: string[];
+  currentNote: string;
   deltaSize: number;
 }
 
 const initialState: NotesArrayState = {
   notesArray: [],
+  playingNotes: [],
+  currentNote: '',
   deltaSize: 0
 };
 
@@ -68,9 +72,9 @@ export const notesArraySlice = createSlice({
     },
     deleteNote: (state, action: PayloadAction<number>) => ({
       ...state,
-      notesArray: state.notesArray.filter((_, index) => {
-        return index !== action.payload;
-      })
+      notesArray: state.notesArray.filter(
+        (_, index) => index !== action.payload
+      )
     }),
     changeActive: (state, action: PayloadAction<ChangeActiveType>) => ({
       ...state,
@@ -88,6 +92,18 @@ export const notesArraySlice = createSlice({
           : element
       )
     }),
+    addPlayingNote: (state, action: PayloadAction<string>) => ({
+      ...state,
+      playingNotes: [...state.playingNotes, action.payload]
+    }),
+    removePlayingNote: (state, action: PayloadAction<string>) => ({
+      ...state,
+      playingNotes: state.playingNotes.filter((item) => item !== action.payload)
+    }),
+    setCurrentNote: (state, action: PayloadAction<string>) => ({
+      ...state,
+      currentNote: action.payload
+    }),
     setDeltaSize: (state, action: PayloadAction<number>) => ({
       ...state,
       deltaSize: action.payload
@@ -101,5 +117,8 @@ export const {
   deleteNote,
   changeActive,
   addActive,
+  addPlayingNote,
+  removePlayingNote,
+  setCurrentNote,
   setDeltaSize
 } = notesArraySlice.actions;

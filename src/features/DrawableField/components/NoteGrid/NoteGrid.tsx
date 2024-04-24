@@ -35,8 +35,6 @@ const NoteGrid = ({ className = '' }: NoteGridProps) => {
     dispatch(setColumnsCount(tactsCount * 16));
   }, []);
 
-  console.log('a');
-
   useEffect(() => {
     if (p5) {
       p5.resizeCanvas(elemWidth * columnCount, elemHeight * rowsCount);

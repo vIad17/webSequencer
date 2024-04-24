@@ -1,6 +1,7 @@
 declare module 'audiokeys' {
   interface Key {
     frequency: number;
+    note: number;
   }
 
   interface Keyboard {

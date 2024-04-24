@@ -31,18 +31,20 @@ const DraggableNote = ({
   onRightClick = () => {},
   onSizeableClick = () => {}
 }: DraggableNoteProps) => {
-  const elementHeight = useSelector(
-    (state: RootState) => state.drawableField.elementHeight
-  );
-  const elementWidth = useSelector(
-    (state: RootState) => state.drawableField.elementWidth
-  );
+  const drawableField = useSelector((state: RootState) => state.drawableField);
+  const columnsCount = drawableField.columnsCount;
+  const elementHeight = drawableField.elementHeight;
+  const elementWidth = drawableField.elementWidth;
   const deltaSize = useSelector(
     (state: RootState) => state.notesArray.deltaSize
   );
 
   const tempSize = isActive
-    ? Math.max(size * elementWidth + deltaSize, elementWidth)
+    ? Math.max(
+        size * elementWidth +
+          Math.min(deltaSize, (columnsCount - (x + size)) * elementWidth),
+        elementWidth
+      )
     : size * elementWidth;
 
   return (

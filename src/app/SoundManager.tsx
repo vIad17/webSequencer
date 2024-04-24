@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 
 import AudioKeys, { Key } from 'audiokeys';
@@ -5,6 +6,10 @@ import * as Tone from 'tone';
 
 import { pitchNotes } from 'src/shared/const/notes';
 import { setBit } from 'src/shared/redux/slices/bitSlice';
+import {
+  addPlayingNote,
+  removePlayingNote
+} from 'src/shared/redux/slices/notesArraySlice';
 import store, { RootState } from 'src/shared/redux/store/store';
 
 /* creating a synth */
@@ -75,29 +80,50 @@ function playMusic(time: number) {
         `0:0:${note.duration}`,
         time
       );
+      store.dispatch(addPlayingNote(pitchNotes[note.note]));
+    }
+    if (note.attackTime + note.duration === currentBit) {
+      store.dispatch(removePlayingNote(pitchNotes[note.note]));
     }
   });
 }
 
 new Tone.Loop(playMusic, '16n').start();
 
-/* creating a keyboard event */
+/* creating a keyboard events */
 const keyboard = new AudioKeys({
   rows: 1
 });
 
 keyboard.down((key: Key) => {
-  synth.triggerAttack(key.frequency);
+  const note = pitchNotes[95 - key.note];
+  store.dispatch(addPlayingNote(note));
+  synth.triggerAttack(note);
 });
 
 keyboard.up((key: Key) => {
-  synth.triggerRelease(key.frequency);
+  const note = pitchNotes[95 - key.note];
+  store.dispatch(removePlayingNote(note));
+  synth.triggerRelease(note);
 });
 
 /* creating a component */
 const SoundManager = () => {
   const soundSettings = useSelector((state: RootState) => state.soundSettings);
   const bpm = useSelector((state: RootState) => state.settings.bpm);
+  const currentNote = useSelector(
+    (state: RootState) => state.notesArray.currentNote
+  );
+
+  const [prevNote, setPrevNote] = useState('');
+
+  useEffect(() => {
+    synth.triggerRelease(prevNote);
+    if (currentNote) {
+      synth.triggerAttack(currentNote);
+    }
+    setPrevNote(currentNote);
+  }, [currentNote]);
 
   synth.volume.value = soundSettings.volume - 12;
   synth.set({

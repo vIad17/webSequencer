@@ -42,6 +42,41 @@ const NoteManager = () => {
 
   const dispatch = useDispatch();
 
+  const moveNote = (deltaX: number, deltaY: number) => {
+    let localDeltaX = deltaX;
+    let localDeltaY = deltaY;
+
+    notesArray.forEach((note) => {
+      if (note.attackTime + localDeltaX < 0) {
+        localDeltaX = -note.attackTime;
+      } else {
+        localDeltaX = Math.min(
+          localDeltaX,
+          drawableField.columnsCount - (note.attackTime + note.duration)
+        );
+      }
+      if (note.note + localDeltaY < 0) {
+        localDeltaY = -note.note;
+      } else {
+        localDeltaY = Math.min(
+          localDeltaY,
+          drawableField.rowsCount - note.note + 1
+        );
+      }
+    });
+
+    notesArray.forEach((note, index) => {
+      note.isActive &&
+        dispatch(
+          updateNotePosition({
+            index,
+            attackTime: note.attackTime + localDeltaX,
+            note: note.note + localDeltaY
+          })
+        );
+    });
+  };
+
   const KeyDownHandler = (event: KeyboardEvent) => {
     if (event.key === ESCAPE) {
       dispatch(changeActive({ index: 0, isActive: false }));
@@ -70,7 +105,15 @@ const NoteManager = () => {
             dispatch(
               updateNoteDuration({
                 index,
-                duration: Math.max(note.duration + deltaDuration, 1)
+                duration: Math.max(
+                  note.duration +
+                    Math.min(
+                      deltaDuration,
+                      drawableField.columnsCount -
+                        (note.attackTime + note.duration)
+                    ),
+                  1
+                )
               })
             );
           }
@@ -83,24 +126,7 @@ const NoteManager = () => {
           yMultiplier = 12;
         }
         const coordinates = moveByGreed[event.key as keyof typeof moveByGreed];
-        notesArray.forEach((note, index) => {
-          note.isActive &&
-            dispatch(
-              updateNotePosition({
-                index,
-                attackTime: clamp(
-                  note.attackTime + coordinates.x * xMultiplier,
-                  0,
-                  drawableField.columnsCount - 1
-                ),
-                note: clamp(
-                  note.note + coordinates.y * yMultiplier,
-                  0,
-                  drawableField.rowsCount - 1
-                )
-              })
-            );
-        });
+        moveNote(coordinates.x * xMultiplier, coordinates.y * yMultiplier);
       }
     }
   };
@@ -108,25 +134,10 @@ const NoteManager = () => {
   const dragNoteHandler = (e: DraggableEvent, position: DraggableData) => {
     setIsDragg(true);
     e.preventDefault();
-    notesArray.forEach((note, index) => {
-      if (note.isActive) {
-        dispatch(
-          updateNotePosition({
-            index,
-            attackTime: Math.max(
-              0,
-              notesArray[index].attackTime +
-                position.deltaX / drawableField.elementWidth
-            ),
-            note: Math.max(
-              0,
-              notesArray[index].note +
-                position.deltaY / drawableField.elementHeight
-            )
-          })
-        );
-      }
-    });
+    moveNote(
+      position.deltaX / drawableField.elementWidth,
+      position.deltaY / drawableField.elementHeight
+    );
   };
 
   const deleteNoteHandler = (e: React.MouseEvent, index1: number) => {
@@ -153,12 +164,13 @@ const NoteManager = () => {
           dispatch(
             updateNoteDuration({
               index,
-              duration: Math.max(
+              duration: clamp(
                 round(
                   (note.duration * drawableField.elementWidth + curDeltaSize) /
                     drawableField.elementWidth
                 ),
-                1
+                1,
+                drawableField.columnsCount - note.attackTime
               )
             })
           );
@@ -213,8 +225,6 @@ const NoteManager = () => {
         onSizeableClick={resizeNoteHandler}
       />
     ));
-
-  console.log(isResizing || isDragg);
 
   return (
     <>

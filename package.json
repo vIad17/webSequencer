@@ -1,8 +1,6 @@
 {
   "name": "web-virtual-sound",
   "version": "0.3.0",
-  "type": "module",
-  "main": "./src/index.tsx",
   "private": true,
   "scripts": {
     "start": "vite",
@@ -10,7 +8,6 @@
     "eslint": "eslint --fix --ext .ts,.tsx .",
     "stylelint": "stylelint --config .stylelintrc.json src/**/*.scss",
     "test": "vitest",
-    "preview": "vite preview",
     "prepare": "husky"
   },
   "dependencies": {
