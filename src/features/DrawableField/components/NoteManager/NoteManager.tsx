@@ -47,21 +47,23 @@ const NoteManager = () => {
     let localDeltaY = deltaY;
 
     notesArray.forEach((note) => {
-      if (note.attackTime + localDeltaX < 0) {
-        localDeltaX = -note.attackTime;
-      } else {
-        localDeltaX = Math.min(
-          localDeltaX,
-          drawableField.columnsCount - (note.attackTime + note.duration)
-        );
-      }
-      if (note.note + localDeltaY < 0) {
-        localDeltaY = -note.note;
-      } else {
-        localDeltaY = Math.min(
-          localDeltaY,
-          drawableField.rowsCount - note.note + 1
-        );
+      if (note.isActive) {
+        if (note.attackTime + localDeltaX < 0) {
+          localDeltaX = -note.attackTime;
+        } else {
+          localDeltaX = Math.min(
+            localDeltaX,
+            drawableField.columnsCount - (note.attackTime + note.duration)
+          );
+        }
+        if (note.note + localDeltaY < 0) {
+          localDeltaY = -note.note;
+        } else {
+          localDeltaY = Math.min(
+            localDeltaY,
+            drawableField.rowsCount - note.note + 1
+          );
+        }
       }
     });
 
