@@ -1,4 +1,3 @@
-// @ts-ignore: Unreachable code error
 import pako from 'pako';
 
 export function compress(object: unknown) {
