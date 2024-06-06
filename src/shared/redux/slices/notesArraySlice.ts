@@ -36,6 +36,10 @@ export const notesArraySlice = createSlice({
   name: 'notesArray',
   initialState,
   reducers: {
+    setNotes: (state, action: PayloadAction<Note[]>) => ({
+      ...state,
+      notesArray: action.payload
+    }),
     addNote: (state, action: PayloadAction<Note>) => ({
       ...state,
       notesArray: [...state.notesArray, action.payload]
@@ -111,6 +115,7 @@ export const notesArraySlice = createSlice({
   }
 });
 export const {
+  setNotes,
   addNote,
   updateNotePosition,
   updateNoteDuration,

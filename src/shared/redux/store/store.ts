@@ -1,6 +1,6 @@
 import { configureStore } from '@reduxjs/toolkit';
 
-import { bitSlice } from 'src/shared/redux/slices/bitSlice';
+import { currentMusicSlice } from 'src/shared/redux/slices/currentMusicSlice';
 import { melodyArraySlice } from 'src/shared/redux/slices/melodyArraySlice';
 import { notesArraySlice } from 'src/shared/redux/slices/notesArraySlice';
 import { settingsSlice } from 'src/shared/redux/slices/settingsSlice';
@@ -13,7 +13,7 @@ const store = configureStore({
     [settingsSlice.name]: settingsSlice.reducer,
     [soundSettingsSlice.name]: soundSettingsSlice.reducer,
     [melodyArraySlice.name]: melodyArraySlice.reducer,
-    [bitSlice.name]: bitSlice.reducer,
+    [currentMusicSlice.name]: currentMusicSlice.reducer,
     [notesArraySlice.name]: notesArraySlice.reducer,
     [drawableFieldSlice.name]: drawableFieldSlice.reducer
   }

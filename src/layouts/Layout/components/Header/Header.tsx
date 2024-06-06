@@ -3,7 +3,10 @@ import { useDispatch, useSelector } from 'react-redux';
 
 import * as Tone from 'tone';
 
-import { setBit } from 'src/shared/redux/slices/bitSlice';
+import {
+  setCurrentBit,
+  setIsPlaying
+} from 'src/shared/redux/slices/currentMusicSlice';
 import { setColumnsCount } from 'src/shared/redux/slices/drawableFieldSlice';
 import { setBpm, setTacts } from 'src/shared/redux/slices/settingsSlice';
 import { RootState } from 'src/shared/redux/store/store';
@@ -20,9 +23,11 @@ interface HeaderProps {
 
 const Header = ({ className = '' }: HeaderProps) => {
   const [myBpm, setMyBpm] = useState(120);
-  const [myTacts, setMyTacts] = useState(4);
+  const [myTacts, setMyTacts] = useState(8);
 
   const settings = useSelector((state: RootState) => state.settings);
+
+  console.log(settings);
 
   const dispatch = useDispatch();
 
@@ -36,6 +41,7 @@ const Header = ({ className = '' }: HeaderProps) => {
               Tone.context.resume();
             }
             Tone.Transport.start();
+            dispatch(setIsPlaying(true));
           }}
         >
           <img
@@ -49,6 +55,7 @@ const Header = ({ className = '' }: HeaderProps) => {
           className="header__button"
           onClick={() => {
             Tone.Transport.pause();
+            dispatch(setIsPlaying(false));
           }}
         >
           <img
@@ -61,8 +68,9 @@ const Header = ({ className = '' }: HeaderProps) => {
         <button
           className="header__button"
           onClick={() => {
+            dispatch(setCurrentBit(0));
+            dispatch(setIsPlaying(false));
             Tone.Transport.stop();
-            dispatch(setBit(0));
           }}
         >
           <img

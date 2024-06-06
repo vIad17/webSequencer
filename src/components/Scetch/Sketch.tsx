@@ -10,16 +10,16 @@ interface MySketchProps {
 const MySketch = ({ className = '' }: MySketchProps) => {
   const waveform = new Tone.Waveform();
   Tone.Master.connect(waveform);
-
+  
   const setup = (p5: p5, canvasParentRef: Element) => {
     p5.createCanvas(400, 400).parent(canvasParentRef);
   };
-
+  
   const draw = (p5: p5) => {
     p5.background('black');
     p5.stroke('white');
     p5.noFill();
-
+    
     const buffer = waveform.getValue();
 
     let start = 0;

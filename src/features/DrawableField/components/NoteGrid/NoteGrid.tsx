@@ -33,7 +33,7 @@ const NoteGrid = ({ className = '' }: NoteGridProps) => {
 
   useEffect(() => {
     dispatch(setColumnsCount(tactsCount * 16));
-  }, []);
+  }, [tactsCount]);
 
   useEffect(() => {
     if (p5) {
@@ -52,7 +52,6 @@ const NoteGrid = ({ className = '' }: NoteGridProps) => {
   };
   const draw = (p5: p5) => {
     setP5(p5);
-
     for (let i = 0; i <= columnCount / 16; i++) {
       const color = i % 2 === 0 ? '#D3D3D3' : '#C0C0C0';
       p5.fill(color);

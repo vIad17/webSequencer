@@ -1,0 +1,19 @@
+.time-stripe {
+  &__stripe {
+    height: 30px;
+    width: fit-content;
+  }
+  
+  &__timeline {
+    position: absolute;
+    pointer-events: none;
+    transform: translateX(var(--x));
+    z-index: 10;
+  }
+
+  &_animated &__timeline {
+    transition-duration: var(--anim-time);
+    transition-property: transform;
+    transition-timing-function: linear;
+  }
+}

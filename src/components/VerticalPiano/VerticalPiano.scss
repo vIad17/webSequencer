@@ -1,9 +1,11 @@
 .vertical-piano {
   height: 100%;
+  display: flex;
+  flex-direction: column;
 
   &__key {
     height: var(--height);
-    width: 100px;
+    width: 100%;
     text-align: left;
     padding-left: 15px;
 

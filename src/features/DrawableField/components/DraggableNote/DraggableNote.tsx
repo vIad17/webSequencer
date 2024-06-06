@@ -58,7 +58,7 @@ const DraggableNote = ({
       bounds="parent"
       grid={[elementWidth, elementHeight]}
     >
-      <button
+      <div
         className={`draggable-note ${isActive && 'draggable-note--active'}`}
         onMouseDownCapture={(e) => onMouseDown(e, index)}
         onMouseUpCapture={(e) => onMouseUp(e, index)}
@@ -72,7 +72,7 @@ const DraggableNote = ({
           onMouseDown={onSizeableClick}
           className="draggable-note__resizible-button"
         />
-      </button>
+      </div>
     </Draggable>
   );
 };

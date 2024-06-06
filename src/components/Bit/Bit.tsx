@@ -17,7 +17,9 @@ const Bit = ({ className = '', bitNumber }: BitProps) => {
   const melodyArray = useSelector(
     (state: RootState) => state.melodyArray.melodyArray
   );
-  const currentBit = useSelector((state: RootState) => state.bit.bit);
+  const currentBit = useSelector(
+    (state: RootState) => state.currentMusic.currentBit
+  );
 
   const dispatch = useDispatch();
 

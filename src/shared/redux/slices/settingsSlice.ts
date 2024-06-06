@@ -14,6 +14,10 @@ export const settingsSlice = createSlice({
   name: 'settings',
   initialState,
   reducers: {
+    setSettings: (state, action: PayloadAction<SettingsState>) => ({
+      ...state,
+      ...action.payload
+    }),
     setBpm: (state, action: PayloadAction<number>) => ({
       ...state,
       bpm: action.payload
@@ -24,4 +28,4 @@ export const settingsSlice = createSlice({
     })
   }
 });
-export const { setBpm, setTacts } = settingsSlice.actions;
+export const { setSettings, setBpm, setTacts } = settingsSlice.actions;

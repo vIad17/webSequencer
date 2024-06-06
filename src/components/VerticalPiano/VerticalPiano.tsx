@@ -22,8 +22,9 @@ const VerticalPiano = ({ className = '' }: VerticalPianoProps) => {
 
   const extraClassName = (note: string) => {
     const color = note.at(1) === '#' ? 'black' : 'white';
-    const active = plaingNotes.includes(note) ? '--active' : '';
-    return `vertical-piano__key-${color} vertical-piano__key-${color}${active}`;
+    const isActive = plaingNotes.includes(note);
+    const className = `vertical-piano__key-${color}`;
+    return `${className}${isActive ? ` ${className}__active` : ''}`;
   };
 
   const onMouseDown = (note: string) => {

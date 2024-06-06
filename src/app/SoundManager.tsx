@@ -5,7 +5,7 @@ import AudioKeys, { Key } from 'audiokeys';
 import * as Tone from 'tone';
 
 import { pitchNotes } from 'src/shared/const/notes';
-import { setBit } from 'src/shared/redux/slices/bitSlice';
+import { setCurrentBit } from 'src/shared/redux/slices/currentMusicSlice';
 import {
   addPlayingNote,
   removePlayingNote
@@ -64,13 +64,8 @@ synth.chain(
 
 /* creating a loop music */
 function playMusic(time: number) {
-  const bit = (Tone.Transport.position as string).split(':');
-  const currentBit =
-    (parseInt(bit[0]) * 16 + parseInt(bit[1]) * 4 + parseInt(bit[2])) %
-    (store.getState().settings.tacts * 16);
-
-  store.dispatch(setBit(currentBit));
-
+  const currentBit = store.getState().currentMusic.currentBit;
+  const tactsCounter = store.getState().settings.tacts;
   const notesArray = store.getState().notesArray.notesArray;
 
   notesArray.forEach((note) => {
@@ -82,10 +77,12 @@ function playMusic(time: number) {
       );
       store.dispatch(addPlayingNote(pitchNotes[note.note]));
     }
-    if (note.attackTime + note.duration === currentBit) {
+    if (note.attackTime + note.duration <= currentBit) {
       store.dispatch(removePlayingNote(pitchNotes[note.note]));
     }
   });
+
+  store.dispatch(setCurrentBit((currentBit + 1) % (tactsCounter * 16)));
 }
 
 new Tone.Loop(playMusic, '16n').start();
@@ -110,7 +107,7 @@ keyboard.up((key: Key) => {
 /* creating a component */
 const SoundManager = () => {
   const soundSettings = useSelector((state: RootState) => state.soundSettings);
-  const bpm = useSelector((state: RootState) => state.settings.bpm);
+  const settings = useSelector((state: RootState) => state.settings);
   const currentNote = useSelector(
     (state: RootState) => state.notesArray.currentNote
   );
@@ -148,7 +145,7 @@ const SoundManager = () => {
   lowFilter.set({ frequency: soundSettings.lowFilter });
   highFilter.set({ frequency: soundSettings.highFilter });
 
-  Tone.Transport.bpm.value = bpm;
+  Tone.Transport.bpm.value = settings.bpm;
 
   return <></>;
 };

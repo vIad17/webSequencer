@@ -1,7 +1,7 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { NonCustomOscillatorType } from 'tone/build/esm/source/oscillator/OscillatorInterface';
 
-interface ChartState {
+interface SoundSettingsState {
   volume: number;
   attack: number;
   decay: number;
@@ -19,7 +19,7 @@ interface ChartState {
   wave: NonCustomOscillatorType;
 }
 
-const initialState: ChartState = {
+const initialState: SoundSettingsState = {
   volume: 0,
   attack: 0,
   decay: 0,
@@ -41,6 +41,10 @@ export const soundSettingsSlice = createSlice({
   name: 'soundSettings',
   initialState,
   reducers: {
+    setSoundSettings: (state, action: PayloadAction<SoundSettingsState>) => ({
+      ...state,
+      ...action.payload
+    }),
     setVolume: (state, action: PayloadAction<number>) => ({
       ...state,
       volume: action.payload
@@ -104,6 +108,7 @@ export const soundSettingsSlice = createSlice({
   }
 });
 export const {
+  setSoundSettings,
   setVolume,
   setAttack,
   setDecay,
