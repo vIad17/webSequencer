@@ -28,7 +28,7 @@ const VerticalPiano = ({ className = '' }: VerticalPianoProps) => {
     return `${className}${isActive ? ` ${className}__active` : ''}`;
   };
   
-  console.log(extraClassName("D4"));
+  // console.log(extraClassName("D4"));
 
   const onMouseDown = (note: string) => {
     dispatch(setCurrentNote(note));

@@ -22,6 +22,7 @@ const stripeHeigth = 30;
 
 const TimeStripe = ({ className = '' }: TimeStripeProps) => {
   const bpm = useSelector((state: RootState) => state.settings.bpm);
+  const tacts = useSelector((state: RootState) => state.settings.tacts);
   const currentBit = useSelector(
     (state: RootState) => state.currentMusic.currentBit
   );
@@ -40,7 +41,7 @@ const TimeStripe = ({ className = '' }: TimeStripeProps) => {
     if (p5) {
       p5.resizeCanvas(elementWidth * columnsCount, stripeHeigth);
     }
-  }, [elementWidth, columnsCount]);
+  }, [elementWidth, columnsCount, tacts]);
 
   const onClick = (e: MouseEvent) => {
     dispatch(setCurrentBit(round(e.offsetX, elementWidth) / elementWidth));
@@ -90,7 +91,7 @@ const TimeStripe = ({ className = '' }: TimeStripeProps) => {
 
     p5.stroke('orange')
       .strokeWeight(2)
-      .line(elementWidth / 2, stripeHeigth, elementWidth / 2, 1000);
+      .line(elementWidth / 2, stripeHeigth, elementWidth / 2, 10000);
   };
 
   return (

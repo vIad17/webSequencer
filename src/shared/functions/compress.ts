@@ -23,7 +23,6 @@ export function decompress(codedBase64Object: string) {
       .map((el) => el.charCodeAt(0));
     const dezippedObject = pako.inflate(new Uint8Array(decodedToCharObject));
     const decodedObject = new TextDecoder().decode(dezippedObject);
-    console.log(decodedObject)
     return decodedObject;
   } catch {
     console.error("ERROR: decompressed error");
