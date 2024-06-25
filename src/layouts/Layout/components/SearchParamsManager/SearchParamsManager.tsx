@@ -32,33 +32,46 @@ const SearchParamsManager = () => {
   const searchNotesArray = searchParams.get('notesArray');
   
   // console.log("AAAAAAAAAAAAAAAA", JSON.parse(decompress(searchNotesArray)));
+  // useEffect(() => {
+  //   if (pageIsStarted) {
+  //     console.log(searchNotesArray);
+  //     // const obj = JSON.parse(decompress(searchParam));
+  //     searchSettings && dispatch(setSettings(JSON.parse(decompress(searchSettings))));
+  //     searchSoundSettings && dispatch(setSoundSettings(JSON.parse(decompress(searchSoundSettings))));
+  //     searchNotesArray  && dispatch(setNotes(JSON.parse(decompress(searchNotesArray))));
+  //   }
+  //   setPageIsStarted(false);
+  // }, []);
+
   useEffect(() => {
-    if (pageIsStarted) {
-      // const obj = JSON.parse(decompress(searchParam));
-      searchSettings && dispatch(setSettings(JSON.parse(decompress(searchSettings))));
-      searchSoundSettings && dispatch(setSoundSettings(JSON.parse(decompress(searchSoundSettings))));
-      searchNotesArray  && dispatch(setNotes(JSON.parse(decompress(searchNotesArray))));
+    const obj = { notesArray, settings, soundSettings };
+    !pageIsStarted && setSearchParams('params=' + compress(obj));
+  }, [notesArray, settings, soundSettings]);
+
+  useEffect(() => {
+    const param = searchParams.get('params');
+    if (!!param && pageIsStarted) {
+      const obj = JSON.parse(decompress(param));
+      console.log(obj.settings);
+      dispatch(setNotes(obj.notesArray));
+      dispatch(setSoundSettings(obj.soundSettings));
+      dispatch(setSettings(obj.settings));
     }
     setPageIsStarted(false);
   }, []);
-
-  // useEffect(() => {
-  //   const obj = { notesArray, settings, soundSettings };
-  //   !pageIsStarted && setSearchParams({params: compress(obj)});
-  // }, [notesArray, settings, soundSettings]);
 
 
   useEffect(() =>{
     !pageIsStarted && setParam({settings: compress(settings)});
   }, [settings]);
 
-  useEffect(() =>{
-    !pageIsStarted && setParam({soundSettings: compress(soundSettings)});
-  }, [soundSettings]);
+  // useEffect(() =>{
+  //   !pageIsStarted && setParam({soundSettings: compress(soundSettings)});
+  // }, [soundSettings]);
 
-  useEffect(() =>{
-    !pageIsStarted && setParam({notesArray: compress(notesArray)});
-  }, [notesArray]);
+  // useEffect(() =>{
+  //   !pageIsStarted && setParam({notesArray: compress(notesArray)});
+  // }, [notesArray]);
 
   return <></>;
 };
