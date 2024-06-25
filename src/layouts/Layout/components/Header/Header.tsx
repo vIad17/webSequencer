@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { ChangeEvent, useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
 import * as Tone from 'tone';
@@ -16,20 +16,35 @@ import startIcom from './images/play_icon.png';
 import stopIcon from './images/stop_icon.png';
 
 import './Header.scss';
+import { useSearchParams } from 'react-router-dom';
+import { decompress } from 'src/shared/functions/compress';
 
 interface HeaderProps {
   className?: string;
 }
 
 const Header = ({ className = '' }: HeaderProps) => {
-  const [myBpm, setMyBpm] = useState(120);
-  const [myTacts, setMyTacts] = useState(8);
+  const [searchParams] = useSearchParams();
+  const param = searchParams.get('settings');
 
-  const settings = useSelector((state: RootState) => state.settings);
+  const obj = JSON.parse(decompress(param || '{}'));
 
-  console.log(settings);
+  const [myBpm, setMyBpm] = useState(obj.bpm || 120);
+  const [myTacts, setMyTacts] = useState(obj.tacts || 8);
 
   const dispatch = useDispatch();
+
+  const handleChange = (
+    event: ChangeEvent<HTMLFormElement | HTMLInputElement>,
+    func: (arg1: number) => void
+  ) => {
+    const inputValue = event.target.value.replace(/\s/g, '');
+    if (isNaN(inputValue)) {
+      return;
+    }
+
+    func(inputValue);
+  };
 
   return (
     <header className={`header ${className}`}>
@@ -83,37 +98,37 @@ const Header = ({ className = '' }: HeaderProps) => {
       <form
         onSubmit={(event) => {
           event.preventDefault();
-          dispatch(setBpm(myBpm));
+          const newBpm = Number(myBpm) || 120;
+          setMyBpm(newBpm);
+          dispatch(setBpm(newBpm));
         }}
       >
         bpm
         <input
           className="header__input"
           type="text"
-          defaultValue={settings.bpm}
-          onChange={(event) => {
-            if (Number(event.target.value)) {
-              setMyBpm(Number(event.target.value));
-            }
+          value={myBpm}
+          onChange={(e) => {
+            handleChange(e, setMyBpm);
           }}
         />
       </form>
       <form
         onSubmit={(event) => {
           event.preventDefault();
-          dispatch(setTacts(myTacts));
-          dispatch(setColumnsCount(myTacts * 16));
+          const newTact = Number(myTacts) || 4;
+          setMyTacts(newTact);
+          dispatch(setTacts(newTact));
+          dispatch(setColumnsCount(newTact * 16));
         }}
       >
         tacts
         <input
           className="header__input"
           type="text"
-          defaultValue={settings.tacts}
-          onChange={(event) => {
-            if (Number(event.target.value)) {
-              setMyTacts(Number(event.target.value));
-            }
+          value={myTacts}
+          onChange={(e) => {
+            handleChange(e, setMyTacts);
           }}
         />
       </form>

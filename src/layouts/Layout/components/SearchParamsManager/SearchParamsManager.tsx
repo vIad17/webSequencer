@@ -14,46 +14,51 @@ const SearchParamsManager = () => {
 
   const dispatch = useDispatch();
 
+  function setParam(param: object) {
+    setSearchParams({ ...Object.fromEntries(searchParams), ...param });
+  }
+
+  // console.log({...Object.fromEntries(searchParams)});
+
   const soundSettings = useSelector((state: RootState) => state.soundSettings);
   const settings = useSelector((state: RootState) => state.settings);
   const notesArray = useSelector(
     (state: RootState) => state.notesArray.notesArray
   );
 
+  const searchParam = searchParams.get('params');
+  const searchSettings = searchParams.get('settings');
+  const searchSoundSettings = searchParams.get('soundSettings');
+  const searchNotesArray = searchParams.get('notesArray');
+  
+  // console.log("AAAAAAAAAAAAAAAA", JSON.parse(decompress(searchNotesArray)));
   useEffect(() => {
-    const param = searchParams.get('params');
-    if (!!param && pageIsStarted) {
-      const obj = JSON.parse(decompress(param));
-      dispatch(setNotes(obj.notesArray));
-      dispatch(setSoundSettings(obj.soundSettings));
-      dispatch(setSettings(obj.settings));
+    if (pageIsStarted) {
+      // const obj = JSON.parse(decompress(searchParam));
+      searchSettings && dispatch(setSettings(JSON.parse(decompress(searchSettings))));
+      searchSoundSettings && dispatch(setSoundSettings(JSON.parse(decompress(searchSoundSettings))));
+      searchNotesArray  && dispatch(setNotes(JSON.parse(decompress(searchNotesArray))));
     }
     setPageIsStarted(false);
   }, []);
 
   // useEffect(() => {
-  //   const param = searchParams.get('params');
-  //   let count = 0;
-  //   const a = setInterval(() => {
-  //     console.log(count);
-  //     count = 0;
-  //   }, 1000);
-  //   const aa = setInterval(() => {
-  //     for (let i = 0; i < 150; i++) {
-  //       decompress(param);
-  //     }
-  //     count++;
-  //   }, 1);
-  //   // while (true) {
-  //   //   compress(obj);
-  //   //   // count++;
-  //   // }
-  // }, []);
+  //   const obj = { notesArray, settings, soundSettings };
+  //   !pageIsStarted && setSearchParams({params: compress(obj)});
+  // }, [notesArray, settings, soundSettings]);
 
-  useEffect(() => {
-    const obj = { notesArray, settings, soundSettings };
-    !pageIsStarted && setSearchParams('params=' + compress(obj));
-  }, [notesArray, settings, soundSettings]);
+
+  useEffect(() =>{
+    !pageIsStarted && setParam({settings: compress(settings)});
+  }, [settings]);
+
+  useEffect(() =>{
+    !pageIsStarted && setParam({soundSettings: compress(soundSettings)});
+  }, [soundSettings]);
+
+  useEffect(() =>{
+    !pageIsStarted && setParam({notesArray: compress(notesArray)});
+  }, [notesArray]);
 
   return <></>;
 };

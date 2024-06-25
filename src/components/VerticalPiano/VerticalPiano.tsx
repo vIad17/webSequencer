@@ -18,14 +18,17 @@ const VerticalPiano = ({ className = '' }: VerticalPianoProps) => {
     (state: RootState) => state.notesArray.playingNotes
   );
 
+  
   const dispatch = useDispatch();
-
+  
   const extraClassName = (note: string) => {
     const color = note.at(1) === '#' ? 'black' : 'white';
     const isActive = plaingNotes.includes(note);
     const className = `vertical-piano__key-${color}`;
     return `${className}${isActive ? ` ${className}__active` : ''}`;
   };
+  
+  console.log(extraClassName("D4"));
 
   const onMouseDown = (note: string) => {
     dispatch(setCurrentNote(note));

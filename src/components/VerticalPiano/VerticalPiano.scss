@@ -13,11 +13,11 @@
       background-color: #000;
       color: #fff;
 
-      &:active, &--active {
+      &:active, &__active {
         background-color: #555;
       }
     }
-    &-white:active, &-white--active {
+    &-white:active, &-white__active {
       background-color: #bbb;
     }
   }
