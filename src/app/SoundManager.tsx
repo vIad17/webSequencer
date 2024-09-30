@@ -65,7 +65,7 @@ synth.chain(
 /* creating a loop music */
 function playMusic(time: number) {
   const currentBit = store.getState().currentMusic.currentBit;
-  const tactsCounter = store.getState().settings.tacts;
+  const tactsCounter = store.getState().settings.tacts ?? 8;
   const notesArray = store.getState().notesArray.notesArray;
 
   notesArray.forEach((note) => {
@@ -106,7 +106,7 @@ keyboard.up((key: Key) => {
 
 /* creating a component */
 const SoundManager = () => {
-  const soundSettings = useSelector((state: RootState) => state.soundSettings);
+  const ss = useSelector((state: RootState) => state.soundSettings);
   const settings = useSelector((state: RootState) => state.settings);
   const currentNote = useSelector(
     (state: RootState) => state.notesArray.currentNote
@@ -122,30 +122,30 @@ const SoundManager = () => {
     setPrevNote(currentNote);
   }, [currentNote]);
 
-  synth.volume.value = soundSettings.volume - 12;
+  synth.volume.value = (ss.volume ?? 0) - 12;
   synth.set({
     oscillator: {
-      type: soundSettings.wave
+      type: ss.wave ?? "sine"
     },
     envelope: {
-      attack: soundSettings.attack,
-      decay: soundSettings.decay,
-      sustain: soundSettings.sustain,
-      release: soundSettings.release
+      attack: ss.attack ?? 0,
+      decay: ss.decay ?? 0,
+      sustain: ss.sustain ?? 1,
+      release: ss.release ?? 0
     }
   });
 
-  tremolo.frequency.value = soundSettings.tremoloFrequency;
-  tremolo.depth.value = soundSettings.tremoloDepth;
-  delay.delayTime.value = soundSettings.delayTime;
-  delay.feedback.value = soundSettings.feedback;
-  dist.distortion = soundSettings.distortion;
-  crusher.bits.value = soundSettings.bits;
-  shifter.pitch = soundSettings.pitchShift;
-  lowFilter.set({ frequency: soundSettings.lowFilter });
-  highFilter.set({ frequency: soundSettings.highFilter });
+  if(ss.tremoloFrequency) tremolo.frequency.value = ss.tremoloFrequency;
+  if(ss.tremoloDepth) tremolo.depth.value = ss.tremoloDepth;
+  if(ss.delayTime)delay.delayTime.value = ss.delayTime;
+  if(ss.feedback) delay.feedback.value = ss.feedback;
+  if(ss.distortion) dist.distortion = ss.distortion;
+  if(ss.bits) crusher.bits.value = ss.bits;
+  if(ss.pitchShift) shifter.pitch = ss.pitchShift;
+  if(ss.lowFilter) lowFilter.set({ frequency: ss.lowFilter });
+  if(ss.highFilter) highFilter.set({ frequency: ss.highFilter });
 
-  Tone.Transport.bpm.value = settings.bpm;
+  if(settings.bpm) Tone.Transport.bpm.value = settings.bpm;
 
   return <></>;
 };

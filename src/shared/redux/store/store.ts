@@ -5,8 +5,8 @@ import { melodyArraySlice } from 'src/shared/redux/slices/melodyArraySlice';
 import { notesArraySlice } from 'src/shared/redux/slices/notesArraySlice';
 import { settingsSlice } from 'src/shared/redux/slices/settingsSlice';
 import { soundSettingsSlice } from 'src/shared/redux/slices/soundSettingsSlice';
-
 import { drawableFieldSlice } from '../slices/drawableFieldSlice';
+import { copiedObjectsSlise } from '../slices/copiedObjectsSlise';
 
 const store = configureStore({
   reducer: {
@@ -15,7 +15,8 @@ const store = configureStore({
     [melodyArraySlice.name]: melodyArraySlice.reducer,
     [currentMusicSlice.name]: currentMusicSlice.reducer,
     [notesArraySlice.name]: notesArraySlice.reducer,
-    [drawableFieldSlice.name]: drawableFieldSlice.reducer
+    [drawableFieldSlice.name]: drawableFieldSlice.reducer,
+    [copiedObjectsSlise.name]: copiedObjectsSlise.reducer
   }
 });
 

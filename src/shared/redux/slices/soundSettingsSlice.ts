@@ -1,40 +1,40 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { NonCustomOscillatorType } from 'tone/build/esm/source/oscillator/OscillatorInterface';
 
-interface SoundSettingsState {
-  volume: number;
-  attack: number;
-  decay: number;
-  sustain: number;
-  release: number;
-  tremoloFrequency: number;
-  tremoloDepth: number;
-  delayTime: number;
-  feedback: number;
-  distortion: number;
-  bits: number;
-  pitchShift: number;
-  lowFilter: number;
-  highFilter: number;
-  wave: NonCustomOscillatorType;
+export interface SoundSettingsState {
+  volume: number | null;
+  attack: number | null;
+  decay: number | null;
+  sustain: number | null;
+  release: number | null;
+  tremoloFrequency: number | null;
+  tremoloDepth: number | null;
+  delayTime: number | null;
+  feedback: number | null;
+  distortion: number | null;
+  bits: number | null;
+  pitchShift: number | null;
+  lowFilter: number | null;
+  highFilter: number | null;
+  wave: NonCustomOscillatorType | null;
 }
 
 const initialState: SoundSettingsState = {
-  volume: 0,
-  attack: 0,
-  decay: 0,
-  sustain: 1,
-  release: 0,
-  tremoloFrequency: 0,
-  tremoloDepth: 0,
-  delayTime: 0,
-  feedback: 0,
-  distortion: 0,
-  bits: 16,
-  pitchShift: 0,
-  lowFilter: 20,
-  highFilter: 8000,
-  wave: 'sine'
+  volume: null,
+  attack: null,
+  decay: null,
+  sustain: null,
+  release: null,
+  tremoloFrequency: null,
+  tremoloDepth: null,
+  delayTime: null,
+  feedback: null,
+  distortion: null,
+  bits: null,
+  pitchShift: null,
+  lowFilter: null,
+  highFilter: null,
+  wave: null
 };
 
 export const soundSettingsSlice = createSlice({

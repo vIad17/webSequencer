@@ -1,18 +1,13 @@
 import pako from 'pako';
 
 export function compress(object: unknown) {
-  try {
-    const zippedObject = pako.gzip(JSON.stringify(object));
-    const codedToCharObject = String.fromCharCode.apply(
-      null,
-      Array.from(zippedObject)
-    );
-    const codedBase64Object = btoa(codedToCharObject).replaceAll('+', '%2b');
-    return codedBase64Object;
-  } catch {
-    console.error("ERROR: compressed error");
-    return '';
-  }
+  const zippedObject = pako.gzip(JSON.stringify(object));
+  const codedToCharObject = String.fromCharCode.apply(
+    null,
+    Array.from(zippedObject)
+  );
+  const codedBase64Object = btoa(codedToCharObject).replaceAll('+', '%2b');
+  return codedBase64Object;
 }
 
 export function decompress(codedBase64Object: string) {
@@ -24,8 +19,9 @@ export function decompress(codedBase64Object: string) {
     const dezippedObject = pako.inflate(new Uint8Array(decodedToCharObject));
     const decodedObject = new TextDecoder().decode(dezippedObject);
     return decodedObject;
-  } catch {
-    console.error("ERROR: decompressed error");
-    return '{}';
+  }
+  catch(e) {
+    console.error("decompress error: " + e);
+    return "{}";
   }
 }

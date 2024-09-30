@@ -15,7 +15,7 @@ const TactsNumbers = ({ className = '' }: TactsNumbersProps) => {
   );
 
   const renderTactsNumber = () =>
-    Array.from({ length: tactsCounter }, (_, i) => (
+    Array.from({ length: tactsCounter ?? 0 }, (_, i) => (
       <p className="tacts-number__tact" key={i}>
         {i}
       </p>

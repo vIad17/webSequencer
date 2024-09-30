@@ -44,6 +44,10 @@ export const notesArraySlice = createSlice({
       ...state,
       notesArray: [...state.notesArray, action.payload]
     }),
+    addNotes: (state, action: PayloadAction<Note[]>) => ({
+      ...state,
+      notesArray: [...state.notesArray, ...action.payload]
+    }),
     updateNotePosition: (
       state,
       action: PayloadAction<UpdateNotePositionType>
@@ -80,7 +84,7 @@ export const notesArraySlice = createSlice({
         (_, index) => index !== action.payload
       )
     }),
-    changeActive: (state, action: PayloadAction<ChangeActiveType>) => ({
+    changeActiveNote: (state, action: PayloadAction<ChangeActiveType>) => ({
       ...state,
       notesArray: state.notesArray.map((element, i) =>
         i === action.payload.index
@@ -88,12 +92,17 @@ export const notesArraySlice = createSlice({
           : { ...element, isActive: false }
       )
     }),
-    addActive: (state, action: PayloadAction<number>) => ({
+    addActiveNote: (state, action: PayloadAction<number>) => ({
       ...state,
       notesArray: state.notesArray.map((element, i) =>
         i === action.payload
           ? { ...element, isActive: !element.isActive }
           : element
+      )
+    }),
+    removeActiveNotes: (state) => ({
+      ...state,
+      notesArray: state.notesArray.map((element) => ({...element, isActive: false})
       )
     }),
     addPlayingNote: (state, action: PayloadAction<string>) => ({
@@ -120,10 +129,12 @@ export const {
   updateNotePosition,
   updateNoteDuration,
   deleteNote,
-  changeActive,
-  addActive,
+  changeActiveNote,
+  addActiveNote,
+  removeActiveNotes,
   addPlayingNote,
   removePlayingNote,
   setCurrentNote,
-  setDeltaSize
+  setDeltaSize,
+  addNotes
 } = notesArraySlice.actions;

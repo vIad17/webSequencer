@@ -1,13 +1,13 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
 interface SettingsState {
-  bpm: number;
-  tacts: number;
+  bpm: number | null;
+  tacts: number | null;
 }
 
 const initialState: SettingsState = {
-  bpm: 120,
-  tacts: 8
+  bpm: null,
+  tacts: null
 };
 
 export const settingsSlice = createSlice({

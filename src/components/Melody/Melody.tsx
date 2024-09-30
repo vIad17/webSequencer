@@ -15,7 +15,7 @@ const Melody = ({ className = '' }: MelodyProps) => {
   const tactsCounter = useSelector((state: RootState) => state.settings.tacts);
 
   const renderTacts = () =>
-    Array.from({ length: tactsCounter }, (_, i) => (
+    Array.from({ length: tactsCounter ?? 0 }, (_, i) => (
       <Tact key={i} tactNumber={i} />
     ));
 

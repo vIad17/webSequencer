@@ -7,14 +7,21 @@ import {
   ARROW_LEFT,
   ARROW_RIGHT,
   ARROW_UP,
-  ESCAPE
+  BACKSPACE,
+  C,
+  ESCAPE,
+  V,
+  Z
 } from 'src/shared/const/KeyboardKeys';
 import { clamp, round } from 'src/shared/functions/math';
 import {
-  addActive,
-  changeActive,
+  addActiveNote,
+  addNotes,
+  changeActiveNote,
   deleteNote,
+  removeActiveNotes,
   setDeltaSize,
+  setNotes,
   updateNoteDuration,
   updateNotePosition
 } from 'src/shared/redux/slices/notesArraySlice';
@@ -22,6 +29,11 @@ import { RootState } from 'src/shared/redux/store/store';
 
 import CreationField from '../CreationField/CreationField';
 import DraggableNote from '../DraggableNote/DraggableNote';
+import {
+  setCopiedObjects,
+  deleteObjects
+} from 'src/shared/redux/slices/copiedObjectsSlise';
+import { useNavigate } from 'react-router-dom';
 
 const moveByGreed = {
   ArrowUp: { x: 0, y: -1 },
@@ -38,7 +50,15 @@ const NoteManager = () => {
   const notesArray = useSelector(
     (state: RootState) => state.notesArray.notesArray
   );
+  const copiedObjects = useSelector(
+    (state: RootState) => state.copiedObjects.objects
+  );
   const drawableField = useSelector((state: RootState) => state.drawableField);
+  const currentBit = useSelector(
+    (state: RootState) => state.currentMusic.currentBit
+  );
+
+  const navigate = useNavigate();
 
   const dispatch = useDispatch();
 
@@ -81,7 +101,32 @@ const NoteManager = () => {
 
   const KeyDownHandler = (event: KeyboardEvent) => {
     if (event.key === ESCAPE) {
-      dispatch(changeActive({ index: 0, isActive: false }));
+      dispatch(removeActiveNotes());
+    }
+    if (event.ctrlKey && event.key === C) {
+      const activeNotes = notesArray.filter((note) => note.isActive);
+      dispatch(setCopiedObjects(activeNotes));
+    }
+    if (event.ctrlKey && event.key === V) {
+      dispatch(removeActiveNotes());
+      const deltaPosition =
+        currentBit - Math.min(...copiedObjects.map((obj) => obj.attackTime));
+      const pastedObjects = copiedObjects.map((obj) => ({
+        ...obj,
+        attackTime: obj.attackTime + deltaPosition
+      }));
+      dispatch(addNotes(pastedObjects));
+    }
+    if (event.ctrlKey && !event.shiftKey && event.key === Z) {
+      navigate(-1);
+    }
+    if (event.ctrlKey && event.shiftKey && event.key === Z) {
+      navigate(1);
+    }
+    if (event.key === BACKSPACE) {
+      const activeNotesIndex = notesArray.map((note, index) => {
+        if (note.isActive) return index;
+      });
     }
     if (
       event.key === ARROW_UP ||
@@ -189,16 +234,16 @@ const NoteManager = () => {
   const changeActiveNoteHandler = (e: React.MouseEvent, index1: number) => {
     if (!notesArray[index1].isActive) {
       if (e.shiftKey) {
-        dispatch(addActive(index1));
+        dispatch(addActiveNote(index1));
       } else {
-        dispatch(changeActive({ index: index1, isActive: true }));
+        dispatch(changeActiveNote({ index: index1, isActive: true }));
       }
     }
   };
 
   const NoteMouseUpHandler = (e: React.MouseEvent, index1: number) => {
     if (!isDragg && !isResizing && !e.shiftKey) {
-      dispatch(changeActive({ index: index1, isActive: true }));
+      dispatch(changeActiveNote({ index: index1, isActive: true }));
     }
     setIsDragg(false);
     setIsBlockedCreation(false);
@@ -209,7 +254,7 @@ const NoteManager = () => {
     return () => {
       document.removeEventListener('keydown', KeyDownHandler);
     };
-  }, [notesArray]);
+  }, [notesArray, currentBit, copiedObjects]);
 
   const renderArray = () =>
     notesArray?.map((element, index) => (

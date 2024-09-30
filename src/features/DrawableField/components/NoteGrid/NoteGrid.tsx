@@ -32,7 +32,7 @@ const NoteGrid = ({ className = '' }: NoteGridProps) => {
   const dispatch = useDispatch();
 
   useEffect(() => {
-    dispatch(setColumnsCount(tactsCount * 16));
+    tactsCount && dispatch(setColumnsCount(tactsCount * 16));
   }, [tactsCount]);
 
   useEffect(() => {
@@ -75,12 +75,14 @@ const NoteGrid = ({ className = '' }: NoteGridProps) => {
     }
   };
 
-  return (
+  return tactsCount ? (
     <Sketch
       className={`grid ${className}`}
       setup={(p5, canvasParentRef) => setup(p5 as p5SVG, canvasParentRef)}
       draw={draw}
     />
+  ) : (
+    <></>
   );
 };
 
