@@ -21,6 +21,7 @@ import { RootState } from 'src/shared/redux/store/store';
 
 import './SoundSettings.scss';
 import RangeSetting from './RangeSetting';
+import EffectCard from 'src/features/Effects/components/EffectCard/EffectCard';
 
 interface SoundSettingsProps {
   className?: string;
@@ -202,6 +203,9 @@ const SoundSettings = ({ className = '' }: SoundSettingsProps) => {
           <></>
         )}
       </ul>
+      <EffectCard name="Oscillator" >
+        asdfghj
+      </EffectCard>
     </div>
   );
 };
