@@ -203,9 +203,9 @@ const SoundSettings = ({ className = '' }: SoundSettingsProps) => {
           <></>
         )}
       </ul>
-      <EffectCard name="Oscillator" >
+      {/* <EffectCard name="Oscillator" >
         asdfghj
-      </EffectCard>
+      </EffectCard> */}
     </div>
   );
 };
