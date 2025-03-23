@@ -6,7 +6,6 @@ const App = () => (
   <div className="App">
     <Router />
     <SoundManager />
-    <SearchParamsManager />
   </div>
 );
 

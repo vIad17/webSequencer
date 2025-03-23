@@ -35,7 +35,7 @@ yarn --version
 ```
 6. Установите зависимости:
 ```bash
-yarn install
+yarn
 ```
 
 ### Запуск

@@ -9,7 +9,7 @@ interface MySketchProps {
 
 const drawSketch = (
   svg: d3.Selection<SVGSVGElement | null, unknown, null, undefined>,
-  buffer: Float32Array<ArrayBufferLike>,
+  buffer: Float32Array,
   width: number,
   height: number
 ) => {
@@ -92,7 +92,7 @@ const MySketch = ({ className = '' }: MySketchProps) => {
     };
   }, []);
 
-  return <svg ref={svgRef} className={`sketch ${className}`}></svg>;
+  return <svg ref={svgRef} className={`sketch ${className}`} />;
 };
 
 export default MySketch;
