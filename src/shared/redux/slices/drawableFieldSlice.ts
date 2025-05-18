@@ -8,8 +8,8 @@ interface DrawableFieldState {
 }
 
 const initialState: DrawableFieldState = {
-  elementWidth: 20,
-  elementHeight: 35,
+  elementWidth: 24,
+  elementHeight: 46,
   columnsCount: 100,
   rowsCount: 72
 };

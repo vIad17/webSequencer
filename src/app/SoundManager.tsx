@@ -5,10 +5,17 @@ import AudioKeys, { Key } from 'audiokeys';
 import * as Tone from 'tone';
 
 import { pitchNotes } from 'src/shared/const/notes';
-import { setCurrentBit } from 'src/shared/redux/slices/currentMusicSlice';
 import {
+  setCurrentBit,
+  setIsPlaying
+} from 'src/shared/redux/slices/currentMusicSlice';
+import {
+  addSelectedNote,
   addPlayingNote,
-  removePlayingNote
+  changeSelectedNote,
+  removePlayingNote,
+  setActiveNote,
+  removeActiveNotes
 } from 'src/shared/redux/slices/notesArraySlice';
 import store, { RootState } from 'src/shared/redux/store/store';
 
@@ -68,8 +75,9 @@ function playMusic(time: number) {
   const tactsCounter = store.getState().settings.tacts ?? 8;
   const notesArray = store.getState().notesArray.notesArray;
 
-  notesArray.forEach((note) => {
+  notesArray.forEach((note, index) => {
     if (note.attackTime === currentBit) {
+      store.dispatch(setActiveNote({ index, isActive: true }));
       synth.triggerAttackRelease(
         pitchNotes[note.note],
         `0:0:${note.duration}`,
@@ -78,11 +86,26 @@ function playMusic(time: number) {
       store.dispatch(addPlayingNote(pitchNotes[note.note]));
     }
     if (note.attackTime + note.duration <= currentBit) {
+      note.isActive &&
+        store.dispatch(setActiveNote({ index, isActive: false }));
       store.dispatch(removePlayingNote(pitchNotes[note.note]));
     }
   });
 
   store.dispatch(setCurrentBit((currentBit + 1) % (tactsCounter * 16)));
+}
+
+export function pauseMusic() {
+  store.dispatch(removeActiveNotes());
+  store.dispatch(setIsPlaying(false));
+  Tone.Transport.pause();
+}
+
+export function stopMusic() {
+  store.dispatch(removeActiveNotes());
+  store.dispatch(setCurrentBit(0));
+  store.dispatch(setIsPlaying(false));
+  Tone.Transport.stop();
 }
 
 new Tone.Loop(playMusic, '16n').start();
@@ -125,7 +148,7 @@ const SoundManager = () => {
   synth.volume.value = (ss.volume ?? 0) - 12;
   synth.set({
     oscillator: {
-      type: ss.wave ?? "sine"
+      type: ss.wave ?? 'sine'
     },
     envelope: {
       attack: ss.attack ?? 0,
@@ -135,17 +158,17 @@ const SoundManager = () => {
     }
   });
 
-  if(ss.tremoloFrequency) tremolo.frequency.value = ss.tremoloFrequency;
-  if(ss.tremoloDepth) tremolo.depth.value = ss.tremoloDepth;
-  if(ss.delayTime)delay.delayTime.value = ss.delayTime;
-  if(ss.feedback) delay.feedback.value = ss.feedback;
-  if(ss.distortion) dist.distortion = ss.distortion;
-  if(ss.bits) crusher.bits.value = ss.bits;
-  if(ss.pitchShift) shifter.pitch = ss.pitchShift;
-  if(ss.lowFilter) lowFilter.set({ frequency: ss.lowFilter });
-  if(ss.highFilter) highFilter.set({ frequency: ss.highFilter });
+  if (ss.tremoloFrequency) tremolo.frequency.value = ss.tremoloFrequency;
+  if (ss.tremoloDepth) tremolo.depth.value = ss.tremoloDepth;
+  if (ss.delayTime) delay.delayTime.value = ss.delayTime;
+  if (ss.feedback) delay.feedback.value = ss.feedback;
+  if (ss.distortion) dist.distortion = ss.distortion;
+  if (ss.bits) crusher.bits.value = ss.bits;
+  if (ss.pitchShift) shifter.pitch = ss.pitchShift;
+  if (ss.lowFilter) lowFilter.set({ frequency: ss.lowFilter });
+  if (ss.highFilter) highFilter.set({ frequency: ss.highFilter });
 
-  if(settings.bpm) Tone.Transport.bpm.value = settings.bpm;
+  if (settings.bpm) Tone.Transport.bpm.value = settings.bpm;
 
   return <></>;
 };

@@ -5,12 +5,14 @@ import { useSelector } from 'react-redux';
 import { RootState } from 'src/shared/redux/store/store';
 
 import './DraggableNote.scss';
+import clsx from 'clsx';
 
 interface DraggableNoteProps {
   x: number;
   y: number;
   size?: number;
   index: number;
+  isSelected?: boolean;
   isActive?: boolean;
   onDrag?: (e: DraggableEvent, position: DraggableData) => void;
   onMouseDown?: (e: React.MouseEvent, index: number) => void;
@@ -24,6 +26,7 @@ const DraggableNote = ({
   y,
   size = 4,
   index,
+  isSelected = false,
   isActive = false,
   onDrag = () => {},
   onMouseDown = () => {},
@@ -39,7 +42,7 @@ const DraggableNote = ({
     (state: RootState) => state.notesArray.deltaSize
   );
 
-  const tempSize = isActive
+  const tempSize = isSelected
     ? Math.max(
         size * elementWidth +
           Math.min(deltaSize, (columnsCount - (x + size)) * elementWidth),
@@ -59,7 +62,10 @@ const DraggableNote = ({
       grid={[elementWidth, elementHeight]}
     >
       <div
-        className={`draggable-note ${isActive && 'draggable-note--active'}`}
+        className={clsx('draggable-note', {
+          'draggable-note--selected': isSelected,
+          'draggable-note--active': isActive
+        })}
         onMouseDownCapture={(e) => onMouseDown(e, index)}
         onMouseUpCapture={(e) => onMouseUp(e, index)}
         onContextMenu={(e) => onRightClick(e, index)}

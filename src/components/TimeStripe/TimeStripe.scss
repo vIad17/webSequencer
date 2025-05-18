@@ -1,4 +1,6 @@
 .time-stripe {
+  // height: 0;
+  width: 100%;
   &__stripe {
     height: 30px;
     width: fit-content;
@@ -8,7 +10,14 @@
     position: absolute;
     pointer-events: none;
     transform: translateX(var(--x));
-    z-index: 10;
+    z-index: 1000;
+    height: 100dvh;
+  }
+
+  &__wrap {
+    position: sticky;
+    top: 0;
+    left: 200px;
   }
 
   &_animated &__timeline {

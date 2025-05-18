@@ -2,6 +2,7 @@ export interface Note {
   attackTime: number;
   note: number;
   duration: number;
+  isSelected?: boolean;
   isActive?: boolean;
 }
 

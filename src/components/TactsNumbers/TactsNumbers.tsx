@@ -3,6 +3,8 @@ import { useSelector } from 'react-redux';
 import { RootState } from 'src/shared/redux/store/store';
 
 import './TactsNumbers.scss';
+import clsx from 'clsx';
+import TimeStripe from '../TimeStripe/TimeStripe';
 
 interface TactsNumbersProps {
   className?: string;
@@ -16,9 +18,15 @@ const TactsNumbers = ({ className = '' }: TactsNumbersProps) => {
 
   const renderTactsNumber = () =>
     Array.from({ length: tactsCounter ?? 0 }, (_, i) => (
-      <p className="tacts-number__tact" key={i}>
-        {i}
-      </p>
+      <div
+        className={clsx('tacts-number__tact', {
+          'tacts-number__tact_first': i === 0
+        })}
+        key={i}
+        style={{ '--width': `${elementWidth * 16}px` }}
+      >
+        <p className="tacts-number__tact-text">{i}</p>
+      </div>
     ));
 
   return (
@@ -26,6 +34,7 @@ const TactsNumbers = ({ className = '' }: TactsNumbersProps) => {
       className={`tacts-number ${className}`}
       style={{ '--width': `${elementWidth * 16}px` }}
     >
+      {/* <TimeStripe className="tacts-number__time-stripe" /> */}
       {renderTactsNumber()}
     </div>
   );

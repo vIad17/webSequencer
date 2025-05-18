@@ -15,11 +15,11 @@ import {
 } from 'src/shared/const/KeyboardKeys';
 import { clamp, round } from 'src/shared/functions/math';
 import {
-  addActiveNote,
+  addSelectedNote,
   addNotes,
-  changeActiveNote,
+  changeSelectedNote,
   deleteNote,
-  removeActiveNotes,
+  removeSelectedNotes,
   setDeltaSize,
   setNotes,
   updateNoteDuration,
@@ -42,7 +42,11 @@ const moveByGreed = {
   ArrowLeft: { x: -1, y: 0 }
 };
 
-const NoteManager = () => {
+interface NoteManagerProps {
+  className?: string;
+}
+
+const NoteManager = ({className} : NoteManagerProps) => {
   const [isResizing, setIsResizing] = useState(false);
   const [isDragg, setIsDragg] = useState(false);
   const [isblockedCreation, setIsBlockedCreation] = useState(false);
@@ -67,7 +71,7 @@ const NoteManager = () => {
     let localDeltaY = deltaY;
 
     notesArray.forEach((note) => {
-      if (note.isActive) {
+      if (note.isSelected) {
         if (note.attackTime + localDeltaX < 0) {
           localDeltaX = -note.attackTime;
         } else {
@@ -88,7 +92,7 @@ const NoteManager = () => {
     });
 
     notesArray.forEach((note, index) => {
-      note.isActive &&
+      note.isSelected &&
         dispatch(
           updateNotePosition({
             index,
@@ -101,14 +105,14 @@ const NoteManager = () => {
 
   const KeyDownHandler = (event: KeyboardEvent) => {
     if (event.key === ESCAPE) {
-      dispatch(removeActiveNotes());
+      dispatch(removeSelectedNotes());
     }
     if (event.ctrlKey && event.key === C) {
-      const activeNotes = notesArray.filter((note) => note.isActive);
+      const activeNotes = notesArray.filter((note) => note.isSelected);
       dispatch(setCopiedObjects(activeNotes));
     }
     if (event.ctrlKey && event.key === V) {
-      dispatch(removeActiveNotes());
+      dispatch(removeSelectedNotes());
       const deltaPosition =
         currentBit - Math.min(...copiedObjects.map((obj) => obj.attackTime));
       const pastedObjects = copiedObjects.map((obj) => ({
@@ -125,7 +129,7 @@ const NoteManager = () => {
     }
     if (event.key === BACKSPACE) {
       const activeNotesIndex = notesArray.map((note, index) => {
-        if (note.isActive) return index;
+        if (note.isSelected) return index;
       });
     }
     if (
@@ -148,7 +152,7 @@ const NoteManager = () => {
           deltaDuration = -1 * multiplier;
         }
         notesArray.forEach((note, index) => {
-          if (note.isActive) {
+          if (note.isSelected) {
             dispatch(
               updateNoteDuration({
                 index,
@@ -207,7 +211,7 @@ const NoteManager = () => {
       document.body.removeEventListener('mousemove', onMouseMove);
 
       notesArray.forEach((note, index) => {
-        if (note.isActive) {
+        if (note.isSelected) {
           dispatch(
             updateNoteDuration({
               index,
@@ -231,19 +235,19 @@ const NoteManager = () => {
     document.body.addEventListener('mouseup', onMouseUp, { once: true });
   };
 
-  const changeActiveNoteHandler = (e: React.MouseEvent, index1: number) => {
-    if (!notesArray[index1].isActive) {
+  const changeSelectedNoteHandler = (e: React.MouseEvent, index1: number) => {
+    if (!notesArray[index1].isSelected) {
       if (e.shiftKey) {
-        dispatch(addActiveNote(index1));
+        dispatch(addSelectedNote(index1));
       } else {
-        dispatch(changeActiveNote({ index: index1, isActive: true }));
+        dispatch(changeSelectedNote({ index: index1, isSelected: true }));
       }
     }
   };
 
   const NoteMouseUpHandler = (e: React.MouseEvent, index1: number) => {
     if (!isDragg && !isResizing && !e.shiftKey) {
-      dispatch(changeActiveNote({ index: index1, isActive: true }));
+      dispatch(changeSelectedNote({ index: index1, isSelected: true }));
     }
     setIsDragg(false);
     setIsBlockedCreation(false);
@@ -264,9 +268,10 @@ const NoteManager = () => {
         y={element.note}
         size={element.duration}
         index={index}
+        isSelected={element.isSelected}
         isActive={element.isActive}
         onDrag={dragNoteHandler}
-        onMouseDown={changeActiveNoteHandler}
+        onMouseDown={changeSelectedNoteHandler}
         onMouseUp={NoteMouseUpHandler}
         onRightClick={deleteNoteHandler}
         onSizeableClick={resizeNoteHandler}
@@ -275,7 +280,7 @@ const NoteManager = () => {
 
   return (
     <>
-      <CreationField
+      <CreationField className={className}
         isblockedCreation={isblockedCreation}
         setIsBlockedCreation={setIsBlockedCreation}
       />

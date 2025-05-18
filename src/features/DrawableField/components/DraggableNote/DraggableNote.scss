@@ -4,20 +4,42 @@
   justify-content: end;
   border: none;
   outline: none;
-  background-color: #00BFFF;
+  background-color: var(--colors-bg-primary);
   font-size: 16px;
-  box-shadow: 0 0 0 1px #191970;
-  overflow:hidden;
+  border-radius: 2px;
+  box-shadow: 0 0 0 4px var(--colors-text-primary);
+  overflow: hidden;
   position: absolute;
   top: 0;
   z-index: 2;
   padding: 0;
 
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0; right: 0; bottom: 0;
+    width: 0;
+    background: linear-gradient(0.25turn, var(--colors-bg-primary), #81138d);
+    transition: width 0.1s ease;
+    z-index: -1;
+  }
+
+  transition: box-shadow 0.2s ease;
+
   width: var(--width);
   height: var(--height);
 
   &--active {
-    box-shadow: 0 0 0 3px #191970;
+    box-shadow: 0 0 0 3px var(--colors-ui-accent);
+
+    &::before {
+      width: 100%;
+      transition-duration: 0.2s;
+    }
+  }
+
+  &--selected {
+    box-shadow: 0 0 0 3px var(--colors-ui-accent);
   }
 
   &__resizible-button {
@@ -27,4 +49,3 @@
     margin-left: 15px;
   }
 }
-  

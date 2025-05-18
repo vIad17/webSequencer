@@ -1,12 +1,61 @@
 .tacts-number {
   display: flex;
   width: fit-content;
-  background-color: #fff;
-  border: 1px solid #000;
-
+  background: none;
+  gap: 0;
+  grid-row: 2;
   $width: var(--width);
 
+  position: sticky;
+  // left: 30px;
+  top: 0;
+  z-index: 13;
+
   &__tact {
+
+    grid-row: 2;
+    // padding-left: 100px;
+
+    background-color: var(--colors-bg-primary);
+
+    border-bottom: 1px solid rgba(255, 255, 255, 0.4);
+    border-radius: 4px;
+    position: sticky;
+    left: 100px;
+    top: 0;
+    z-index: 13;
     width: $width;
+    box-sizing: border-box;
+  }
+
+  &__tact-text {
+    // position: absolute;
+    margin-bottom: -26px;
+    margin-left: -20px;
+    width: fit-content;
+    background-color: var(--colors-bg-primary);
+    padding: 14px;
+    border: #4e545b 1px solid;
+    border-radius: 4px;
+
+    color: var(--colors-text-primary);
+  }
+
+  &__time-stripe {
+    position: absolute;
+    z-index: 100;
+
+    // position: sticky;
+    top: 0;
+    // left: 0
+    clip-path: polygon(
+      100px 0,        /* верхняя левая точка смещена вправо на 100px */
+      100% 0,         /* верхний правый угол */
+      100% 100%,      /* нижний правый угол */
+      100px 100%,     /* нижняя левая точка смещена вправо на 100px */
+                /* верхний левый угол (за пределами видимой области) */
+    );
+    width: 100%;
+    height: 100%;
   }
 }

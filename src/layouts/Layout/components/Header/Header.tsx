@@ -3,19 +3,20 @@ import { useDispatch, useSelector } from 'react-redux';
 
 import * as Tone from 'tone';
 
-import {
-  setCurrentBit,
-  setIsPlaying
-} from 'src/shared/redux/slices/currentMusicSlice';
+import { setIsPlaying } from 'src/shared/redux/slices/currentMusicSlice';
 import { setColumnsCount } from 'src/shared/redux/slices/drawableFieldSlice';
 import { setBpm, setTacts } from 'src/shared/redux/slices/settingsSlice';
 import { RootState } from 'src/shared/redux/store/store';
 
-import pauseIcon from './images/pause_icon.png';
-import startIcom from './images/play_icon.png';
-import stopIcon from './images/stop_icon.png';
+// import pauseIcon from './images/pause_icon.png';
+// import startIcom from './images/play_icon.png';
+// import stopIcon from './images/stop_icon.png';
+import startIcon from './images/playIcon.svg';
+import stopIcon from './images/stopIcon.svg';
+import pauseIcon from './images/pauseIcon.svg';
 
 import './Header.scss';
+import { pauseMusic, stopMusic } from 'src/app/SoundManager';
 
 interface HeaderProps {
   className?: string;
@@ -31,7 +32,7 @@ const Header = ({ className = '' }: HeaderProps) => {
 
   return (
     <header className={`header ${className}`}>
-      {settings.bpm || settings.tacts ? (
+      {(!!settings.bpm || !!settings.tacts) && (
         <div className="header__buttons">
           <button
             className="header__button"
@@ -45,31 +46,18 @@ const Header = ({ className = '' }: HeaderProps) => {
           >
             <img
               className="header__icon header__icon-start"
-              src={startIcom}
+              src={startIcon}
               alt="start"
             />
           </button>
-          <button
-            className="header__button"
-            onClick={() => {
-              Tone.Transport.pause();
-              dispatch(setIsPlaying(false));
-            }}
-          >
+          <button className="header__button" onClick={pauseMusic}>
             <img
               className="header__icon header__icon-pause"
               src={pauseIcon}
               alt="pause"
             />
           </button>
-          <button
-            className="header__button"
-            onClick={() => {
-              dispatch(setCurrentBit(0));
-              dispatch(setIsPlaying(false));
-              Tone.Transport.stop();
-            }}
-          >
+          <button className="header__button" onClick={stopMusic}>
             <img
               className="header__icon header__icon_stop"
               src={stopIcon}
@@ -77,55 +65,54 @@ const Header = ({ className = '' }: HeaderProps) => {
             />
           </button>
         </div>
-      ) : (
-        <></>
       )}
 
-      {settings.bpm ? (
-        <form
-          onSubmit={(event) => {
-            event.preventDefault();
-            dispatch(setBpm(myBpm));
-          }}
-        >
-          bpm
-          <input
-            className="header__input"
-            type="text"
-            defaultValue={settings.bpm}
-            onChange={(event) => {
-              if (Number(event.target.value)) {
-                setMyBpm(Number(event.target.value));
-              }
+      <div className="header__inputs">
+        {!!settings.bpm && (
+          <form
+            className="header__input-form"
+            onSubmit={(event) => {
+              event.preventDefault();
+              dispatch(setBpm(myBpm));
             }}
-          />
-        </form>
-      ) : (
-        <></>
-      )}
-      {settings.tacts ? (
-        <form
-          onSubmit={(event) => {
-            event.preventDefault();
-            dispatch(setTacts(myTacts));
-            dispatch(setColumnsCount(myTacts * 16));
-          }}
-        >
-          tacts
-          <input
-            className="header__input"
-            type="text"
-            defaultValue={settings.tacts}
-            onChange={(event) => {
-              if (Number(event.target.value)) {
-                setMyTacts(Number(event.target.value));
-              }
+          >
+            bpm
+            <input
+              className="header__input"
+              type="text"
+              defaultValue={settings.bpm}
+              onChange={(event) => {
+                if (Number(event.target.value)) {
+                  setMyBpm(Number(event.target.value));
+                }
+              }}
+            />
+          </form>
+        )}
+
+        {!!settings.tacts && (
+          <form
+            className="header__input-form"
+            onSubmit={(event) => {
+              event.preventDefault();
+              dispatch(setTacts(myTacts));
+              dispatch(setColumnsCount(myTacts * 16));
             }}
-          />
-        </form>
-      ) : (
-        <></>
-      )}
+          >
+            tacts
+            <input
+              className="header__input"
+              type="text"
+              defaultValue={settings.tacts}
+              onChange={(event) => {
+                if (Number(event.target.value)) {
+                  setMyTacts(Number(event.target.value));
+                }
+              }}
+            />
+          </form>
+        )}
+      </div>
     </header>
   );
 };

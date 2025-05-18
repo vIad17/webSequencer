@@ -13,6 +13,11 @@ export interface UpdateNotePositionType {
   note: number;
 }
 
+export interface ChangeSelectedType {
+  index: number;
+  isSelected?: boolean;
+}
+
 export interface ChangeActiveType {
   index: number;
   isActive?: boolean;
@@ -84,26 +89,46 @@ export const notesArraySlice = createSlice({
         (_, index) => index !== action.payload
       )
     }),
-    changeActiveNote: (state, action: PayloadAction<ChangeActiveType>) => ({
+    changeSelectedNote: (state, action: PayloadAction<ChangeSelectedType>) => ({
       ...state,
       notesArray: state.notesArray.map((element, i) =>
         i === action.payload.index
-          ? { ...element, isActive: action.payload.isActive ?? true }
-          : { ...element, isActive: false }
+          ? { ...element, isSelected: action.payload.isSelected ?? true }
+          : { ...element, isSelected: false }
       )
     }),
-    addActiveNote: (state, action: PayloadAction<number>) => ({
+    setActiveNote: (state, action: PayloadAction<ChangeActiveType>) => ({
       ...state,
       notesArray: state.notesArray.map((element, i) =>
-        i === action.payload
-          ? { ...element, isActive: !element.isActive }
+        i === action.payload.index
+          ? {
+              ...element,
+              isActive: action.payload.isActive ?? !element.isActive
+            }
           : element
       )
     }),
     removeActiveNotes: (state) => ({
       ...state,
-      notesArray: state.notesArray.map((element) => ({...element, isActive: false})
+      notesArray: state.notesArray.map((element) => ({
+        ...element,
+        isActive: false
+      }))
+    }),
+    addSelectedNote: (state, action: PayloadAction<number>) => ({
+      ...state,
+      notesArray: state.notesArray.map((element, i) =>
+        i === action.payload
+          ? { ...element, isSelected: !element.isSelected }
+          : element
       )
+    }),
+    removeSelectedNotes: (state) => ({
+      ...state,
+      notesArray: state.notesArray.map((element) => ({
+        ...element,
+        isSelected: false
+      }))
     }),
     addPlayingNote: (state, action: PayloadAction<string>) => ({
       ...state,
@@ -129,9 +154,11 @@ export const {
   updateNotePosition,
   updateNoteDuration,
   deleteNote,
-  changeActiveNote,
-  addActiveNote,
+  changeSelectedNote,
+  addSelectedNote,
+  setActiveNote,
   removeActiveNotes,
+  removeSelectedNotes,
   addPlayingNote,
   removePlayingNote,
   setCurrentNote,

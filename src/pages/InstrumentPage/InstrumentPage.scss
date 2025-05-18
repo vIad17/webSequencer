@@ -1,21 +1,28 @@
 .instrument-page {
+
+  $tacts-count: var(--tacts-count);
+  $width: var(--element-width);
+
+  // margin-top: 50px;
   height: 100%;
   overflow: auto;
   display: grid;
-  grid-template-columns: 100px auto;
+  grid-template-columns: 100px repeat($tacts-count, $width);
 
   &__drawable-field {
     display: flex;
     width: fit-content;
+    grid-row: 3;
   }
 
   &__vertical-piano {
     position: sticky;
     left: 0;
     z-index: 12;
+    grid-row: 3;
   }
 
-  background-color: #DCDCDC;
+  background-color: var(--colors-bg-primary);
 
   &::-webkit-scrollbar {
     display: none;
@@ -25,18 +32,46 @@
 .top-field {
   display: flex;
 
+  &__left {
+    display: flex;
+    flex-direction: column;
+    // position: sticky;
+    // left: 0;
+  }
+
+  &__right {
+    // position: sticky;
+    // left: 0;
+    width: 80dvw;
+    height: 100%;
+    overflow-x: auto;
+  }
+
+  &__tacts-number {
+    // width: 100dvw;
+  }
+
   &__empty {
+    height: 30px;
     min-width: 100px;
     position: sticky;
-    background-color: #DCDCDC;
+    background-color: var(--colors-bg-primary);
+
+    border-bottom: 1px solid rgba(255, 255, 255, 0.4);
     top: 0;
     left: 0;
     z-index: 13;
+    grid-row: 2;
   }
 
   &__content {
     position: sticky;
     top: 0;
     z-index: 11;
+  }
+
+  &__time-stripe {
+    grid-column: 1 / var(--tacts-count);
+    grid-row: 1;
   }
 }

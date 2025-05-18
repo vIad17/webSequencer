@@ -9,16 +9,22 @@
     text-align: left;
     padding-left: 15px;
 
+    color: var(--colors-text-primary);
+    border: var(--colors-ui-secondary) 1px solid;
+
     &-black {
-      background-color: #000;
-      color: #fff;
+      background: var(--colors-bg-primary);
 
       &:active, &--active {
         background-color: #555;
       }
     }
-    &-white:active, &-white--active {
-      background-color: #bbb;
+    &-white{
+      background-color: #001629;
+
+      &:active, &-white--active {
+        background-color: #001629;
+      }
     }
-  }
+    }
 }
