@@ -16,7 +16,7 @@ const NoteGrid = ({ className = '' }: NoteGridProps) => {
   const svgRef = useRef<SVGSVGElement | null>(null);
 
   const drawableField = useSelector((state: RootState) => state.drawableField);
-  const tactsCount = useSelector((state: RootState) => state.settings.tacts);
+  const tactsCount = useSelector((state: RootState) => state.settings.tacts) ?? 8;
 
   const elemWidth = drawableField.elementWidth;
   const elemHeight = drawableField.elementHeight;

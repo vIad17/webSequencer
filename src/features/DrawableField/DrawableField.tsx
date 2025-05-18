@@ -6,14 +6,15 @@ import './DrawableField.scss';
 
 interface DrawableFieldProps {
   className?: string;
+  isPreview?: boolean;
 }
 
-const DrawableField = ({ className = '' }: DrawableFieldProps) => {
+const DrawableField = ({ className = '', isPreview = false }: DrawableFieldProps) => {
   return (
     <div className={`drawable-field ${className}`}>
-      <TimeStripe className="drawable-field__time-stripe" />
-      <NoteGrid className="drawable-field__note-grid"/>
-      <NoteManager className="drawable-field__note-manager"/>
+      {!isPreview && <TimeStripe className="drawable-field__time-stripe" />}
+      <NoteGrid className="drawable-field__note-grid" />
+      <NoteManager className="drawable-field__note-manager" isEditable={!isPreview}/>
     </div>
   );
 };

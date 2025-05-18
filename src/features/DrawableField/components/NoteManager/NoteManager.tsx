@@ -44,9 +44,10 @@ const moveByGreed = {
 
 interface NoteManagerProps {
   className?: string;
+  isEditable?: boolean
 }
 
-const NoteManager = ({className} : NoteManagerProps) => {
+const NoteManager = ({className, isEditable = true} : NoteManagerProps) => {
   const [isResizing, setIsResizing] = useState(false);
   const [isDragg, setIsDragg] = useState(false);
   const [isblockedCreation, setIsBlockedCreation] = useState(false);
@@ -270,18 +271,18 @@ const NoteManager = ({className} : NoteManagerProps) => {
         index={index}
         isSelected={element.isSelected}
         isActive={element.isActive}
-        onDrag={dragNoteHandler}
-        onMouseDown={changeSelectedNoteHandler}
-        onMouseUp={NoteMouseUpHandler}
-        onRightClick={deleteNoteHandler}
-        onSizeableClick={resizeNoteHandler}
+        onDrag={isEditable ? dragNoteHandler : () => {}}
+        onMouseDown={isEditable ? changeSelectedNoteHandler : () => {}}
+        onMouseUp={isEditable ? NoteMouseUpHandler : () => {}}
+        onRightClick={isEditable ? deleteNoteHandler : () => {}}
+        onSizeableClick={isEditable ? resizeNoteHandler : () => {}}
       />
     ));
 
   return (
     <>
       <CreationField className={className}
-        isblockedCreation={isblockedCreation}
+        isblockedCreation={isblockedCreation || !isEditable}
         setIsBlockedCreation={setIsBlockedCreation}
       />
       {renderArray()}

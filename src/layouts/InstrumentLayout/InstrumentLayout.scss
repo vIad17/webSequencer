@@ -1,8 +1,6 @@
-.layout {
+.instrument-layout {
   width: 100vw;
   height: 100dvh;
-
-  background-color: var(--colors-bg-primary);
 
   &__header {
     height: 8%;
@@ -19,9 +17,6 @@
   }
 
   &__sidebar {
-    // position: fixed;
-    // right: 0;
-    // top: 0;
     width: 20%;
   }
 }

@@ -1,0 +1,11 @@
+.preview {
+  width: 100dvw;
+  height: 100dvh;
+  overflow: auto;
+  &::-webkit-scrollbar {
+    display: none;
+  }
+  &__drawableField {
+    height: 100dvh;
+  }
+}
