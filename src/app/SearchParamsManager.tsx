@@ -5,7 +5,10 @@ import { useSearchParams } from 'react-router-dom';
 import { compress, decompress } from 'src/shared/functions/compress';
 import { setNotes } from 'src/shared/redux/slices/notesArraySlice';
 import { setSettings } from 'src/shared/redux/slices/settingsSlice';
-import { setSoundSettings, SoundSettingsState } from 'src/shared/redux/slices/soundSettingsSlice';
+import {
+  setSoundSettings,
+  SoundSettingsState
+} from 'src/shared/redux/slices/soundSettingsSlice';
 import { RootState } from 'src/shared/redux/store/store';
 
 const INITIAL_SETTINGS: SoundSettingsState = {
@@ -23,7 +26,7 @@ const INITIAL_SETTINGS: SoundSettingsState = {
   pitchShift: 0,
   lowFilter: 20,
   highFilter: 8000,
-  wave: "sine"
+  wave: 'sine'
 };
 
 const SearchParamsManager = () => {
@@ -37,6 +40,7 @@ const SearchParamsManager = () => {
   const notesArray = useSelector(
     (state: RootState) => state.notesArray.notesArray
   );
+
   useEffect(() => {
     const param = searchParams.get('params');
     if (!!param && pageIsStarted) {
@@ -52,7 +56,12 @@ const SearchParamsManager = () => {
   }, []);
 
   useEffect(() => {
-    const obj = { notesArray, settings, soundSettings };
+    const storedNotesArray = notesArray?.map((note) => ({
+      note: note.note,
+      attackTime: note.attackTime,
+      duration: note.duration
+    }));
+    const obj = { notesArray: storedNotesArray, settings, soundSettings };
     !pageIsStarted && setSearchParams('params=' + compress(obj));
   }, [notesArray, settings, soundSettings]);
 
