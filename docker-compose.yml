@@ -1,0 +1,13 @@
+services:
+  web:
+    build: .
+    container_name: sequencer
+    restart: unless-stopped
+    ports:
+      - "5174:5174"
+    networks:
+      - sequencer-network
+
+networks:
+  sequencer-network:
+    driver: bridge
