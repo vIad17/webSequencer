@@ -36,6 +36,8 @@ const CreationField = ({
           duration: 4
         })
       );
+
+      console.log("Creating note:"+ getPosition(mouse.elementY, drawableField.elementHeight) + " attackTime: getPosition(mouse.elementX, drawableField.elementWidth)");
     }
     setIsBlockedCreation(false);
   };

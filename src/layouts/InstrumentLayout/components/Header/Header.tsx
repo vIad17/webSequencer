@@ -16,7 +16,7 @@ import stopIcon from './images/stopIcon.svg';
 import pauseIcon from './images/pauseIcon.svg';
 
 import './Header.scss';
-import { pauseMusic, stopMusic } from 'src/app/SoundManager';
+import { pauseMusic, stopMusic, openMIDI } from 'src/app/SoundManager';
 
 interface HeaderProps {
   className?: string;
@@ -34,6 +34,30 @@ const Header = ({ className = '' }: HeaderProps) => {
     <header className={`header ${className}`}>
       {(!!settings.bpm || !!settings.tacts) && (
         <div className="header__buttons">
+          <input type="file" onChange={(event) => {
+            const files = (event.target as HTMLInputElement).files;
+            if (files && files.length > 0) {
+              const file = files[0];
+              const reader = new FileReader();
+
+              reader.onload = (loadEvent) => {
+                const arrayBuffer = loadEvent.target?.result;
+                if (arrayBuffer instanceof ArrayBuffer) {
+                  // Use the arrayBuffer here
+                  console.log("MIDI File read successfully:", arrayBuffer);
+                  openMIDI(arrayBuffer);
+                }
+              };
+              
+              reader.onerror = () => {
+                console.error("Error reading MIDI file");
+              };
+              
+              reader.readAsArrayBuffer(file);
+            }
+            
+          }}/>
+
           <button
             className="header__button"
             onClick={() => {

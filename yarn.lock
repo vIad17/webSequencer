@@ -1157,6 +1157,11 @@
   dependencies:
     regenerator-runtime "^0.14.0"
 
+"@babel/runtime@^7.27.6":
+  version "7.27.6"
+  resolved "https://registry.yarnpkg.com/@babel/runtime/-/runtime-7.27.6.tgz#ec4070a04d76bae8ddbb10770ba55714a417b7c6"
+  integrity sha512-vbavdySgbTTrmFE+EsiqUTzlOr5bzlnJtUv9PynGCAKvfQqjIXbvFdumPM/GxMDfyuGMJaJAU6TO4zc1Jf1i8Q==
+
 "@babel/template@^7.22.15", "@babel/template@^7.23.9", "@babel/template@^7.3.3":
   version "7.23.9"
   resolved "https://registry.npmjs.org/@babel/template/-/template-7.23.9.tgz"
@@ -3847,6 +3852,16 @@ braces@^3.0.2, braces@~3.0.2:
   dependencies:
     fill-range "^7.0.1"
 
+broker-factory@^3.1.8:
+  version "3.1.8"
+  resolved "https://registry.yarnpkg.com/broker-factory/-/broker-factory-3.1.8.tgz#48dfcf9fdcf8d9873e06bcf2de72b476201ff9f9"
+  integrity sha512-xmVnYN0FZtynhPUmAnN+/MFRdbDi3syCuxWV7o7s78FcIN0pjDtn9mUrVqEgdjQkbfojRhlPWbYbXJkMCyddrg==
+  dependencies:
+    "@babel/runtime" "^7.27.6"
+    fast-unique-numbers "^9.0.22"
+    tslib "^2.8.1"
+    worker-factory "^7.0.44"
+
 browser-process-hrtime@^1.0.0:
   version "1.0.0"
   resolved "https://registry.npmjs.org/browser-process-hrtime/-/browser-process-hrtime-1.0.0.tgz"
@@ -5790,6 +5805,14 @@ fast-levenshtein@^2.0.6, fast-levenshtein@~2.0.6:
   version "2.0.6"
   resolved "https://registry.npmjs.org/fast-levenshtein/-/fast-levenshtein-2.0.6.tgz"
   integrity sha512-DCXu6Ifhqcks7TZKY3Hxp3y6qphY5SJZmrWMDrKcERSOXWQdMhU9Ig/PYrzyw/ul9jOIyh0N4M0tbC5hodg8dw==
+
+fast-unique-numbers@^9.0.22:
+  version "9.0.22"
+  resolved "https://registry.yarnpkg.com/fast-unique-numbers/-/fast-unique-numbers-9.0.22.tgz#cb39d5e11fd1122b2590582d93db20cf9764cb3c"
+  integrity sha512-dBR+30yHAqBGvOuxxQdnn2lTLHCO6r/9B+M4yF8mNrzr3u1yiF+YVJ6u3GTyPN/VRWqaE1FcscZDdBgVKmrmQQ==
+  dependencies:
+    "@babel/runtime" "^7.27.6"
+    tslib "^2.8.1"
 
 fastest-levenshtein@^1.0.16:
   version "1.0.16"
@@ -7913,6 +7936,35 @@ micromatch@4.0.5, micromatch@^4.0.2, micromatch@^4.0.4, micromatch@^4.0.5:
   dependencies:
     braces "^3.0.2"
     picomatch "^2.3.1"
+
+midi-json-parser-broker@^4.0.125:
+  version "4.0.125"
+  resolved "https://registry.yarnpkg.com/midi-json-parser-broker/-/midi-json-parser-broker-4.0.125.tgz#81ca464c98f3e61e5c233eedf74bed5e59e6f8ca"
+  integrity sha512-bCpAQtC2LQ7nocOHg6gPA+FtqebMp0/e3dgLayj9w7kDpe5aeujY+Wkouq18hI9ZGwj9zXhsp4nMXBX+5n96Rg==
+  dependencies:
+    "@babel/runtime" "^7.27.6"
+    broker-factory "^3.1.8"
+    midi-json-parser-worker "^8.1.60"
+    tslib "^2.8.1"
+
+midi-json-parser-worker@^8.1.60:
+  version "8.1.60"
+  resolved "https://registry.yarnpkg.com/midi-json-parser-worker/-/midi-json-parser-worker-8.1.60.tgz#16b7a49530ee514f018482325d23700c17805c9e"
+  integrity sha512-4Rdd1iKSVHOgveP+yKYySWd+4Vt7X0NFmAkRmYnljrU8QIHOKIl2Myq05Qz/onK53Tw2wclD6ofxmJ+GODWsrw==
+  dependencies:
+    "@babel/runtime" "^7.27.6"
+    tslib "^2.8.1"
+    worker-factory "^7.0.44"
+
+midi-json-parser@^8.1.66:
+  version "8.1.66"
+  resolved "https://registry.yarnpkg.com/midi-json-parser/-/midi-json-parser-8.1.66.tgz#f2015ceb5ba58793d132fc7c3840b65c37d66041"
+  integrity sha512-/X9I0n6a8dkwmKEFQ9fpR3O+KFi1j8+nlFDKDskvKdMF07tvZsjaBr7tSqPhf8fof3UJIM+aFQryUczTFK0QaQ==
+  dependencies:
+    "@babel/runtime" "^7.27.6"
+    midi-json-parser-broker "^4.0.125"
+    midi-json-parser-worker "^8.1.60"
+    tslib "^2.8.1"
 
 mime-db@1.52.0, "mime-db@>= 1.43.0 < 2":
   version "1.52.0"
@@ -10217,7 +10269,16 @@ string-natural-compare@^3.0.1:
   resolved "https://registry.npmjs.org/string-natural-compare/-/string-natural-compare-3.0.1.tgz"
   integrity sha512-n3sPwynL1nwKi3WJ6AIsClwBMa0zTi54fn2oLU6ndfTSIO05xaznjSf15PcBZU6FNWbmN5Q6cxT4V5hGvB4taw==
 
-"string-width-cjs@npm:string-width@^4.2.0", string-width@^4.1.0, string-width@^4.2.0, string-width@^4.2.3:
+"string-width-cjs@npm:string-width@^4.2.0":
+  version "4.2.3"
+  resolved "https://registry.npmjs.org/string-width/-/string-width-4.2.3.tgz"
+  integrity sha512-wKyQRQpjJ0sIp62ErSZdGsjMJWsap5oRNihHhu6G7JVO/9jIB6UyevL+tXuOqrng8j/cxKTWyWUwvSTriiZz/g==
+  dependencies:
+    emoji-regex "^8.0.0"
+    is-fullwidth-code-point "^3.0.0"
+    strip-ansi "^6.0.1"
+
+string-width@^4.1.0, string-width@^4.2.0, string-width@^4.2.3:
   version "4.2.3"
   resolved "https://registry.npmjs.org/string-width/-/string-width-4.2.3.tgz"
   integrity sha512-wKyQRQpjJ0sIp62ErSZdGsjMJWsap5oRNihHhu6G7JVO/9jIB6UyevL+tXuOqrng8j/cxKTWyWUwvSTriiZz/g==
@@ -10309,7 +10370,14 @@ stringify-object@^3.3.0:
     is-obj "^1.0.1"
     is-regexp "^1.0.0"
 
-"strip-ansi-cjs@npm:strip-ansi@^6.0.1", strip-ansi@^6.0.0, strip-ansi@^6.0.1:
+"strip-ansi-cjs@npm:strip-ansi@^6.0.1":
+  version "6.0.1"
+  resolved "https://registry.npmjs.org/strip-ansi/-/strip-ansi-6.0.1.tgz"
+  integrity sha512-Y38VPSHcqkFrCpFnQ9vuSXmquuv5oXOKpGeT6aGrr3o3Gc9AlVa6JBfUSOCnbxGGZF+/0ooI7KrPuUSztUdU5A==
+  dependencies:
+    ansi-regex "^5.0.1"
+
+strip-ansi@^6.0.0, strip-ansi@^6.0.1:
   version "6.0.1"
   resolved "https://registry.npmjs.org/strip-ansi/-/strip-ansi-6.0.1.tgz"
   integrity sha512-Y38VPSHcqkFrCpFnQ9vuSXmquuv5oXOKpGeT6aGrr3o3Gc9AlVa6JBfUSOCnbxGGZF+/0ooI7KrPuUSztUdU5A==
@@ -10784,6 +10852,11 @@ tslib@^2.0.1, tslib@^2.0.3, tslib@^2.6.2:
   version "2.6.2"
   resolved "https://registry.npmjs.org/tslib/-/tslib-2.6.2.tgz"
   integrity sha512-AEYxH93jGFPn/a2iVAwW87VuUIkR1FVUKB77NwMF7nBTDkDrrT/Hpt/IrCJ0QXhW27jTBDcf5ZY7w6RiqTMw2Q==
+
+tslib@^2.8.1:
+  version "2.8.1"
+  resolved "https://registry.yarnpkg.com/tslib/-/tslib-2.8.1.tgz#612efe4ed235d567e8aba5f2a5fab70280ade83f"
+  integrity sha512-oJFu94HQb+KVduSUQL7wnpmqnfmLsOA/nAh6b6EH0wCEoK0/mPeXU6c3wKDV83MkOuHPRHtSXKKU99IBazS/2w==
 
 tsutils@^3.21.0:
   version "3.21.0"
@@ -11522,7 +11595,25 @@ workbox-window@6.6.1:
     "@types/trusted-types" "^2.0.2"
     workbox-core "6.6.1"
 
-"wrap-ansi-cjs@npm:wrap-ansi@^7.0.0", wrap-ansi@^7.0.0:
+worker-factory@^7.0.44:
+  version "7.0.44"
+  resolved "https://registry.yarnpkg.com/worker-factory/-/worker-factory-7.0.44.tgz#c691601d967ee944e242cc10aba09ab7aaf0549d"
+  integrity sha512-08AuUfWi+KeZI+KC7nU4pU/9tDeAFvE5NSWk+K9nIfuQc6UlOsZtjjeGVYVEn+DEchyXNJ5i10HCn0xRzFXEQA==
+  dependencies:
+    "@babel/runtime" "^7.27.6"
+    fast-unique-numbers "^9.0.22"
+    tslib "^2.8.1"
+
+"wrap-ansi-cjs@npm:wrap-ansi@^7.0.0":
+  version "7.0.0"
+  resolved "https://registry.npmjs.org/wrap-ansi/-/wrap-ansi-7.0.0.tgz"
+  integrity sha512-YVGIj2kamLSTxw6NsZjoBxfSwsn0ycdesmc4p+Q21c5zPuZ1pl+NfxVdxPtdHvmNVOQ6XSYG4AUtyt/Fi7D16Q==
+  dependencies:
+    ansi-styles "^4.0.0"
+    string-width "^4.1.0"
+    strip-ansi "^6.0.0"
+
+wrap-ansi@^7.0.0:
   version "7.0.0"
   resolved "https://registry.npmjs.org/wrap-ansi/-/wrap-ansi-7.0.0.tgz"
   integrity sha512-YVGIj2kamLSTxw6NsZjoBxfSwsn0ycdesmc4p+Q21c5zPuZ1pl+NfxVdxPtdHvmNVOQ6XSYG4AUtyt/Fi7D16Q==
