@@ -27,11 +27,11 @@ const VerticalPiano = ({ className = '' }: VerticalPianoProps) => {
     return `${className}${isActive ? ` ${className}__active` : ''}`;
   };
 
-  const onMouseDown = (note: string) => {
+  const startPlayingNote = (note: string) => {
     dispatch(setCurrentNote(note));
   };
 
-  const onMouseUp = () => {
+  const stopPlayingNote = () => {
     dispatch(setCurrentNote(''));
   };
 
@@ -42,8 +42,9 @@ const VerticalPiano = ({ className = '' }: VerticalPianoProps) => {
           key={note}
           className={`vertical-piano__key ${extraClassName(note)}`}
           style={{ '--height': `${elemHeight}px` }}
-          onMouseDown={() => onMouseDown(note)}
-          onMouseUp={() => onMouseUp()}
+          onMouseDown={() => startPlayingNote(note)}
+          onMouseUp={() => stopPlayingNote()}
+          onMouseLeave={() => stopPlayingNote()}
         >
           {note}
         </button>

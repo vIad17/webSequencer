@@ -1,13 +1,28 @@
 .header {
   color: #fff;
-  // background-color: #2b2b2b;
   display: flex;
   align-items: center;
-  justify-content: center;
   gap: 40px;
   top: 0;
   width: 100%;
   z-index: 2;
+
+  &__left {
+    flex: 1;
+    margin-left: 80px;
+  }
+
+  &__center {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 36px;
+  }
+
+  &__right {
+    flex: 1;
+  }
 
   &__settings {
     color: #fff;
@@ -46,6 +61,8 @@
   }
 
   &__input-form {
+    display: flex;
+    align-items: center;
     text-transform: uppercase;
     font-size: 16px;
     color: var(--colors-ui-tertiary);
@@ -61,5 +78,35 @@
     padding: 6px 12px;
     text-align: center;
     margin-left: 16px;
+  }
+
+  &__left-item {
+    width: fit-content;
+    position: relative;
+  }
+
+  &__left-button {
+    background: none;
+    padding: 0;
+    border: none;
+    color: var(--colors-text-secondary);
+    font-size: 24px;
+
+    transition: color 0.1s ease;
+
+    &:hover:not(&_active) {
+      color: var(--colors-ui-primary);
+    }
+
+    &:active, &_active {
+      color: var(--colors-ui-accent);
+    }
+  }
+
+  &__left-button-modal {
+    top: 40px;
+    left: 0;
+    min-width: 170px;
+    z-index: 50;
   }
 }

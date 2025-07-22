@@ -6,7 +6,6 @@ import InstrumentLayout from 'src/layouts/InstrumentLayout/InstrumentLayout';
 
 import InstrumentPage from 'src/pages/InstrumentPage/InstrumentPage';
 import Main from 'src/pages/Main/OldMain';
-import SearchParamsManager from '../SearchParamsManager';
 import Layout from 'src/layouts/Layout/Layout';
 import PreviewPage from 'src/pages/PreviewPage/PreviewPage';
 

@@ -43,7 +43,7 @@ const TimeStripe = ({ className = '' }: TimeStripeProps) => {
     const svg = d3.select(svgRef.current);
     svg.attr('width', elementWidth * columnsCount)
        .attr('height', stripeHeight)
-       .style('cursor', 'pointer');
+       .style('cursor', 'grab');
 
     svg.selectAll('*').remove();
 

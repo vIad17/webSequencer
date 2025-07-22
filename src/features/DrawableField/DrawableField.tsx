@@ -12,9 +12,9 @@ interface DrawableFieldProps {
 const DrawableField = ({ className = '', isPreview = false }: DrawableFieldProps) => {
   return (
     <div className={`drawable-field ${className}`}>
+      <NoteManager className="drawable-field__note-manager" isEditable={!isPreview}/>
       {!isPreview && <TimeStripe className="drawable-field__time-stripe" />}
       <NoteGrid className="drawable-field__note-grid" />
-      <NoteManager className="drawable-field__note-manager" isEditable={!isPreview}/>
     </div>
   );
 };
