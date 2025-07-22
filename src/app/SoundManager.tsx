@@ -113,6 +113,11 @@ export function stopMusic() {
   Tone.Transport.stop();
 }
 
+export function rewindMusic(bit: number){
+  store.dispatch(removeActiveNotes());
+  store.dispatch(setCurrentBit(bit));
+} 
+
 interface MIDINote {
   note: number;
   attackTime: number;
