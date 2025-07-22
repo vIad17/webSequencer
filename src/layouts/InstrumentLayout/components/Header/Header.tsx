@@ -43,8 +43,6 @@ const Header = ({ className = '' }: HeaderProps) => {
               reader.onload = (loadEvent) => {
                 const arrayBuffer = loadEvent.target?.result;
                 if (arrayBuffer instanceof ArrayBuffer) {
-                  // Use the arrayBuffer here
-                  console.log("MIDI File read successfully:", arrayBuffer);
                   openMIDI(arrayBuffer);
                 }
               };
@@ -52,7 +50,6 @@ const Header = ({ className = '' }: HeaderProps) => {
               reader.onerror = () => {
                 console.error("Error reading MIDI file");
               };
-              
               reader.readAsArrayBuffer(file);
             }
             
