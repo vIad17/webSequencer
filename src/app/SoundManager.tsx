@@ -119,6 +119,12 @@ interface MIDINote {
   duration: number;
 }
 
+interface MidiEvent {
+  delta?: number;
+  setTempo?: { microsecondsPerQuarter: number };
+  noteOn?: { noteNumber: number; velocity: number };
+  noteOff?: { noteNumber: number };
+}
 
 function convertMIDInoteToSequencer(note: number) :number{
   return 83 - note;
@@ -146,26 +152,27 @@ export function openMIDI(arrayBuffer: ArrayBuffer) {
 
     // First pass: Process all events
     for (const event of mainTrack) {
+      const e = event as MidiEvent;
       currentTick += event.delta || 0;
-      if (event.setTempo) {
-          const bpm = mpqToBpm(event.setTempo.microsecondsPerQuarter);
+      if (e.setTempo) {
+          const bpm = mpqToBpm(e.setTempo.microsecondsPerQuarter);
           console.log(`Tempo change: ${bpm.toFixed(1)} BPM`);
           store.dispatch(setBpm(bpm));
-      } else if (event.noteOn && event.noteOn.velocity > 0) {
+      } else if (e.noteOn && e.noteOn.velocity > 0) {
         // Note ON event
         const noteData = {
-          note: convertMIDInoteToSequencer(event.noteOn.noteNumber),
+          note: convertMIDInoteToSequencer(e.noteOn.noteNumber),
           attackTime: currentTick / ticksPerBeat, // Convert ticks to beats
           duration: 0 // Will be calculated later
         };
-        activeNotes.set(event.noteOn.noteNumber, noteData);
+        activeNotes.set(e.noteOn.noteNumber, noteData);
       } 
       else if (
-        (event.noteOff) || 
-        (event.noteOn && event.noteOn.velocity === 0)
+        (e.noteOff) || 
+        (e.noteOn && e.noteOn.velocity === 0)
       ) {
         // Note OFF event (explicit or zero-velocity noteOn)
-        const noteNumber = event.noteOff?.noteNumber || event.noteOn?.noteNumber;
+        const noteNumber = e.noteOff?.noteNumber || e.noteOn?.noteNumber;
         if (noteNumber === undefined) continue;
 
         const noteStart = activeNotes.get(noteNumber);
