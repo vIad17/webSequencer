@@ -20,14 +20,12 @@ const TactsNumbers = ({ className = '' }: TactsNumbersProps) => {
 
   const handleClickTacts = (event: React.MouseEvent<HTMLDivElement>) => {
     if (!tactsCounter) return;
-    console.log('TactsNumbers clicked', event.clientX);
     const rect = event.currentTarget.getBoundingClientRect();
     const relativeX = event.clientX - rect.left;
     const totalWidth = rect.width;
     const clickPosition = relativeX / totalWidth;
 
     const totalBits = tactsCounter * 16;
-    
     const targetBit = Math.floor(clickPosition * totalBits);
 
     rewindMusic(targetBit);

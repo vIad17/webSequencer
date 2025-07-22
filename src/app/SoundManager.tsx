@@ -114,6 +114,7 @@ export function stopMusic() {
 }
 
 export function rewindMusic(bit: number){
+  console.log("Rewinding to: "+ bit)
   store.dispatch(removeActiveNotes());
   store.dispatch(setCurrentBit(bit));
 } 
