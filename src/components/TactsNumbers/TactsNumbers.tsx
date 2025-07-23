@@ -1,3 +1,4 @@
+import { useCallback, useEffect, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
 import { RootState } from 'src/shared/redux/store/store';
@@ -18,7 +19,28 @@ const TactsNumbers = ({ className = '' }: TactsNumbersProps) => {
     (state: RootState) => state.drawableField.elementWidth
   );
 
-  const handleClickTacts = (event: React.MouseEvent<HTMLDivElement>) => {
+  const bRewindActiveRef = useRef(false);
+
+  const handleGlobalMouseUp = useCallback(() => {
+    bRewindActiveRef.current = false;
+    document.removeEventListener('mouseup', handleGlobalMouseUp);
+  }, []);
+
+  useEffect(() => {
+    //document.addEventListener('mouseup', handleGlobalMouseUp);
+    return () => {
+      document.removeEventListener('mouseup', handleGlobalMouseUp);
+    };
+  }, [handleGlobalMouseUp]);
+
+  const handleMouseDownTacts = (event: React.MouseEvent<HTMLDivElement>) => {
+    document.addEventListener('mouseup', handleGlobalMouseUp);
+    bRewindActiveRef.current = true;
+    handleRewindTacts(event);
+  };
+
+  const handleRewindTacts = (event: React.MouseEvent<HTMLDivElement>) => {
+    if (!bRewindActiveRef.current) return;
     if (!tactsCounter) return;
     const rect = event.currentTarget.getBoundingClientRect();
     const relativeX = event.clientX - rect.left;
@@ -48,7 +70,9 @@ const TactsNumbers = ({ className = '' }: TactsNumbersProps) => {
     <div
       className={`tacts-number ${className}`}
       style={{ '--width': `${elementWidth * 16}px` }}
-      onClick={handleClickTacts}
+      //onClick={handleClickTacts}
+      onMouseDown={handleMouseDownTacts}
+      onMouseMove={handleRewindTacts}
     >
       {/* <TimeStripe className="tacts-number__time-stripe" /> */}
       {renderTactsNumber()}
