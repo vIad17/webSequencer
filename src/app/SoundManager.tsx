@@ -24,6 +24,7 @@ import { addNote } from 'src/shared/redux/slices/notesArraySlice';
 import { setBpm, setTacts } from 'src/shared/redux/slices/settingsSlice';
 
 
+
 /* creating a synth */
 const synth = new Tone.PolySynth(Tone.Synth, {
   oscillator: {
@@ -119,6 +120,22 @@ export function rewindMusic(bit: number){
   store.dispatch(setCurrentBit(bit));
 } 
 
+export function noteDown(note: string){
+  store.dispatch(addPlayingNote(note));
+  synth.triggerAttack(note);
+}
+
+export function noteUp(note: string){
+  store.dispatch(removePlayingNote(note));
+  synth.triggerRelease(note);
+}
+
+export function getPitch(i:number):string{
+  return pitchNotes[i];
+}
+
+/*MIDI Import*/
+
 interface MIDINote {
   note: number;
   attackTime: number;
@@ -132,7 +149,7 @@ interface MidiEvent {
   noteOff?: { noteNumber: number };
 }
 
-function convertMIDInoteToSequencer(note: number) :number{
+export function convertMIDInoteToSequencer(note: number) :number{
   return 83 - note;
 }
 
@@ -210,6 +227,8 @@ export function openMIDI(arrayBuffer: ArrayBuffer) {
   });
 }
 
+/*end: MIDI Import*/
+
 new Tone.Loop(playMusic, '16n').start();
 
 /* creating a keyboard events */
@@ -219,14 +238,12 @@ const keyboard = new AudioKeys({
 
 keyboard.down((key: Key) => {
   const note = pitchNotes[95 - key.note];
-  store.dispatch(addPlayingNote(note));
-  synth.triggerAttack(note);
+  noteDown(note);
 });
 
 keyboard.up((key: Key) => {
   const note = pitchNotes[95 - key.note];
-  store.dispatch(removePlayingNote(note));
-  synth.triggerRelease(note);
+  noteUp(note);
 });
 
 /* creating a component */

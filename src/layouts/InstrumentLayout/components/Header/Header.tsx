@@ -21,6 +21,9 @@ import Modal, { ModalItem } from 'src/components/Modal/Modal';
 import { useHandleClickOutside } from 'src/shared/hooks/useHandleClickOutside';
 import clsx from 'clsx';
 
+import {useMIDIInputs } from '@react-midi/hooks';
+
+
 interface HeaderProps {
   className?: string;
 }
@@ -61,6 +64,9 @@ const Header = ({ className = '' }: HeaderProps) => {
     }
   };
 
+  const { input, inputs, selectInput, selectedInputId } = useMIDIInputs();
+  //inputs - массив устройств
+
   const FileData: ModalItem[] = [
     {
       text: 'Import MIDI File',
@@ -77,6 +83,10 @@ const Header = ({ className = '' }: HeaderProps) => {
     {
       text: 'Autosave',
       callback: () => {}
+    },
+    {
+      text: 'Connect MIDI input',
+      callback: () => {selectInput('input-1')}
     }
   ];
 
