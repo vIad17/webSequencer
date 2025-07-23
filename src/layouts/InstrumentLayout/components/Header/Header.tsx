@@ -11,6 +11,8 @@ import { RootState } from 'src/shared/redux/store/store';
 // import pauseIcon from './images/pause_icon.png';
 // import startIcom from './images/play_icon.png';
 // import stopIcon from './images/stop_icon.png';
+import arrowRightIcon from './images/arrowRightIcon.svg';
+import checkIcon from './images/checkIcon.svg';
 import startIcon from './images/playIcon.svg';
 import stopIcon from './images/stopIcon.svg';
 import pauseIcon from './images/pauseIcon.svg';
@@ -21,20 +23,22 @@ import Modal, { ModalItem } from 'src/components/Modal/Modal';
 import { useHandleClickOutside } from 'src/shared/hooks/useHandleClickOutside';
 import clsx from 'clsx';
 
-import {useMIDIInputs } from '@react-midi/hooks';
-
+import { useMIDIInputs } from '@react-midi/hooks';
 
 interface HeaderProps {
   className?: string;
 }
 
-
 const Header = ({ className = '' }: HeaderProps) => {
   const [myBpm, setMyBpm] = useState(120);
   const [myTacts, setMyTacts] = useState(8);
   const [fileOpen, setFileOpen] = useState(false);
+  const [inputModalOpen, setInputModalOpen] = useState(false);
 
-  const { modalRef } = useHandleClickOutside(() => setFileOpen(false));
+  const { modalRef } = useHandleClickOutside(() => {
+    setFileOpen(false);
+    setInputModalOpen(false);
+  });
 
   const settings = useSelector((state: RootState) => state.settings);
 
@@ -47,25 +51,40 @@ const Header = ({ className = '' }: HeaderProps) => {
     if (files && files.length > 0) {
       const file = files[0];
       const reader = new FileReader();
-  
+
       reader.onload = (loadEvent) => {
         const arrayBuffer = loadEvent.target?.result;
         if (arrayBuffer instanceof ArrayBuffer) {
           openMIDI(arrayBuffer);
-          setFileOpen(false)
+          setFileOpen(false);
         }
       };
-  
+
       reader.onerror = () => {
         console.error('Error reading MIDI file');
       };
-  
+
       reader.readAsArrayBuffer(file);
     }
   };
 
   const { input, inputs, selectInput, selectedInputId } = useMIDIInputs();
-  //inputs - массив устройств
+
+  const midiDeviceModalData: ModalItem[] = inputs.map((el) => ({
+    text: el.name,
+    callback: (event) => {
+      event.stopPropagation();
+      selectInput(el.id);
+    },
+    sideContent: (
+      <img
+        className={clsx('modal__side-icon', {
+          'modal__side-icon_hidden': selectedInputId !== el.id
+        })}
+        src={checkIcon}
+      />
+    )
+  }));
 
   const FileData: ModalItem[] = [
     {
@@ -85,8 +104,23 @@ const Header = ({ className = '' }: HeaderProps) => {
       callback: () => {}
     },
     {
-      text: 'Connect MIDI input',
-      callback: () => {selectInput('input-1')}
+      text: 'MIDI input',
+      callback: () => {
+        setInputModalOpen((prev) => !prev);
+      },
+      sideContent: (
+        <>
+          <img className="modal__side-icon" src={arrowRightIcon} />
+          <Modal
+            className={clsx(
+              'header__inputs-left-button-sub-modal',
+              'header__left-button-sub-modal'
+            )}
+            modalActions={midiDeviceModalData}
+            isOpen={inputModalOpen}
+          />
+        </>
+      )
     }
   ];
 
@@ -95,12 +129,12 @@ const Header = ({ className = '' }: HeaderProps) => {
   return (
     <header className={`header ${className}`}>
       <div className="header__left">
-        <div ref={modalRef}  className="header__left-item">
+        <div ref={modalRef} className="header__left-item">
           <button
             className={clsx('header__left-button', {
               'header__left-button_active': fileOpen
             })}
-            onClick={() => setFileOpen((prev) => !prev)}
+            onClick={() => {setFileOpen((prev) => !prev); setInputModalOpen(false)}}
           >
             File
           </button>
@@ -108,7 +142,6 @@ const Header = ({ className = '' }: HeaderProps) => {
             className={clsx('header__left-button-modal')}
             modalActions={FileData}
             isOpen={fileOpen}
-            setIsOpen={setFileOpen}
           />
         </div>
       </div>

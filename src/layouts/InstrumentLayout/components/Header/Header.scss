@@ -109,4 +109,15 @@
     min-width: 170px;
     z-index: 50;
   }
+
+  &__inputs-left-button-sub-modal {
+    width: 280px;
+  }
+
+  &__left-button-sub-modal {
+    top: 0;
+    left: 100%;
+    margin-left: 20px;
+    min-width: 170px;
+  }
 }
