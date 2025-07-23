@@ -48,7 +48,7 @@ const TactsNumbers = ({ className = '' }: TactsNumbersProps) => {
     const clickPosition = relativeX / totalWidth;
 
     const totalBits = tactsCounter * 16;
-    const targetBit = Math.floor(clickPosition * totalBits);
+    const targetBit = Math.round(clickPosition * totalBits);
 
     rewindMusic(targetBit);
   };
