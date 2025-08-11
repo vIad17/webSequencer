@@ -11,25 +11,40 @@
   top: 0;
   z-index: 13;
 
+  &__content {
+    z-index: 2;
+  }
+
+  &__empty {
+    height: 30px;
+    width: 100px;
+    // position: sticky;
+    position: sticky;
+    left: 0;
+    background-color: var(--colors-bg-primary);
+
+    border-bottom: 1px solid rgba(255, 255, 255, 0.4);
+    // top: 0;
+    // left: 0;
+    z-index: 2;
+    // grid-row: 2;
+  }
+
   &__tact {
 
-    grid-row: 2;
-    // padding-left: 100px;
-
-    background-color: var(--colors-bg-primary);
+    pointer-events: none;
 
     border-bottom: 1px solid rgba(255, 255, 255, 0.4);
     border-radius: 4px;
     position: sticky;
     left: 100px;
     top: 0;
-    z-index: 13;
+    z-index: 3;
     width: $width;
     box-sizing: border-box;
   }
 
   &__tact-text {
-    // position: absolute;
     margin-bottom: -26px;
     margin-left: -20px;
     width: fit-content;
@@ -43,7 +58,11 @@
 
   &__time-stripe {
     position: absolute;
-    z-index: 100;
+    // left: 100px;
+    z-index: 4;
+
+    pointer-events: none;
+
 
     // position: sticky;
     top: 0;
@@ -56,6 +75,16 @@
                 /* верхний левый угол (за пределами видимой области) */
     );
     width: 100%;
-    height: 100%;
+    height: 100dvh;
+  }
+
+  &__background {
+    position: absolute;
+    // left:50px;
+
+    z-index: 1;
+    margin: 0 0 0 50px;
+    padding: 0;
+    border: none;
   }
 }

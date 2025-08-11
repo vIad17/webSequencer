@@ -35,7 +35,7 @@ const InstrumentPage = ({ className = '' }: InstrumentPageProps) => {
       }}
     >
 
-      <div className="top-field__empty" />
+      
       <TactsNumbers className="top-field__tacts-number" />
       <VerticalPiano className="instrument-page__vertical-piano" />
       <DrawableField className="instrument-page__drawable-field" />
