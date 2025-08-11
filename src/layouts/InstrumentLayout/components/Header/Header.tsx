@@ -24,6 +24,8 @@ import { useHandleClickOutside } from 'src/shared/hooks/useHandleClickOutside';
 import clsx from 'clsx';
 
 import { useMIDIInputs } from '@react-midi/hooks';
+import { Icon } from 'src/shared/icons/Icon';
+import { IconType } from 'src/shared/icons/IconMap';
 
 interface HeaderProps {
   className?: string;
@@ -134,7 +136,10 @@ const Header = ({ className = '' }: HeaderProps) => {
             className={clsx('header__left-button', {
               'header__left-button_active': fileOpen
             })}
-            onClick={() => {setFileOpen((prev) => !prev); setInputModalOpen(false)}}
+            onClick={() => {
+              setFileOpen((prev) => !prev);
+              setInputModalOpen(false);
+            }}
           >
             File
           </button>
@@ -159,24 +164,21 @@ const Header = ({ className = '' }: HeaderProps) => {
                 dispatch(setIsPlaying(true));
               }}
             >
-              <img
+              <Icon
+                icon={IconType.Play}
                 className="header__icon header__icon-start"
-                src={startIcon}
-                alt="start"
               />
             </button>
             <button className="header__button" onClick={pauseMusic}>
-              <img
+              <Icon
+                icon={IconType.Pause}
                 className="header__icon header__icon-pause"
-                src={pauseIcon}
-                alt="pause"
               />
             </button>
             <button className="header__button" onClick={stopMusic}>
-              <img
+              <Icon
+                icon={IconType.Repeat}
                 className="header__icon header__icon_stop"
-                src={stopIcon}
-                alt="stop"
               />
             </button>
           </div>

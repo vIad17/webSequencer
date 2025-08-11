@@ -1,0 +1,14 @@
+.icon {
+  & > * {
+    transition: stroke 0.1s ease;
+    stroke: var(--colors-text-secondary);
+  }
+
+  &:hover * {
+    stroke: var(--colors-ui-primary);
+  }
+
+  &:active  * {
+    stroke: var(--colors-ui-accent);
+  }
+}
