@@ -6,8 +6,9 @@
   grid-row: 2;
   $width: var(--width);
 
+  border-bottom: solid rgba(255, 255, 255, 0.4);
+
   position: sticky;
-  // left: 30px;
   top: 0;
   z-index: 13;
 
@@ -18,23 +19,16 @@
   &__empty {
     height: 30px;
     width: 100px;
-    // position: sticky;
     position: sticky;
     left: 0;
     background-color: var(--colors-bg-primary);
 
-    border-bottom: 1px solid rgba(255, 255, 255, 0.4);
-    // top: 0;
-    // left: 0;
     z-index: 2;
-    // grid-row: 2;
   }
 
   &__tact {
 
     pointer-events: none;
-
-    border-bottom: 1px solid rgba(255, 255, 255, 0.4);
     border-radius: 4px;
     position: sticky;
     left: 100px;
@@ -46,7 +40,9 @@
 
   &__tact-text {
     margin-bottom: -26px;
-    margin-left: -20px;
+    // margin-left: -20px;
+    transform: translateX(-50%);
+
     width: fit-content;
     background-color: var(--colors-bg-primary);
     padding: 14px;
@@ -58,22 +54,10 @@
 
   &__time-stripe {
     position: absolute;
-    // left: 100px;
     z-index: 4;
 
     pointer-events: none;
-
-
-    // position: sticky;
     top: 0;
-    // left: 0
-    clip-path: polygon(
-      100px 0,        /* верхняя левая точка смещена вправо на 100px */
-      100% 0,         /* верхний правый угол */
-      100% 100%,      /* нижний правый угол */
-      100px 100%,     /* нижняя левая точка смещена вправо на 100px */
-                /* верхний левый угол (за пределами видимой области) */
-    );
     width: 100%;
     height: 100dvh;
   }

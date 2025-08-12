@@ -24,13 +24,16 @@
     z-index: -1;
   }
 
-  transition: box-shadow 0.2s ease;
+  transition: box-shadow 0.1s ease;
 
   width: var(--width);
   height: var(--height);
 
   &--active {
-    box-shadow: 0 0 0 3px var(--colors-ui-accent);
+    box-shadow: 
+      0 0 0 3px var(--colors-ui-accent),
+      0 0 10px 5px var(--colors-ui-accent);
+
 
     &::before {
       width: 100%;
@@ -39,7 +42,9 @@
   }
 
   &--selected {
-    box-shadow: 0 0 0 3px var(--colors-ui-accent);
+    box-shadow: 
+      0 0 0 3px var(--colors-ui-accent),
+      0 0 5px 4px var(--colors-ui-accent);
   }
 
   &__resizible-button {

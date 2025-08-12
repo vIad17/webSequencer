@@ -23,8 +23,6 @@ import { parseArrayBuffer } from 'midi-json-parser';
 import { addNote } from 'src/shared/redux/slices/notesArraySlice';
 import { setBpm, setTacts } from 'src/shared/redux/slices/settingsSlice';
 
-
-
 /* creating a synth */
 const synth = new Tone.PolySynth(Tone.Synth, {
   oscillator: {
@@ -154,77 +152,84 @@ export function convertMIDInoteToSequencer(note: number): number {
 }
 
 function mpqToBpm(microsecondsPerQuarter: number): number {
-  const MICROSECONDS_PER_MINUTE = 60000000;  // 60,000,000 μs in a minute
-  return MICROSECONDS_PER_MINUTE / microsecondsPerQuarter;
+  const MICROSECONDS_PER_MINUTE = 60_000_000; // 60,000,000 μs in a minute
+  return Math.round(MICROSECONDS_PER_MINUTE / microsecondsPerQuarter);
 }
 
 export function openMIDI(arrayBuffer: ArrayBuffer) {
-  parseArrayBuffer(arrayBuffer).then((json) => {
-    if (!json?.tracks?.length) {
-      console.error('Invalid MIDI file: No tracks found');
-      return;
-    }
-
-    console.log(json);
-
-    const ticksPerBeat = (json.division || 480) / 4; // Default to 480 if missing
-    const mainTrack = json.tracks[0];
-    let currentTick = 0;
-    const activeNotes: Map<number, MIDINote> = new Map();
-    const completedNotes: MIDINote[] = [];
-
-    // First pass: Process all events
-    for (const event of mainTrack) {
-      const e = event as MidiEvent;
-      currentTick += event.delta || 0;
-      if (e.setTempo) {
-        const bpm = mpqToBpm(e.setTempo.microsecondsPerQuarter);
-        console.log(`Tempo change: ${bpm.toFixed(1)} BPM`);
-        store.dispatch(setBpm(bpm));
-      } else if (e.noteOn && e.noteOn.velocity > 0) {
-        // Note ON event
-        const noteData = {
-          note: convertMIDInoteToSequencer(e.noteOn.noteNumber),
-          attackTime: currentTick / ticksPerBeat, // Convert ticks to beats
-          duration: 0 // Will be calculated later
-        };
-        activeNotes.set(e.noteOn.noteNumber, noteData);
+  parseArrayBuffer(arrayBuffer)
+    .then((json) => {
+      if (!json?.tracks?.length) {
+        console.error('Invalid MIDI file: No tracks found');
+        return;
       }
-      else if (
-        (e.noteOff) ||
-        (e.noteOn && e.noteOn.velocity === 0)
-      ) {
-        // Note OFF event (explicit or zero-velocity noteOn)
-        const noteNumber = e.noteOff?.noteNumber || e.noteOn?.noteNumber;
-        if (noteNumber === undefined) continue;
 
-        const noteStart = activeNotes.get(noteNumber);
-        if (noteStart) {
-          const durationBeats = (currentTick - noteStart.attackTime * ticksPerBeat) / ticksPerBeat;
-          completedNotes.push({
-            ...noteStart,
-            duration: Math.max(durationBeats, 0.1) // Ensure minimal duration
-          });
-          activeNotes.delete(noteNumber);
+      const ticksPerBeat = (json.division || 480) / 4; // Default to 480 if missing
+      const mainTrack = json.tracks[0];
+      let currentTick = 0;
+      const activeNotes: Map<number, MIDINote> = new Map();
+      const completedNotes: MIDINote[] = [];
+
+      // First pass: Process all events
+      for (const event of mainTrack) {
+        const e = event as MidiEvent;
+        currentTick += event.delta || 0;
+        if (e.setTempo) {
+          const bpm = mpqToBpm(e.setTempo.microsecondsPerQuarter);
+          console.log(`Tempo change: ${bpm.toFixed(1)} BPM`);
+          store.dispatch(setBpm(bpm));
+        } else if (e.noteOn && e.noteOn.velocity > 0) {
+          // Note ON event
+          const noteData = {
+            note: convertMIDInoteToSequencer(e.noteOn.noteNumber),
+            attackTime: Math.round(currentTick / ticksPerBeat), // Convert ticks to beats
+            duration: 0 // Will be calculated later
+          };
+          activeNotes.set(e.noteOn.noteNumber, noteData);
+        } else if (e.noteOff || (e.noteOn && e.noteOn.velocity === 0)) {
+          // Note OFF event (explicit or zero-velocity noteOn)
+          const noteNumber = e.noteOff?.noteNumber || e.noteOn?.noteNumber;
+          if (noteNumber === undefined) continue;
+
+          const noteStart = activeNotes.get(noteNumber);
+          if (noteStart) {
+            const durationBeats =
+              (currentTick - noteStart.attackTime * ticksPerBeat) /
+              ticksPerBeat;
+            completedNotes.push({
+              ...noteStart,
+              duration: Math.max(durationBeats, 0.1) // Ensure minimal duration
+            });
+            activeNotes.delete(noteNumber);
+          }
         }
       }
-    }
 
-    // Second pass: Dispatch notes to Redux
-    completedNotes.forEach(note => {
-      store.dispatch(
-        addNote({
-          note: note.note,
-          attackTime: note.attackTime,
-          duration: note.duration
-        })
-      );
+      if (completedNotes.length > 0) {
+        store.dispatch(
+          setTacts(
+            Math.ceil((completedNotes[completedNotes.length - 1].attackTime ??
+              0 + completedNotes[completedNotes.length - 1].duration) / 16)
+          )
+        );
+      }
+
+      // Second pass: Dispatch notes to Redux
+      completedNotes.forEach((note) => {
+        store.dispatch(
+          addNote({
+            note: note.note,
+            attackTime: note.attackTime,
+            duration: note.duration
+          })
+        );
+      });
+
+      console.log(`Imported ${completedNotes.length} notes from MIDI`);
+    })
+    .catch((error) => {
+      console.error('Error processing MIDI file:', error);
     });
-
-    console.log(`Imported ${completedNotes.length} notes from MIDI`);
-  }).catch(error => {
-    console.error('Error processing MIDI file:', error);
-  });
 }
 
 /*end: MIDI Import*/
@@ -237,7 +242,6 @@ const keyboard = new AudioKeys({
 });
 
 keyboard.down((key: Key) => {
-  console.log(key)
   const note = pitchNotes[108 - key.note];
   noteDown(note);
 });
