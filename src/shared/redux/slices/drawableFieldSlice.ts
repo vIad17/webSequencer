@@ -1,4 +1,5 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { pitchNotes } from 'src/shared/const/notes';
 
 interface DrawableFieldState {
   elementWidth: number;
@@ -11,7 +12,7 @@ const initialState: DrawableFieldState = {
   elementWidth: 24,
   elementHeight: 46,
   columnsCount: 100,
-  rowsCount: 72
+  rowsCount: pitchNotes.length
 };
 
 export const drawableFieldSlice = createSlice({

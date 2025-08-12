@@ -25,18 +25,15 @@ const NoteGrid = ({ className = '' }: NoteGridProps) => {
 
   const dispatch = useDispatch();
 
-  // При изменении tactsCount устанавливаем columnsCount
   useEffect(() => {
     if (tactsCount) {
       dispatch(setColumnsCount(tactsCount * 16));
     }
   }, [tactsCount, dispatch]);
 
-  // Функция отрисовки сетки с помощью d3
   const drawGrid = () => {
     if (!svgRef.current) return;
 
-    // Очистим SVG перед рисованием
     d3.select(svgRef.current).selectAll('*').remove();
 
     const svg = d3
@@ -44,18 +41,6 @@ const NoteGrid = ({ className = '' }: NoteGridProps) => {
       .attr('width', elemWidth * columnCount)
       .attr('height', elemHeight * rowsCount);
 
-    // Рисуем полосы по 16 колонок с разным цветом
-    // const bandCount = Math.ceil(columnCount / 16);
-    // for (let i = 0; i <= bandCount; i++) {
-    //   svg.append('rect')
-    //     .attr('x', elemWidth * 16 * i)
-    //     .attr('y', 0)
-    //     .attr('width', elemWidth * 16)
-    //     .attr('height', elemHeight * rowsCount)
-    //     .attr('fill', i % 2 === 0 ? '#D3D3D3' : '#C0C0C0');
-    // }
-
-    // Рисуем затемнённые полосы для нот с #
     for (let i = 0; i <= rowsCount; i++) {
       if (pitchNotes[i]?.charAt(1) !== '#') {
         svg
@@ -68,7 +53,6 @@ const NoteGrid = ({ className = '' }: NoteGridProps) => {
       }
     }
 
-    // Рисуем вертикальные линии сетки
     for (let x = 0; x <= columnCount; x++) {
       svg
         .append('line')
@@ -81,7 +65,6 @@ const NoteGrid = ({ className = '' }: NoteGridProps) => {
         .attr('stroke-width', x % 16 === 0 ? 4 : 1);
     }
 
-    // Рисуем горизонтальные линии сетки
     for (let y = 0; y <= rowsCount; y++) {
       svg
         .append('line')
@@ -95,14 +78,12 @@ const NoteGrid = ({ className = '' }: NoteGridProps) => {
     }
   };
 
-  // Перерисовываем сетку при изменениях параметров
   useEffect(() => {
     if (tactsCount && svgRef.current) {
       drawGrid();
     }
   }, [elemWidth, elemHeight, columnCount, rowsCount, tactsCount]);
 
-  // Если tactsCount нет - ничего не рендерим
   if (!tactsCount) return null;
 
   return (
