@@ -4,11 +4,13 @@
     stroke: var(--colors-text-secondary);
   }
 
-  &:hover * {
-    stroke: var(--colors-ui-primary);
-  }
+  &_interactable {
+    &:hover * {
+      stroke: var(--colors-ui-primary);
+    }
 
-  &:active  * {
-    stroke: var(--colors-ui-accent);
+    &:active  * {
+      stroke: var(--colors-ui-accent);
+    }
   }
 }

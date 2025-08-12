@@ -114,23 +114,23 @@ export function stopMusic() {
   Tone.Transport.stop();
 }
 
-export function rewindMusic(bit: number){
+export function rewindMusic(bit: number) {
   //console.log("Rewinding to: "+ bit)
   store.dispatch(removeActiveNotes());
   store.dispatch(setCurrentBit(bit));
-} 
+}
 
-export function noteDown(note: string){
+export function noteDown(note: string) {
   store.dispatch(addPlayingNote(note));
   synth.triggerAttack(note);
 }
 
-export function noteUp(note: string){
+export function noteUp(note: string) {
   store.dispatch(removePlayingNote(note));
   synth.triggerRelease(note);
 }
 
-export function getPitch(i:number):string{
+export function getPitch(i: number): string {
   return pitchNotes[i];
 }
 
@@ -149,8 +149,8 @@ interface MidiEvent {
   noteOff?: { noteNumber: number };
 }
 
-export function convertMIDInoteToSequencer(note: number) :number{
-  return 83 - note;
+export function convertMIDInoteToSequencer(note: number): number {
+  return 108 - note;
 }
 
 function mpqToBpm(microsecondsPerQuarter: number): number {
@@ -178,9 +178,9 @@ export function openMIDI(arrayBuffer: ArrayBuffer) {
       const e = event as MidiEvent;
       currentTick += event.delta || 0;
       if (e.setTempo) {
-          const bpm = mpqToBpm(e.setTempo.microsecondsPerQuarter);
-          console.log(`Tempo change: ${bpm.toFixed(1)} BPM`);
-          store.dispatch(setBpm(bpm));
+        const bpm = mpqToBpm(e.setTempo.microsecondsPerQuarter);
+        console.log(`Tempo change: ${bpm.toFixed(1)} BPM`);
+        store.dispatch(setBpm(bpm));
       } else if (e.noteOn && e.noteOn.velocity > 0) {
         // Note ON event
         const noteData = {
@@ -189,9 +189,9 @@ export function openMIDI(arrayBuffer: ArrayBuffer) {
           duration: 0 // Will be calculated later
         };
         activeNotes.set(e.noteOn.noteNumber, noteData);
-      } 
+      }
       else if (
-        (e.noteOff) || 
+        (e.noteOff) ||
         (e.noteOn && e.noteOn.velocity === 0)
       ) {
         // Note OFF event (explicit or zero-velocity noteOn)
@@ -237,12 +237,13 @@ const keyboard = new AudioKeys({
 });
 
 keyboard.down((key: Key) => {
-  const note = pitchNotes[95 - key.note];
+  console.log(key)
+  const note = pitchNotes[108 - key.note];
   noteDown(note);
 });
 
 keyboard.up((key: Key) => {
-  const note = pitchNotes[95 - key.note];
+  const note = pitchNotes[108 - key.note];
   noteUp(note);
 });
 

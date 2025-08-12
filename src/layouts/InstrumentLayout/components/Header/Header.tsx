@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
 import * as Tone from 'tone';
@@ -8,14 +8,8 @@ import { setColumnsCount } from 'src/shared/redux/slices/drawableFieldSlice';
 import { setBpm, setTacts } from 'src/shared/redux/slices/settingsSlice';
 import { RootState } from 'src/shared/redux/store/store';
 
-// import pauseIcon from './images/pause_icon.png';
-// import startIcom from './images/play_icon.png';
-// import stopIcon from './images/stop_icon.png';
 import arrowRightIcon from './images/arrowRightIcon.svg';
 import checkIcon from './images/checkIcon.svg';
-import startIcon from './images/playIcon.svg';
-import stopIcon from './images/stopIcon.svg';
-import pauseIcon from './images/pauseIcon.svg';
 
 import './Header.scss';
 import { pauseMusic, stopMusic, openMIDI } from 'src/app/SoundManager';
@@ -72,19 +66,23 @@ const Header = ({ className = '' }: HeaderProps) => {
 
   const { input, inputs, selectInput, selectedInputId } = useMIDIInputs();
 
+  useEffect(() => {
+    const midiInput = localStorage.getItem("midi-input")
+    midiInput && selectInput(midiInput)
+  }, [selectInput])
+
   const midiDeviceModalData: ModalItem[] = inputs.map((el) => ({
     text: el.name,
     callback: (event) => {
       event.stopPropagation();
+      localStorage.setItem("midi-input", el.id)
       selectInput(el.id);
     },
     sideContent: (
-      <img
-        className={clsx('modal__side-icon', {
+      <Icon icon={IconType.Check}
+        className={clsx('modal__side-icon', 'modal__check-icon', {
           'modal__side-icon_hidden': selectedInputId !== el.id
-        })}
-        src={checkIcon}
-      />
+        })} />
     )
   }));
 
@@ -101,10 +99,10 @@ const Header = ({ className = '' }: HeaderProps) => {
         />
       )
     },
-    {
-      text: 'Autosave',
-      callback: () => {}
-    },
+    // {
+    //   text: 'Autosave',
+    //   callback: () => { }
+    // },
     {
       text: 'MIDI input',
       callback: () => {
@@ -112,7 +110,7 @@ const Header = ({ className = '' }: HeaderProps) => {
       },
       sideContent: (
         <>
-          <img className="modal__side-icon" src={arrowRightIcon} />
+          <Icon icon={IconType.ChevronRight} className="modal__side-icon" />
           <Modal
             className={clsx(
               'header__inputs-left-button-sub-modal',
@@ -166,18 +164,21 @@ const Header = ({ className = '' }: HeaderProps) => {
             >
               <Icon
                 icon={IconType.Play}
+                interactable
                 className="header__icon header__icon-start"
               />
             </button>
             <button className="header__button" onClick={pauseMusic}>
               <Icon
                 icon={IconType.Pause}
+                interactable
                 className="header__icon header__icon-pause"
               />
             </button>
             <button className="header__button" onClick={stopMusic}>
               <Icon
                 icon={IconType.Repeat}
+                interactable
                 className="header__icon header__icon_stop"
               />
             </button>

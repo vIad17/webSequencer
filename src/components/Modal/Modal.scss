@@ -26,7 +26,8 @@
       color: var(--colors-ui-primary);
     }
 
-    &:active, &:_active {
+    &:active,
+    &:_active {
       color: var(--colors-ui-accent);
     }
   }
@@ -38,6 +39,12 @@
 
   &__side-content {
     margin: auto 0 auto 16px;
+    display: flex;
+    justify-content: center;
+  }
+
+  &__side-content>&__check-icon>* {
+    stroke: var(--colors-ui-accent);
   }
 
   &__side-icon {
@@ -51,4 +58,3 @@
     }
   }
 }
-
