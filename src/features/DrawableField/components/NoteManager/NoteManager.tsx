@@ -135,7 +135,6 @@ const NoteManager = ({className, isEditable = true} : NoteManagerProps) => {
     if (event.ctrlKey && event.key === D) {
       event.preventDefault();
       const activeNotes = notesArray.filter((note) => note.isSelected);
-      dispatch(setCopiedObjects(activeNotes));
       dispatch(removeSelectedNotes());
       const deltaPosition = Math.max(...activeNotes.map((obj) => obj.duration));
       const pastedObjects = activeNotes.map((obj) => ({
