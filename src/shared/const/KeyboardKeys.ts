@@ -1,11 +1,12 @@
 export const ARROW_UP = 'ArrowUp';
-export const ARROW_RIGHT = 'ArrowRight';
 export const ARROW_DOWN = 'ArrowDown';
 export const ARROW_LEFT = 'ArrowLeft';
+export const ARROW_RIGHT = 'ArrowRight';
 export const ESCAPE = 'Escape';
-export const DEL = 'Delete';
 export const CTRL = 'Control';
 export const BACKSPACE = 'Backspace'
+export const DEL = 'Delete';
+export const Z = 'z';
+export const X = 'x';
 export const C = 'c';
 export const V = 'v';
-export const Z = 'z';

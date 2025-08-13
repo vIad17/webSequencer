@@ -12,6 +12,7 @@ import {
   C,
   ESCAPE,
   V,
+  X,
   Z
 } from 'src/shared/const/KeyboardKeys';
 import { clamp, round } from 'src/shared/functions/math';
@@ -20,6 +21,8 @@ import {
   addNotes,
   changeSelectedNote,
   deleteNote,
+  deleteNotes,
+  deleteSelectedNotes,
   removeSelectedNotes,
   setDeltaSize,
   setNotes,
@@ -113,6 +116,11 @@ const NoteManager = ({className, isEditable = true} : NoteManagerProps) => {
       const activeNotes = notesArray.filter((note) => note.isSelected);
       dispatch(setCopiedObjects(activeNotes));
     }
+    if (event.ctrlKey && event.key === X) {
+      const activeNotes = notesArray.filter((note) => note.isSelected);
+      dispatch(setCopiedObjects(activeNotes));
+      dispatch(deleteSelectedNotes());
+    }
     if (event.ctrlKey && event.key === V) {
       dispatch(removeSelectedNotes());
       const deltaPosition =
@@ -131,11 +139,7 @@ const NoteManager = ({className, isEditable = true} : NoteManagerProps) => {
     }
     if (event.key === BACKSPACE || event.key === DEL) {
       event.preventDefault();
-      for (let i = notesArray.length - 1; i >= 0; i--) {
-        if (notesArray[i].isSelected) {
-          dispatch(deleteNote(i));
-        }
-      }
+      dispatch(deleteSelectedNotes());
     }
     if (
       event.key === ARROW_UP ||

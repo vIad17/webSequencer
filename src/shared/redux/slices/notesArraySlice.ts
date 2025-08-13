@@ -89,6 +89,18 @@ export const notesArraySlice = createSlice({
         (_, index) => index !== action.payload
       )
     }),
+    deleteNotes: (state, action: PayloadAction<number[]>) => ({
+      ...state,
+      notesArray: state.notesArray.filter(
+        (_, index) => !new Set(action.payload).has(index)
+      )
+    }),
+    deleteSelectedNotes: (state) => ({
+      ...state,
+      notesArray: state.notesArray.filter(
+        (note) => !note.isSelected
+      )
+    }),
     changeSelectedNote: (state, action: PayloadAction<ChangeSelectedType>) => ({
       ...state,
       notesArray: state.notesArray.map((element, i) =>
@@ -154,6 +166,8 @@ export const {
   updateNotePosition,
   updateNoteDuration,
   deleteNote,
+  deleteNotes,
+  deleteSelectedNotes,
   changeSelectedNote,
   addSelectedNote,
   setActiveNote,
