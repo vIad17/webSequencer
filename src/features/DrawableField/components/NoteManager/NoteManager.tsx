@@ -35,8 +35,7 @@ import { RootState } from 'src/shared/redux/store/store';
 import CreationField from '../CreationField/CreationField';
 import DraggableNote from '../DraggableNote/DraggableNote';
 import {
-  setCopiedObjects,
-  deleteObjects
+  setCopiedObjects
 } from 'src/shared/redux/slices/copiedObjectsSlise';
 import { useNavigate } from 'react-router-dom';
 
@@ -52,7 +51,7 @@ interface NoteManagerProps {
   isEditable?: boolean
 }
 
-const NoteManager = ({className, isEditable = true} : NoteManagerProps) => {
+const NoteManager = ({ className, isEditable = true }: NoteManagerProps) => {
   const [isResizing, setIsResizing] = useState(false);
   const [isDragg, setIsDragg] = useState(false);
   const [isblockedCreation, setIsBlockedCreation] = useState(false);
@@ -291,11 +290,11 @@ const NoteManager = ({className, isEditable = true} : NoteManagerProps) => {
         index={index}
         isSelected={element.isSelected}
         isActive={element.isActive}
-        onDrag={isEditable ? dragNoteHandler : () => {}}
-        onMouseDown={isEditable ? changeSelectedNoteHandler : () => {}}
-        onMouseUp={isEditable ? NoteMouseUpHandler : () => {}}
-        onRightClick={isEditable ? deleteNoteHandler : () => {}}
-        onSizeableClick={isEditable ? resizeNoteHandler : () => {}}
+        onDrag={isEditable ? dragNoteHandler : () => { }}
+        onMouseDown={isEditable ? changeSelectedNoteHandler : () => { }}
+        onMouseUp={isEditable ? NoteMouseUpHandler : () => { }}
+        onRightClick={isEditable ? deleteNoteHandler : () => { }}
+        onSizeableClick={isEditable ? resizeNoteHandler : () => { }}
       />
     ));
 

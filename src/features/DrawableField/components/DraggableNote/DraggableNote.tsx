@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { memo, useEffect } from 'react';
 import Draggable, { DraggableData, DraggableEvent } from 'react-draggable';
 import { useSelector } from 'react-redux';
 
@@ -83,4 +83,15 @@ const DraggableNote = ({
   );
 };
 
-export default React.memo(DraggableNote);
+export default React.memo(DraggableNote, arePropsEqual);
+
+function arePropsEqual(oldProps: DraggableNoteProps, newProps: DraggableNoteProps) {
+  return (
+    oldProps.index === newProps.index &&
+    oldProps.x === newProps.x &&
+    oldProps.y === newProps.y &&
+    oldProps.size === newProps.size &&
+    oldProps.isSelected === newProps.isSelected &&
+    oldProps.isActive === newProps.isActive
+  );
+}
