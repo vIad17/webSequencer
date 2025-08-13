@@ -3,6 +3,7 @@ export const ARROW_RIGHT = 'ArrowRight';
 export const ARROW_DOWN = 'ArrowDown';
 export const ARROW_LEFT = 'ArrowLeft';
 export const ESCAPE = 'Escape';
+export const DEL = 'Delete';
 export const CTRL = 'Control';
 export const BACKSPACE = 'Backspace'
 export const C = 'c';

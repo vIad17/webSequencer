@@ -8,6 +8,7 @@ import {
   ARROW_RIGHT,
   ARROW_UP,
   BACKSPACE,
+  DEL,
   C,
   ESCAPE,
   V,
@@ -128,10 +129,13 @@ const NoteManager = ({className, isEditable = true} : NoteManagerProps) => {
     if (event.ctrlKey && event.shiftKey && event.key === Z) {
       navigate(1);
     }
-    if (event.key === BACKSPACE) {
-      const activeNotesIndex = notesArray.map((note, index) => {
-        if (note.isSelected) return index;
-      });
+    if (event.key === BACKSPACE || event.key === DEL) {
+      event.preventDefault();
+      for (let i = notesArray.length - 1; i >= 0; i--) {
+        if (notesArray[i].isSelected) {
+          dispatch(deleteNote(i));
+        }
+      }
     }
     if (
       event.key === ARROW_UP ||
