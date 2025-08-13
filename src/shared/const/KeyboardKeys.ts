@@ -10,3 +10,4 @@ export const Z = 'z';
 export const X = 'x';
 export const C = 'c';
 export const V = 'v';
+export const D = 'd';

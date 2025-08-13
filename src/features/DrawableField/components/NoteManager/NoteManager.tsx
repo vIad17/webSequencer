@@ -12,6 +12,7 @@ import {
   C,
   ESCAPE,
   V,
+  D,
   X,
   Z
 } from 'src/shared/const/KeyboardKeys';
@@ -126,6 +127,18 @@ const NoteManager = ({className, isEditable = true} : NoteManagerProps) => {
       const deltaPosition =
         currentBit - Math.min(...copiedObjects.map((obj) => obj.attackTime));
       const pastedObjects = copiedObjects.map((obj) => ({
+        ...obj,
+        attackTime: obj.attackTime + deltaPosition
+      }));
+      dispatch(addNotes(pastedObjects));
+    }
+    if (event.ctrlKey && event.key === D) {
+      event.preventDefault();
+      const activeNotes = notesArray.filter((note) => note.isSelected);
+      dispatch(setCopiedObjects(activeNotes));
+      dispatch(removeSelectedNotes());
+      const deltaPosition = Math.max(...activeNotes.map((obj) => obj.duration));
+      const pastedObjects = activeNotes.map((obj) => ({
         ...obj,
         attackTime: obj.attackTime + deltaPosition
       }));
