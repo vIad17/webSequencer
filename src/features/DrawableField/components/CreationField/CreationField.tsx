@@ -46,6 +46,7 @@ const CreationField = ({
     <button
       className={`creation-field ${className}`}
       onClickCapture={onMouseUp}
+      onContextMenu={(e) => e.preventDefault()}
       ref={mouseRef}
     />
   );
