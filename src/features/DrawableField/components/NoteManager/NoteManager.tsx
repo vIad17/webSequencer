@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { DraggableData, DraggableEvent } from 'react-draggable';
 import { useDispatch, useSelector } from 'react-redux';
 
@@ -67,6 +67,8 @@ const NoteManager = ({ className, isEditable = true }: NoteManagerProps) => {
     (state: RootState) => state.currentMusic.currentBit
   );
 
+  const pressedKeysRef = useRef<Set<string>>(new Set());
+
   const navigate = useNavigate();
 
   const dispatch = useDispatch();
@@ -109,6 +111,12 @@ const NoteManager = ({ className, isEditable = true }: NoteManagerProps) => {
   };
 
   const KeyDownHandler = (event: KeyboardEvent) => {
+    if (pressedKeysRef.current.has(event.key)) {
+      event.preventDefault();
+      return; // Key already pressed, ignore repeat
+    }
+    pressedKeysRef.current.add(event.key);
+
     if (event.key === ESCAPE) {
       dispatch(removeSelectedNotes());
     }
@@ -202,6 +210,10 @@ const NoteManager = ({ className, isEditable = true }: NoteManagerProps) => {
     }
   };
 
+   const KeyUpHandler = (e: KeyboardEvent) => {
+      pressedKeysRef.current.delete(e.key);
+    };
+
   const dragNoteHandler = (e: DraggableEvent, position: DraggableData) => {
     setIsDragg(true);
     e.preventDefault();
@@ -275,8 +287,12 @@ const NoteManager = ({ className, isEditable = true }: NoteManagerProps) => {
 
   useEffect(() => {
     document.addEventListener('keydown', KeyDownHandler);
+    document.addEventListener('keyup', KeyUpHandler);
+
+    
     return () => {
       document.removeEventListener('keydown', KeyDownHandler);
+      document.removeEventListener('keyup', KeyUpHandler);
     };
   }, [notesArray, currentBit, copiedObjects]);
 
