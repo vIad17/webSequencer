@@ -113,16 +113,16 @@ const NoteManager = ({className, isEditable = true} : NoteManagerProps) => {
     if (event.key === ESCAPE) {
       dispatch(removeSelectedNotes());
     }
-    if (event.ctrlKey && event.key === C) {
+    if (event.ctrlKey && event.code === C) {
       const activeNotes = notesArray.filter((note) => note.isSelected);
       dispatch(setCopiedObjects(activeNotes));
     }
-    if (event.ctrlKey && event.key === X) {
+    if (event.ctrlKey && event.code === X) {
       const activeNotes = notesArray.filter((note) => note.isSelected);
       dispatch(setCopiedObjects(activeNotes));
       dispatch(deleteSelectedNotes());
     }
-    if (event.ctrlKey && event.key === V) {
+    if (event.ctrlKey && event.code === V) {
       dispatch(removeSelectedNotes());
       const deltaPosition =
         currentBit - Math.min(...copiedObjects.map((obj) => obj.attackTime));
@@ -132,7 +132,7 @@ const NoteManager = ({className, isEditable = true} : NoteManagerProps) => {
       }));
       dispatch(addNotes(pastedObjects));
     }
-    if (event.ctrlKey && event.key === D) {
+    if (event.ctrlKey && event.code === D) {
       event.preventDefault();
       const activeNotes = notesArray.filter((note) => note.isSelected);
       dispatch(removeSelectedNotes());
@@ -143,10 +143,10 @@ const NoteManager = ({className, isEditable = true} : NoteManagerProps) => {
       }));
       dispatch(addNotes(pastedObjects));
     }
-    if (event.ctrlKey && !event.shiftKey && event.key === Z) {
+    if (event.ctrlKey && !event.shiftKey && event.code === Z) {
       navigate(-1);
     }
-    if (event.ctrlKey && event.shiftKey && event.key === Z) {
+    if (event.ctrlKey && event.shiftKey && event.code === Z) {
       navigate(1);
     }
     if (event.key === BACKSPACE || event.key === DEL) {
