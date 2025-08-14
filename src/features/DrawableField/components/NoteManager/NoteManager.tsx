@@ -115,99 +115,111 @@ const NoteManager = ({ className, isEditable = true }: NoteManagerProps) => {
       event.preventDefault();
       return; // Key already pressed, ignore repeat
     }
-    pressedKeysRef.current.add(event.key);
 
-    if (event.key === ESCAPE) {
-      dispatch(removeSelectedNotes());
-    }
-    if (event.ctrlKey && event.code === C) {
-      const activeNotes = notesArray.filter((note) => note.isSelected);
-      dispatch(setCopiedObjects(activeNotes));
-    }
-    if (event.ctrlKey && event.code === X) {
-      const activeNotes = notesArray.filter((note) => note.isSelected);
-      dispatch(setCopiedObjects(activeNotes));
-      dispatch(deleteSelectedNotes());
-    }
-    if (event.ctrlKey && event.code === V) {
-      dispatch(removeSelectedNotes());
-      const deltaPosition =
-        currentBit - Math.min(...copiedObjects.map((obj) => obj.attackTime));
-      const pastedObjects = copiedObjects.map((obj) => ({
-        ...obj,
-        attackTime: obj.attackTime + deltaPosition
-      }));
-      dispatch(addNotes(pastedObjects));
-    }
-    if (event.ctrlKey && event.code === D) {
-      event.preventDefault();
-      const activeNotes = notesArray.filter((note) => note.isSelected);
-      dispatch(removeSelectedNotes());
-      const deltaPosition = Math.max(...activeNotes.map((obj) => obj.duration));
-      const pastedObjects = activeNotes.map((obj) => ({
-        ...obj,
-        attackTime: obj.attackTime + deltaPosition
-      }));
-      dispatch(addNotes(pastedObjects));
-    }
-    if (event.ctrlKey && !event.shiftKey && event.code === Z) {
-      navigate(-1);
-    }
-    if (event.ctrlKey && event.shiftKey && event.code === Z) {
-      navigate(1);
-    }
-    if (event.key === BACKSPACE || event.key === DEL) {
-      event.preventDefault();
-      dispatch(deleteSelectedNotes());
-    }
-    if (
-      event.key === ARROW_UP ||
-      event.key === ARROW_RIGHT ||
-      event.key === ARROW_DOWN ||
-      event.key === ARROW_LEFT
-    ) {
-      event.preventDefault();
-
-      if (event.shiftKey) {
-        let deltaDuration = 0;
-        let multiplier = 1;
+    switch (event.code) {
+      case ESCAPE:
+        dispatch(removeSelectedNotes());
+        break;
+      case C:
+        if(event.ctrlKey){
+          const activeNotes = notesArray.filter((note) => note.isSelected);
+          dispatch(setCopiedObjects(activeNotes));
+        }
+        break;
+      case X:
         if (event.ctrlKey) {
-          multiplier = 4;
+          const activeNotes = notesArray.filter((note) => note.isSelected);
+          dispatch(setCopiedObjects(activeNotes));
+          dispatch(deleteSelectedNotes());
         }
-        if (event.key === ARROW_RIGHT) {
-          deltaDuration = 1 * multiplier;
-        } else if (event.key === ARROW_LEFT) {
-          deltaDuration = -1 * multiplier;
+        break;
+      case V:
+        if (event.ctrlKey) {
+          dispatch(removeSelectedNotes());
+          const deltaPosition =
+            currentBit - Math.min(...copiedObjects.map((obj) => obj.attackTime));
+          const pastedObjects = copiedObjects.map((obj) => ({
+            ...obj,
+            attackTime: obj.attackTime + deltaPosition
+          }));
+          dispatch(addNotes(pastedObjects));
         }
-        notesArray.forEach((note, index) => {
-          if (note.isSelected) {
-            dispatch(
-              updateNoteDuration({
-                index,
-                duration: Math.max(
-                  note.duration +
-                    Math.min(
-                      deltaDuration,
-                      drawableField.columnsCount -
-                        (note.attackTime + note.duration)
-                    ),
-                  1
-                )
-              })
-            );
+        break;
+      case D:
+        if (event.ctrlKey) {
+          const activeNotes = notesArray.filter((note) => note.isSelected);
+          dispatch(removeSelectedNotes());
+          const deltaPosition = Math.max(...activeNotes.map((obj) => obj.duration));
+          const pastedObjects = activeNotes.map((obj) => ({
+            ...obj,
+            attackTime: obj.attackTime + deltaPosition
+          }));
+          dispatch(addNotes(pastedObjects));
+        }
+        break;
+      case Z:
+        if (event.ctrlKey) {
+          navigate(event.shiftKey?1:-1);
+        }
+        break;
+    
+      case BACKSPACE:
+      case DEL:
+        dispatch(deleteSelectedNotes());
+        break;
+
+      case ARROW_UP:
+      case ARROW_RIGHT:
+      case ARROW_DOWN:
+      case ARROW_LEFT:
+        if (event.shiftKey) {
+          let deltaDuration = 0;
+          let multiplier = 1;
+          if (event.ctrlKey) {
+            multiplier = 4;
           }
-        });
-      } else {
-        let xMultiplier = 1;
-        let yMultiplier = 1;
-        if (event.ctrlKey) {
-          xMultiplier = 4;
-          yMultiplier = 12;
+          if (event.key === ARROW_RIGHT) {
+            deltaDuration = 1 * multiplier;
+          } else if (event.key === ARROW_LEFT) {
+            deltaDuration = -1 * multiplier;
+          }
+          notesArray.forEach((note, index) => {
+            if (note.isSelected) {
+              dispatch(
+                updateNoteDuration({
+                  index,
+                  duration: Math.max(
+                    note.duration +
+                      Math.min(
+                        deltaDuration,
+                        drawableField.columnsCount -
+                          (note.attackTime + note.duration)
+                      ),
+                    1
+                  )
+                })
+              );
+            }
+          });
+        } else {
+          let xMultiplier = 1;
+          let yMultiplier = 1;
+          if (event.ctrlKey) {
+            xMultiplier = 4;
+            yMultiplier = 12;
+          }
+          const coordinates = moveByGreed[event.key as keyof typeof moveByGreed];
+          moveNote(coordinates.x * xMultiplier, coordinates.y * yMultiplier);
         }
-        const coordinates = moveByGreed[event.key as keyof typeof moveByGreed];
-        moveNote(coordinates.x * xMultiplier, coordinates.y * yMultiplier);
-      }
+        break;
+
+      default:
+        return;
+        break;
     }
+
+    pressedKeysRef.current.add(event.key);
+    event.preventDefault();
   };
 
    const KeyUpHandler = (e: KeyboardEvent) => {
