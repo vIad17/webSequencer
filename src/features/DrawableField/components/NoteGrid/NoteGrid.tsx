@@ -16,7 +16,13 @@ const NoteGrid = ({ className = '' }: NoteGridProps) => {
   const svgRef = useRef<SVGSVGElement | null>(null);
 
   const drawableField = useSelector((state: RootState) => state.drawableField);
-  const tactsCount = useSelector((state: RootState) => state.settings.tacts) ?? 8;
+  const tactsCount =
+    useSelector((state: RootState) => state.settings.tacts) ?? 8;
+  const plaingNotes = useSelector(
+    (state: RootState) => state.notesArray.playingNotes
+  );
+
+  console.log(plaingNotes);
 
   const elemWidth = drawableField.elementWidth;
   const elemHeight = drawableField.elementHeight;
@@ -42,15 +48,20 @@ const NoteGrid = ({ className = '' }: NoteGridProps) => {
       .attr('height', elemHeight * rowsCount);
 
     for (let i = 0; i <= rowsCount; i++) {
-      if (pitchNotes[i]?.charAt(1) !== '#') {
-        svg
-          .append('rect')
-          .attr('x', 0)
-          .attr('y', i * elemHeight)
-          .attr('width', elemWidth * columnCount)
-          .attr('height', elemHeight)
-          .attr('fill', '#001629');
-      }
+      const isPlaying = plaingNotes.includes(pitchNotes[i]);
+      const isBlack = pitchNotes[i]?.charAt(1) === '#';
+      
+      const color = isBlack 
+        ? isPlaying ? '#350b46' : '#030918'
+        : isPlaying ? '#331654' : '#001629';
+
+      svg
+        .append('rect')
+        .attr('x', 0)
+        .attr('y', i * elemHeight)
+        .attr('width', elemWidth * columnCount)
+        .attr('height', elemHeight)
+        .attr('fill', color);
     }
 
     for (let x = 0; x <= columnCount; x++) {
@@ -82,7 +93,7 @@ const NoteGrid = ({ className = '' }: NoteGridProps) => {
     if (tactsCount && svgRef.current) {
       drawGrid();
     }
-  }, [elemWidth, elemHeight, columnCount, rowsCount, tactsCount]);
+  }, [elemWidth, elemHeight, columnCount, rowsCount, tactsCount, plaingNotes]);
 
   if (!tactsCount) return null;
 

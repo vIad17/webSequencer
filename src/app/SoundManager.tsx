@@ -87,12 +87,12 @@ function playMusic(time: number) {
         `0:0:${note.duration}`,
         time
       );
-      store.dispatch(addPlayingNote(pitchNotes[note.note]));
+      // store.dispatch(addPlayingNote(pitchNotes[note.note]));
     }
     if (note.attackTime + note.duration <= currentBit) {
       note.isActive &&
         store.dispatch(setActiveNote({ index, isActive: false }));
-      store.dispatch(removePlayingNote(pitchNotes[note.note]));
+      // store.dispatch(removePlayingNote(pitchNotes[note.note]));
     }
   });
 

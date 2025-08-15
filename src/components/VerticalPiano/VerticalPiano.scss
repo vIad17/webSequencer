@@ -13,18 +13,20 @@
     border: var(--colors-ui-secondary) 1px solid;
 
     &-black {
-      background: var(--colors-bg-primary);
+      background-color: var(--colors-bg-primary);
 
-      &:active, &--active {
-        background-color: #555;
+      &:active,
+      &--active {
+        background-color: #350b46;
       }
     }
-    &-white{
-      background-color: #001629;
+    &-white {
+      background-color: var(--colors-bg-secondary);
 
-      &:active, &-white--active {
-        background-color: #001629;
+      &:active,
+      &--active {
+        background-color: #331654;
       }
     }
-    }
+  }
 }

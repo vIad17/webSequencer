@@ -24,7 +24,7 @@ const VerticalPiano = ({ className = '' }: VerticalPianoProps) => {
     const color = note.at(1) === '#' ? 'black' : 'white';
     const isActive = plaingNotes.includes(note);
     const className = `vertical-piano__key-${color}`;
-    return `${className}${isActive ? ` ${className}__active` : ''}`;
+    return `${className}${isActive ? ` ${className}--active` : ''}`;
   };
 
   const startPlayingNote = (note: string) => {
