@@ -88,7 +88,6 @@ const TactsNumbers = ({ className = '' }: TactsNumbersProps) => {
   }, [handleGlobalMouseUp]);
 
   const handleMouseDownTacts = (event: React.MouseEvent<HTMLButtonElement>) => {
-    console.log("ASDFGHJ")
     document.addEventListener('mouseup', handleGlobalMouseUp);
     bRewindActiveRef.current = true;
     handleRewindTacts(event);
@@ -98,7 +97,6 @@ const TactsNumbers = ({ className = '' }: TactsNumbersProps) => {
     if (!bRewindActiveRef.current) return;
     if (!tactsCounter) return;
     const rect = event.currentTarget.getBoundingClientRect();
-    console.log(event.clientX)
     const relativeX = event.clientX - rect.left - 50;
     const totalWidth = svgRef.current?.width.baseVal.value ?? 1;
     const clickPosition = relativeX / totalWidth;

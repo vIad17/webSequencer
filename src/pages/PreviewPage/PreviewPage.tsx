@@ -60,7 +60,7 @@ const PreviewPage = ({ className = '' }: InstrumentPageProps) => {
   });
 
   // useEffect(() => {
-  //   console.log("FDSGDHF")
+  //   console.log("  FDSGDHF")
   //   document.querySelector('.preview')?.scrollTo({
   //     top: 200
   //   })
