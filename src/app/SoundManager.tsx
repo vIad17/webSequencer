@@ -267,26 +267,51 @@ async function exportToBuffer() {
   const bpm = store.getState().settings.bpm ?? 120;
 
   const totalSteps = tactsCounter * 4;
-  const durationSeconds = ((tactsCounter * 4) / bpm ) * 60;
+  const durationSeconds = ((tactsCounter * 4) / bpm) * 60;
 
   const buffer = await Tone.Offline(({ transport }) => {
     // --- recreate synth in offline context (clone from live if needed)
-    const synth = new Tone.Synth().toDestination();
+    const exportedSynth = new Tone.Synth();
 
-    console.log("tempo: " + transport.bpm.value)
+    exportedSynth.set(synth.get());
 
-    // --- recreate effects (you can also pass `.get()` from live instances)
-    const tremolo = new Tone.Tremolo().start();
-    const delay = new Tone.FeedbackDelay("8n", 0.5);
-    const dist = new Tone.Distortion(0.4);
-    const crusher = new Tone.BitCrusher(4);
-    const shifter = new Tone.PitchShift(2);
-    const highFilter = new Tone.Filter(12000, "lowpass");
-    const lowFilter = new Tone.Filter(200, "highpass");
-    const gain = new Tone.Gain(0.8);
+    // // --- recreate effects (you can also pass `.get()` from live instances)
+    const tremolo = new Tone.Tremolo(0, 0).start(); // affects the gain
 
-    // --- chain them together
-    synth.chain(
+    // delayTime [0, 1]
+    // feedback [0, 1]
+    const delay = new Tone.FeedbackDelay(0, 0);
+
+    // distortion [0, 10]
+    const dist = new Tone.Distortion(0); // affects the gain
+
+    // bits [1, 16]
+    const crusher = new Tone.BitCrusher(16);
+
+    // pitchShift [0, 1]
+    const shifter = new Tone.PitchShift(0);
+
+    // filter [20, 8000]
+    const highFilter = new Tone.Filter(20, 'lowpass');
+    const lowFilter = new Tone.Filter(8000, 'highpass');
+
+    const gain = new Tone.Gain(6).toDestination();
+
+
+    // const ss = useSelector((state: RootState) => state.soundSettings);
+    const ss = store.getState().soundSettings
+
+    if (ss.tremoloFrequency) tremolo.frequency.value = ss.tremoloFrequency;
+    if (ss.tremoloDepth) tremolo.depth.value = ss.tremoloDepth;
+    if (ss.delayTime) delay.delayTime.value = ss.delayTime;
+    if (ss.feedback) delay.feedback.value = ss.feedback;
+    if (ss.distortion) dist.distortion = ss.distortion;
+    if (ss.bits) crusher.bits.value = ss.bits;
+    if (ss.pitchShift) shifter.pitch = ss.pitchShift;
+    if (ss.lowFilter) lowFilter.set({ frequency: ss.lowFilter });
+    if (ss.highFilter) highFilter.set({ frequency: ss.highFilter });
+
+    exportedSynth.chain(
       tremolo,
       delay,
       dist,
@@ -294,20 +319,16 @@ async function exportToBuffer() {
       shifter,
       highFilter,
       lowFilter,
-      gain,
-      Tone.getDestination()
+      gain
     );
 
-    // --- schedule notes
     notesArray
       // .sort((a, b) => a.attackTime - b.attackTime)
       .forEach((note) => {
         const startTime = `0:0:${note.attackTime}`;
         const durTime = `0:0:${note.duration}`;
 
-        console.log(startTime, durTime)
-
-        synth.triggerAttackRelease(
+        exportedSynth.triggerAttackRelease(
           pitchNotes[note.note],
           durTime,
           startTime
@@ -321,15 +342,13 @@ async function exportToBuffer() {
 }
 
 function audioBufferToMp3(buffer: AudioBuffer): Blob {
-  console.log("ABOBA: " + buffer.sampleRate)
   const mp3Encoder = new lamejs.Mp3Encoder(1, buffer.sampleRate, 128);
-  const samples = buffer.getChannelData(0); // mono for simplicity
+  const samples = buffer.getChannelData(0);
   const mp3Data: Uint8Array[] = [];
 
   const sampleBlockSize = 1152;
   for (let i = 0; i < samples.length; i += sampleBlockSize) {
     const sampleChunk = (samples.subarray(i, i + sampleBlockSize).map(el => el * 10000));
-    // console.log(sampleChunk)
     const mp3buf = mp3Encoder.encodeBuffer(sampleChunk);
     if (mp3buf.length > 0) {
       mp3Data.push(mp3buf);
