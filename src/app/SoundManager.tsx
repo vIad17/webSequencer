@@ -19,6 +19,8 @@ import {
 } from 'src/shared/redux/slices/notesArraySlice';
 import store, { RootState } from 'src/shared/redux/store/store';
 
+import * as lamejs from '@breezystack/lamejs';
+
 import { parseArrayBuffer } from 'midi-json-parser';
 import { addNote } from 'src/shared/redux/slices/notesArraySlice';
 import { setBpm, setTacts } from 'src/shared/redux/slices/settingsSlice';
@@ -87,12 +89,10 @@ function playMusic(time: number) {
         `0:0:${note.duration}`,
         time
       );
-      // store.dispatch(addPlayingNote(pitchNotes[note.note]));
     }
     if (note.attackTime + note.duration <= currentBit) {
       note.isActive &&
         store.dispatch(setActiveNote({ index, isActive: false }));
-      // store.dispatch(removePlayingNote(pitchNotes[note.note]));
     }
   });
 
@@ -111,6 +111,13 @@ export function stopMusic() {
   store.dispatch(setIsPlaying(false));
   Tone.Transport.stop();
 }
+
+// Tone.Timeline()
+
+// const seq = new Tone.Sequence((time, note) => {
+// 	synth.triggerAttackRelease(note, 0.1, time);
+// }, ["C4", ["E4", "D4", "E4", "F4"], "G4", [244, "G4"]]).start(0);
+// Tone.Transport.start();
 
 export function rewindMusic(bit: number) {
   //console.log("Rewinding to: "+ bit)
@@ -250,6 +257,103 @@ keyboard.up((key: Key) => {
   const note = pitchNotes[108 - key.note];
   noteUp(note);
 });
+
+async function exportToBuffer() {
+  const notesArray = store.getState().notesArray.notesArray;
+  // const pitchNotes = store.getState().pitchNotes;
+  const tactsCounter = store.getState().settings.tacts ?? 8;
+
+  const totalSteps = tactsCounter * 16;
+  const durationSeconds = Tone.Time(`${totalSteps} * 16n`).toSeconds();
+
+  const buffer = await Tone.Offline(({ transport }) => {
+    // --- recreate synth in offline context (clone from live if needed)
+    const synth = new Tone.Synth().toDestination();
+
+    console.log("tempo: " + transport.bpm.value)    
+
+    // --- recreate effects (you can also pass `.get()` from live instances)
+    const tremolo = new Tone.Tremolo().start();
+    const delay = new Tone.FeedbackDelay("8n", 0.5);
+    const dist = new Tone.Distortion(0.4);
+    const crusher = new Tone.BitCrusher(4);
+    const shifter = new Tone.PitchShift(2);
+    const highFilter = new Tone.Filter(12000, "lowpass");
+    const lowFilter = new Tone.Filter(200, "highpass");
+    const gain = new Tone.Gain(0.8);
+
+    // --- chain them together
+    synth.chain(
+      tremolo,
+      delay,
+      dist,
+      crusher,
+      shifter,
+      highFilter,
+      lowFilter,
+      gain,
+      Tone.getDestination()
+    );
+
+    // --- schedule notes
+    notesArray
+      // .sort((a, b) => a.attackTime - b.attackTime)
+      .forEach((note) => {
+        const startTime = note.attackTime;
+        const durTime = `0:0:${note.duration}`;
+
+        console.log(startTime, durTime)
+
+        synth.triggerAttackRelease(
+          pitchNotes[note.note],
+          durTime,
+          startTime
+        );
+      });
+
+    transport.start(0);
+  }, durationSeconds);
+
+  return buffer.get();
+}
+
+function audioBufferToMp3(buffer: AudioBuffer): Blob {
+  console.log("ABOBA: " + buffer.sampleRate)
+  const mp3Encoder = new lamejs.Mp3Encoder(1, buffer.sampleRate, 128);
+  const samples = buffer.getChannelData(0); // mono for simplicity
+  const mp3Data: Uint8Array[] = [];
+
+  const sampleBlockSize = 1152;
+  for (let i = 0; i < samples.length; i += sampleBlockSize) {
+    const sampleChunk = (samples.subarray(i, i + sampleBlockSize).map(el => el * 10000));
+    // console.log(sampleChunk)
+    const mp3buf = mp3Encoder.encodeBuffer(sampleChunk);
+    if (mp3buf.length > 0) {
+      mp3Data.push(mp3buf);
+    }
+  }
+
+  const mp3buf = mp3Encoder.flush();
+  if (mp3buf.length > 0) {
+    mp3Data.push(mp3buf);
+  }
+
+  return new Blob(mp3Data, { type: "audio/mp3" });
+}
+
+export async function exportMp3() {
+  const buffer = await exportToBuffer();
+  const mp3Blob = audioBufferToMp3(buffer);
+
+  const url = URL.createObjectURL(mp3Blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "melody.mp3";
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+
 
 /* creating a component */
 const SoundManager = () => {

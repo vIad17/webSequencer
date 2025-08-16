@@ -11,6 +11,7 @@
     "prepare": "husky"
   },
   "dependencies": {
+    "@breezystack/lamejs": "^1.2.7",
     "@react-midi/hooks": "^2.0.1",
     "@reduxjs/toolkit": "1.9.5",
     "@uidotdev/usehooks": "2.4.1",
@@ -19,6 +20,7 @@
     "audiokeys": "0.1.1",
     "clsx": "^2.1.1",
     "d3": "^7.9.0",
+    "lamejs": "^1.2.1",
     "midi-json-parser": "^8.1.66",
     "p5.js-svg": "1.5.1",
     "pako": "2.1.0",

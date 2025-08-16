@@ -12,7 +12,7 @@ import arrowRightIcon from './images/arrowRightIcon.svg';
 import checkIcon from './images/checkIcon.svg';
 
 import './Header.scss';
-import { pauseMusic, stopMusic, openMIDI } from 'src/app/SoundManager';
+import { pauseMusic, stopMusic, openMIDI, exportMp3 } from 'src/app/SoundManager';
 import Modal, { ModalItem } from 'src/components/Modal/Modal';
 import { useHandleClickOutside } from 'src/shared/hooks/useHandleClickOutside';
 import clsx from 'clsx';
@@ -152,6 +152,7 @@ const Header = ({ className = '' }: HeaderProps) => {
       <div className="header__center">
         {(!!settings.bpm || !!settings.tacts) && (
           <div className="header__buttons">
+                  <button onClick={() => exportMp3()}>Export</button>
             <button
               className="header__button"
               onClick={() => {
