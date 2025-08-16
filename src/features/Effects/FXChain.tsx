@@ -94,11 +94,7 @@ export class FXChain {
         return newFX;
     }
 
-    public removeFX(position: number): void {
-        if (position < 0 || position >= this.effectsChain.length) {
-            return;
-        }
-
+    private removeFXconnections(position: number): Tone.ToneAudioNode{
         const removedFX = this.effectsChain[position];
         
         if (this.effectsChain.length === 1) {
@@ -118,8 +114,30 @@ export class FXChain {
             removedFX.disconnect();
             this.effectsChain[position - 1].connect(this.effectsChain[position + 1]);
         }
+
+        return removedFX;
+    }
+
+    public removeFX(position: number): void {
+        if (position < 0 || position >= this.effectsChain.length) return;
+
+        this.removeFXconnections(position);
         this.effectsChain[position].dispose();
         this.effectsChain.splice(position, 1);
+    }
+
+    public moveFX(position: number, newPosition: number){
+        if (position < 0 || position >= this.effectsChain.length) return;
+        newPosition = Math.max(0, Math.min(newPosition, this.effectsChain.length-1));
+        if (newPosition == position) return;
+
+        const removedFX = this.removeFXconnections(position);
+
+        if(newPosition>position)newPosition++;
+        this.addFX(removedFX, newPosition);
+
+        this.effectsChain.splice(position, 1);
+        
     }
 
     public appendFX(newFX: Tone.ToneAudioNode){
