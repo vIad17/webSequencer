@@ -25,24 +25,16 @@ import { parseArrayBuffer } from 'midi-json-parser';
 import { addNote } from 'src/shared/redux/slices/notesArraySlice';
 import { setBpm, setTacts } from 'src/shared/redux/slices/settingsSlice';
 
-/* creating a synth */
-const synth = new Tone.PolySynth(Tone.Synth, {
-  oscillator: {
-    type: 'sine'
-  },
-  envelope: {
-    attack: 0,
-    decay: 0,
-    sustain: 1,
-    release: 0.01
-  }
-}).connect(new Tone.Add(2));
+import {FXChain} from 'src/features/Effects/FXChain';
 
+
+const chain = new FXChain();
+const synth = chain.getSynth();
 /* creating effects */
 
 // tremoloFrequency [0, 10]
 // tremoloDepth [0, 1]
-const tremolo = new Tone.Tremolo(0, 0).start(); // affects the gain
+const tremolo = new Tone.Tremolo(0, 0)//.start(); // affects the gain
 
 // delayTime [0, 1]
 // feedback [0, 1]
@@ -63,17 +55,14 @@ const lowFilter = new Tone.Filter(8000, 'highpass');
 
 const gain = new Tone.Gain(6);
 
-synth.chain(
-  tremolo,
-  delay,
-  dist,
-  crusher,
-  shifter,
-  highFilter,
-  lowFilter,
-  gain,
-  Tone.getDestination()
-);
+chain.appendFX(tremolo);
+chain.appendFX(delay);
+chain.appendFX(dist);
+chain.appendFX(crusher);
+chain.appendFX(shifter);
+chain.appendFX(highFilter);
+chain.appendFX(lowFilter);
+chain.appendFX(gain);
 
 /* creating a loop music */
 function playMusic(time: number) {
@@ -271,56 +260,8 @@ async function exportToBuffer() {
 
   const buffer = await Tone.Offline(({ transport }) => {
     // --- recreate synth in offline context (clone from live if needed)
-    const exportedSynth = new Tone.Synth();
-
-    exportedSynth.set(synth.get());
-
-    // // --- recreate effects (you can also pass `.get()` from live instances)
-    const tremolo = new Tone.Tremolo(0, 0).start(); // affects the gain
-
-    // delayTime [0, 1]
-    // feedback [0, 1]
-    const delay = new Tone.FeedbackDelay(0, 0);
-
-    // distortion [0, 10]
-    const dist = new Tone.Distortion(0); // affects the gain
-
-    // bits [1, 16]
-    const crusher = new Tone.BitCrusher(16);
-
-    // pitchShift [0, 1]
-    const shifter = new Tone.PitchShift(0);
-
-    // filter [20, 8000]
-    const highFilter = new Tone.Filter(20, 'lowpass');
-    const lowFilter = new Tone.Filter(8000, 'highpass');
-
-    const gain = new Tone.Gain(6).toDestination();
-
-
-    // const ss = useSelector((state: RootState) => state.soundSettings);
-    const ss = store.getState().soundSettings
-
-    if (ss.tremoloFrequency) tremolo.frequency.value = ss.tremoloFrequency;
-    if (ss.tremoloDepth) tremolo.depth.value = ss.tremoloDepth;
-    if (ss.delayTime) delay.delayTime.value = ss.delayTime;
-    if (ss.feedback) delay.feedback.value = ss.feedback;
-    if (ss.distortion) dist.distortion = ss.distortion;
-    if (ss.bits) crusher.bits.value = ss.bits;
-    if (ss.pitchShift) shifter.pitch = ss.pitchShift;
-    if (ss.lowFilter) lowFilter.set({ frequency: ss.lowFilter });
-    if (ss.highFilter) highFilter.set({ frequency: ss.highFilter });
-
-    exportedSynth.chain(
-      tremolo,
-      delay,
-      dist,
-      crusher,
-      shifter,
-      highFilter,
-      lowFilter,
-      gain
-    );
+    const chainOffline = chain.clone();
+    const exportedSynth = chainOffline.getSynth();
 
     notesArray
       // .sort((a, b) => a.attackTime - b.attackTime)
