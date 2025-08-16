@@ -81,14 +81,15 @@ function playMusic(time: number) {
   const tactsCounter = store.getState().settings.tacts ?? 8;
   const notesArray = store.getState().notesArray.notesArray;
 
+  console.log("time", time)
+
   notesArray.forEach((note, index) => {
     if (note.attackTime === currentBit) {
       store.dispatch(setActiveNote({ index, isActive: true }));
       synth.triggerAttackRelease(
         pitchNotes[note.note],
         `0:0:${note.duration}`,
-        time
-      );
+        time);
     }
     if (note.attackTime + note.duration <= currentBit) {
       note.isActive &&
@@ -263,14 +264,16 @@ async function exportToBuffer() {
   // const pitchNotes = store.getState().pitchNotes;
   const tactsCounter = store.getState().settings.tacts ?? 8;
 
-  const totalSteps = tactsCounter * 16;
-  const durationSeconds = Tone.Time(`${totalSteps} * 16n`).toSeconds();
+  const bpm = store.getState().settings.bpm ?? 120;
+
+  const totalSteps = tactsCounter * 4;
+  const durationSeconds = ((tactsCounter * 4) / bpm ) * 60;
 
   const buffer = await Tone.Offline(({ transport }) => {
     // --- recreate synth in offline context (clone from live if needed)
     const synth = new Tone.Synth().toDestination();
 
-    console.log("tempo: " + transport.bpm.value)    
+    console.log("tempo: " + transport.bpm.value)
 
     // --- recreate effects (you can also pass `.get()` from live instances)
     const tremolo = new Tone.Tremolo().start();
@@ -299,7 +302,7 @@ async function exportToBuffer() {
     notesArray
       // .sort((a, b) => a.attackTime - b.attackTime)
       .forEach((note) => {
-        const startTime = note.attackTime;
+        const startTime = `0:0:${note.attackTime}`;
         const durTime = `0:0:${note.duration}`;
 
         console.log(startTime, durTime)
