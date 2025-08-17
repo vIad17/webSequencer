@@ -10,6 +10,7 @@ import {
 import { NonCustomOscillatorType } from 'tone/build/esm/source/oscillator/OscillatorInterface';
 import { RootState } from 'src/shared/redux/store/store';
 import { useSelector, useDispatch } from 'react-redux';
+import RangeSetting from 'src/components/SoundSettings/RangeSetting';
 
 interface SynthCardProps {
   name: string;
@@ -94,9 +95,12 @@ const SynthCard = ({ name = '' }: SynthCardProps) => {
     const currentWaveIndex = getCurrentWaveIndex();
     const currentFn = waveTypes[currentWaveIndex].fn;
     
+    // Fixed volume calculation - normalize volume to 0-1 range for amplitude scaling
+    const normalizedVolume = Math.max(0, (soundSettings.volume + 50) / 60);
+    
     const sineData = d3.range(0.001, cols, 0.005).map((x) => ({
       x,
-      y: 2 + 1.5 * currentFn(x / 2),
+      y: 2 + 1.5 * currentFn(x / 2) * normalizedVolume,
     }));
 
     const lineGenerator = d3
@@ -135,7 +139,7 @@ const SynthCard = ({ name = '' }: SynthCardProps) => {
     return () => {
       svg.selectAll('*').remove();
     };
-  }, [soundSettings.wave]); // Re-run when wave changes
+  }, [soundSettings.wave, soundSettings.volume]); // Re-run when wave OR volume changes
 
   // Get current wave name for display
   const currentWaveName = waveTypes[getCurrentWaveIndex()]?.name || 'sine';
@@ -157,6 +161,14 @@ const SynthCard = ({ name = '' }: SynthCardProps) => {
         </div>
         <svg ref={svgRef} className="sketch" />
       </div>
+      <RangeSetting
+        value={soundSettings.volume}
+        setValue={(value) => dispatch(setVolume(value))} // Dispatch the action with value
+        min={-50}
+        max={10}
+        step={0.1}
+        label="volume"
+      />
     </div>
   );
 };
