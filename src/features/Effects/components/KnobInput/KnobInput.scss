@@ -1,24 +1,31 @@
-.Knob__element{
-  display: flex;
-  flex-direction: column;
-  flex-wrap: nowrap;
-  align-content: center;
-  justify-content: center;
-  align-items: center;
-}
+.knob {
+  &__element{
+    display: flex;
+    flex-direction: column;
+    flex-wrap: nowrap;
+    align-content: center;
+    justify-content: center;
+    align-items: center;
+  }
 
-.Knob__bt{
-  background-color: transparent;
-  border: none;
-  height: 80px;
-  width: 80px;
-  padding: 0;
+  &__bt{
+    background-color: transparent;
+    border: none;
+    height: 80px;
+    width: 80px;
+    padding: 0;
+  }
 
-  .icon{
+  &__icon{
     height: 100%;
     width: 100%;
+
+    &:hover * {
+      stroke: var(--colors-ui-primary);
+    }
+
+    &:active line {
+      stroke: var(--colors-ui-accent);
+    }
   }
 }
-
-
-

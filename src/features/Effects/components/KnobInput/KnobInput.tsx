@@ -93,18 +93,19 @@ const KnobInput = ({
   const displayValue = value !== null ? formatValue(value) : 0;
 
   return value !== null ? (
-    <div className="Knob__element">
+    <div className="knob__element">
       <button 
-        className="Knob__bt"
+        className="knob__bt"
         onMouseDown={handleMouseDown}
       >
-        <Icon 
+        <Icon
+        className='knob__icon'
           icon={IconType.Knob} 
           style={{ transform: `rotate(${getRotationAngle()}deg)` }} 
         />
       </button>
-      <p className="Knob__name">{label}</p>
-      {showValue && <p className="Knob__value">{displayValue}</p>}
+      <p className="knob__name">{label}</p>
+      {showValue && <p className="knob__value">{displayValue}</p>}
     </div>
   ) : null;
 };
