@@ -23,6 +23,7 @@ import './SoundSettings.scss';
 import RangeSetting from './RangeSetting';
 import KnobInput from 'src/features/Effects/components/KnobInput/KnobInput';
 import EffectCard from 'src/features/Effects/components/EffectCard/EffectCard';
+import SynthCard from 'src/features/Effects/components/SynthCard/SynthCard';
 
 interface SoundSettingsProps {
   className?: string;
@@ -35,6 +36,9 @@ const SoundSettings = ({ className = '' }: SoundSettingsProps) => {
   return (
     <div className={`sound-settings ${className}`}>
       <ul className="sound-settings__list">
+        <SynthCard
+          name="Synth"
+        />
         <KnobInput 
           value={soundSettings.volume}
           setValue={setVolume}
