@@ -1,66 +1,57 @@
-.effect {
-  background-color: #041D32;
-  border-radius: 20px;
-  padding: 12px 20px 24px;
-}
-
-.effect__header {
-  display: flex;
-  justify-content: space-between;
-  margin-bottom: 24px;
-}
-
-.effect__header-icons {
-  display: flex;
-  gap: 4px;
-}
-
-.effect-icon {
-  padding: 3px;
-  width: 20px;
-  height: 20px;
-  font-size: 16px;
-  text-align: center;
-  background-color: #2C4B65;
-  border-radius: 100%;
-}
-
-.effect__header-title {
-  font-size: 20px;
-  font-weight: medium;
-}
-
 .grid-line {
-  stroke: #ccc;
-  stroke-width: 1;
+  stroke: #fff;
+  opacity: 0.2;
+  stroke-width: 2;
 }
 
-/* Make the parent container relative so absolute children are positioned relative to it */
-.synth_Render {
+.synth {
+  display: flex;
+  flex-direction: column;
+  gap: 32px
+}
+
+.synth__header-title {
+  font-size: 18px;
+  color: var(--colors-ui-tertiary);
+}
+
+.synth__render {
   position: relative;
-  /* Add any other styles you need for this container */
 }
 
-.synth_topMenu {
+.synth__top-menu {
   display: flex;
   position: absolute;
   top: 0;
   left: 0;
   right: 0;
-  width: 400px;
   flex-direction: row;
   flex-wrap: nowrap;
   align-items: center;
   justify-content: space-between;
-  z-index: 10; /* Ensure it's above the SVG */
-  background: rgba(4, 29, 50, 0.8); /* Optional: semi-transparent background */
-  padding: 8px 16px; /* Optional: some padding */
-  border-radius: 8px 8px 0 0; /* Optional: rounded top corners */
-  margin: 0 auto; /* Center it if needed */
+  z-index: 10;
+  padding: 8px 16px;
 }
 
-/* Optional: Add some styles to make sure SVG doesn't overlap with menu */
-.sketch {
-  display: block;
-  margin-top: 40px; /* Space for the menu */
+.synth__button {
+  border: none;
+  background: none;
+  padding: 0;
+  margin: 0;
+}
+
+.synth__name {
+  color: var(--colors-text-primary);
+}
+
+.synth__range-wrap {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  gap: 6px
+}
+
+.synth__range {
+  width: 100%;
+  list-style: none;
 }

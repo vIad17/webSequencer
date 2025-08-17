@@ -26,14 +26,14 @@ const drawSketch = (
   const x = d3
     .scaleLinear()
     .domain([0, buffer.length / 2])
-    .range([0, width]);
+    .range([-2, width]);
 
   const y = d3.scaleLinear().domain([-1, 1]).range([height, 0]);
 
   const line = d3
     .area<number>()
     .x((_, i) => x(i))
-    .y0(height)
+    .y0(height + 2)
     .y1((d) => y(d));
 
   const defs = svg.append('defs');
@@ -66,8 +66,8 @@ const MySketch = ({ className = '' }: MySketchProps) => {
   Tone.Master.connect(waveform);
 
   useEffect(() => {
-    const width = 400;
-    const height = 400;
+    const width = 350;
+    const height = 260;
 
     const svg = d3
       .select(svgRef.current)

@@ -14,6 +14,7 @@ import Power from './svg/power.svg?react';
 import Repeat from './svg/repeat.svg?react';
 import X from './svg/x.svg?react';
 import Knob from './svg/knob.svg?react';
+import Sound from './svg/sound.svg?react';
 
 export enum IconType {
   ArrowDown,
@@ -29,7 +30,8 @@ export enum IconType {
   Power,
   Repeat,
   X,
-  Knob
+  Knob,
+  Sound
 }
 
 export type IconProps = React.SVGProps<SVGSVGElement> & {
@@ -54,4 +56,5 @@ export const IconMap: Record<IconType, (props: IconProps) => ReactElement> = {
   [IconType.Repeat]: (props) => <Repeat {...props} />,
   [IconType.X]: (props) => <X {...props} />,
   [IconType.Knob]: (props) => <Knob {...props} />,
+  [IconType.Sound]: (props) => <Sound {...props} />,
 };

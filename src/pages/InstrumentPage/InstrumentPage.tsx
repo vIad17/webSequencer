@@ -1,7 +1,6 @@
 import { useEffect } from 'react';
 
 import TactsNumbers from 'src/components/TactsNumbers/TactsNumbers';
-import TimeStripe from 'src/components/TimeStripe/TimeStripe';
 import VerticalPiano from 'src/components/VerticalPiano/VerticalPiano';
 
 import DrawableField from 'src/features/DrawableField/DrawableField';
@@ -34,8 +33,6 @@ const InstrumentPage = ({ className = '' }: InstrumentPageProps) => {
         '--element-width': `${elementWidth*16}px`
       }}
     >
-
-      
       <TactsNumbers className="top-field__tacts-number" />
       <VerticalPiano className="instrument-page__vertical-piano" />
       <DrawableField className="instrument-page__drawable-field" />

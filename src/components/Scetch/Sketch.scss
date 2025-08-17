@@ -1,5 +1,7 @@
 .sketch  {
-  background: linear-gradient(#0c0b10 0%, #002440 35%, #ed006f42 65%);
+  border-radius: 8px;
+  outline: solid 6px var(--colors-bg-primary);
+  background: linear-gradient(#011d33 0%, #ed006f42 65%);
 }
 
 .sketch__line {
