@@ -57,12 +57,12 @@ const gain = new Tone.Gain(6);
 
 chain.appendFX(tremolo);
 chain.appendFX(delay);
-chain.appendFX(dist);
+// chain.appendFX(dist);
 chain.appendFX(crusher);
 chain.appendFX(shifter);
 chain.appendFX(highFilter);
 chain.appendFX(lowFilter);
-chain.appendFX(gain);
+// chain.appendFX(gain);
 
 /* creating a loop music */
 function playMusic(time: number) {
@@ -259,6 +259,8 @@ async function exportToBuffer() {
 
   const buffer = await Tone.Offline(({ transport }) => {
     const chainOffline = chain.clone();
+    // const gain = new Tone.Gain(0.2);
+    // chainOffline.appendFX(gain);
     const exportedSynth = chainOffline.getSynth();
 
     notesArray
@@ -293,7 +295,7 @@ async function exportToBuffer() {
 function floatTo16BitPCM(float32Array : Float32Array<ArrayBuffer>) {
     const int16Array = new Int16Array(float32Array.length);
     for (let i = 0; i < float32Array.length; i++) {
-        int16Array[i] = float32Array[i] * 0x7FFF / 4;
+        int16Array[i] = float32Array[i] * 0x7FFF / 16;
     }
     return int16Array;
 }

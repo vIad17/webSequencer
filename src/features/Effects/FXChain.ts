@@ -1,5 +1,5 @@
 import { useSelector } from "react-redux";
-import { RootState } from "src/shared/redux/store/store";
+import store, { RootState } from "src/shared/redux/store/store";
 import * as Tone from 'tone';
 
 export class FXChain {
@@ -145,26 +145,42 @@ export class FXChain {
   }
 
   public clone(): FXChain {
+    // Clone synth first
     const synthOptions = this.synth.get();
     const clonedChain = new FXChain(synthOptions);
 
-    // Recreate each effect in order
-    this.effectsChain.forEach((fx, index) => {
-      const FXConstructor = fx.constructor as new () => Tone.ToneAudioNode;
-      try {
-        const clonedFX = new FXConstructor();
+    const ss = store.getState().soundSettings;
 
-        // Copy over parameters if possible
-        if ((fx as any).get && (clonedFX as any).set) {
-          const params = (fx as any).get();
-          (clonedFX as any).set(params);
-        }
+    const tremolo = new Tone.Tremolo(0, 0)
+    const delay = new Tone.FeedbackDelay(0, 0);
+    // const dist = new Tone.Distortion(0);
+    const crusher = new Tone.BitCrusher(16);
+    const shifter = new Tone.PitchShift(0);
+    const highFilter = new Tone.Filter(20, 'lowpass');
+    const lowFilter = new Tone.Filter(8000, 'highpass');
+    // const gain = new Tone.Gain(6);
 
-        clonedChain.appendFX(clonedFX);
-      } catch (e) {
-        console.warn("Could not clone effect at index", index, e);
-      }
-    });
+    console.log(ss)
+
+    if (ss.tremoloFrequency) tremolo.frequency.value = ss.tremoloFrequency;
+    if (ss.tremoloDepth) tremolo.depth.value = ss.tremoloDepth;
+    if (ss.delayTime) delay.delayTime.value = ss.delayTime;
+    if (ss.feedback) delay.feedback.value = ss.feedback;
+    // if (ss.distortion) dist.distortion = ss.distortion;
+    if (ss.bits) crusher.bits.value = ss.bits;
+    if (ss.pitchShift) shifter.pitch = ss.pitchShift;
+    if (ss.lowFilter) lowFilter.set({ frequency: ss.lowFilter });
+    if (ss.highFilter) highFilter.set({ frequency: ss.highFilter });
+
+
+    clonedChain.appendFX(tremolo);
+    clonedChain.appendFX(delay);
+    // clonedChain.appendFX(dist);
+    clonedChain.appendFX(crusher);
+    clonedChain.appendFX(shifter);
+    clonedChain.appendFX(highFilter);
+    clonedChain.appendFX(lowFilter);
+    // clonedChain.appendFX(gain);
 
     return clonedChain;
   }
