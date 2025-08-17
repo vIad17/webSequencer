@@ -10,9 +10,7 @@ import {
   setIsPlaying
 } from 'src/shared/redux/slices/currentMusicSlice';
 import {
-  addSelectedNote,
   addPlayingNote,
-  changeSelectedNote,
   removePlayingNote,
   setActiveNote,
   removeActiveNotes
@@ -26,6 +24,7 @@ import { addNote } from 'src/shared/redux/slices/notesArraySlice';
 import { setBpm, setTacts } from 'src/shared/redux/slices/settingsSlice';
 
 import { FXChain } from 'src/features/Effects/FXChain';
+import { setCurrentStep, setProgress } from 'src/shared/redux/slices/progressSlice';
 
 
 const chain = new FXChain();
@@ -254,6 +253,9 @@ async function exportToBuffer() {
 
   const bpm = store.getState().settings.bpm ?? 120;
 
+  store.dispatch(setCurrentStep("Exporting data to buffer"));
+  store.dispatch(setProgress(0));
+
   const totalSteps = tactsCounter * 4;
   const durationSeconds = ((tactsCounter * 4) / bpm) * 60;
 
@@ -279,6 +281,7 @@ async function exportToBuffer() {
     transport.start(0);
   }, durationSeconds, 1, 48000);
 
+  store.dispatch(setProgress(100));
   return buffer.get();
 }
 
@@ -292,55 +295,74 @@ async function exportToBuffer() {
 // }
 
 // Alternative more concise version
-function floatTo16BitPCM(float32Array : Float32Array<ArrayBuffer>) {
-    const int16Array = new Int16Array(float32Array.length);
-    for (let i = 0; i < float32Array.length; i++) {
-        int16Array[i] = float32Array[i] * 0x7FFF / 16;
-    }
-    return int16Array;
+function floatTo16BitPCM(float32Array: Float32Array<ArrayBufferLike>) {
+  const int16Array = new Int16Array(float32Array.length);
+  for (let i = 0; i < float32Array.length; i++) {
+    int16Array[i] = float32Array[i] * 0x7FFF / 16;
+  }
+  return int16Array;
 }
 
-function audioBufferToMp3(buffer: AudioBuffer): Blob {
+function audioBufferToMp3(buffer: AudioBuffer): Promise<Blob> {
   const mp3Encoder = new lamejs.Mp3Encoder(buffer.numberOfChannels, buffer.sampleRate, 320);
   const samples = buffer.getChannelData(0);
   const mp3Data: Uint8Array[] = [];
 
   const int16Array = floatTo16BitPCM(samples);
-
-
   const sampleBlockSize = 1152;
-  for (let i = 0; i < samples.length; i += sampleBlockSize) {
 
-    const sampleChunk = int16Array.subarray(i, i + sampleBlockSize);
-    const mp3buf = mp3Encoder.encodeBuffer(sampleChunk);
-    if (mp3buf.length > 0) {
-      mp3Data.push(mp3buf);
-    }
-  }
+  return new Promise<Blob>((resolve) => {
+    let i = 0;
 
-  const mp3buf = mp3Encoder.flush();
-  if (mp3buf.length > 0) {
-    mp3Data.push(mp3buf);
-  }
+    const processChunk = () => {
+      store.dispatch(setCurrentStep(`Encoding... ${Math.round((i / samples.length) * 100)}%`));
 
-  return new Blob(mp3Data as BlobPart[], { type: "audio/mp3" });
+      const end = Math.min(i + sampleBlockSize, samples.length);
+      const sampleChunk = int16Array.subarray(i, end);
+      const mp3buf = mp3Encoder.encodeBuffer(sampleChunk);
+      if (mp3buf.length > 0) {
+        mp3Data.push(mp3buf);
+      }
+
+      store.dispatch(setProgress((i / samples.length) * 100));
+
+      i += sampleBlockSize;
+
+      if (i < samples.length) {
+        setTimeout(processChunk, 0);
+      } else {
+        const mp3buf = mp3Encoder.flush();
+        if (mp3buf.length > 0) {
+          mp3Data.push(mp3buf);
+        }
+        store.dispatch(setCurrentStep("Done"));
+        store.dispatch(setProgress(100));
+        resolve(new Blob(mp3Data, { type: "audio/mp3" }));
+      }
+    };
+
+    processChunk();
+  }).then(blob => blob);
 }
 
 export async function exportMp3() {
   const buffer = await exportToBuffer();
   if (buffer) {
-    const mp3Blob = audioBufferToMp3(buffer);
+    const mp3Blob = await audioBufferToMp3(buffer);
+
+    store.dispatch(setCurrentStep("Saving mp3"));
+    store.dispatch(setProgress(0));
 
     const url = URL.createObjectURL(mp3Blob);
     const a = document.createElement("a");
     a.href = url;
-    a.download = "melody.mp3";
+    a.download = "untitledf1.mp3";
     a.click();
     URL.revokeObjectURL(url);
+    store.dispatch(setProgress(100));
+    store.dispatch(setCurrentStep(null));
   }
 }
-
-
 
 /* creating a component */
 const SoundManager = () => {
