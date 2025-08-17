@@ -25,7 +25,7 @@ import { parseArrayBuffer } from 'midi-json-parser';
 import { addNote } from 'src/shared/redux/slices/notesArraySlice';
 import { setBpm, setTacts } from 'src/shared/redux/slices/settingsSlice';
 
-import {FXChain} from 'src/features/Effects/FXChain';
+import { FXChain } from 'src/features/Effects/FXChain';
 
 
 const chain = new FXChain();
@@ -250,7 +250,6 @@ keyboard.up((key: Key) => {
 
 async function exportToBuffer() {
   const notesArray = store.getState().notesArray.notesArray;
-  // const pitchNotes = store.getState().pitchNotes;
   const tactsCounter = store.getState().settings.tacts ?? 8;
 
   const bpm = store.getState().settings.bpm ?? 120;
@@ -259,7 +258,6 @@ async function exportToBuffer() {
   const durationSeconds = ((tactsCounter * 4) / bpm) * 60;
 
   const buffer = await Tone.Offline(({ transport }) => {
-    // --- recreate synth in offline context (clone from live if needed)
     const chainOffline = chain.clone();
     const exportedSynth = chainOffline.getSynth();
 
@@ -277,19 +275,41 @@ async function exportToBuffer() {
       });
 
     transport.start(0);
-  }, durationSeconds);
+  }, durationSeconds, 1, 48000);
 
   return buffer.get();
 }
 
+// function floatTo16BitPCM(float32Array) {
+//     const int16Array = new Int16Array(float32Array.length);
+//     for (let i = 0; i < float32Array.length; i++) {
+//         const s = Math.max(-1, Math.min(1, float32Array[i]));
+//         int16Array[i] = s < 0 ? s * 0x8000 : s * 0x7FFF;
+//     }
+//     return int16Array;
+// }
+
+// Alternative more concise version
+function floatTo16BitPCM(float32Array : Float32Array<ArrayBuffer>) {
+    const int16Array = new Int16Array(float32Array.length);
+    for (let i = 0; i < float32Array.length; i++) {
+        int16Array[i] = float32Array[i] * 0x7FFF / 4;
+    }
+    return int16Array;
+}
+
 function audioBufferToMp3(buffer: AudioBuffer): Blob {
-  const mp3Encoder = new lamejs.Mp3Encoder(1, buffer.sampleRate, 128);
+  const mp3Encoder = new lamejs.Mp3Encoder(buffer.numberOfChannels, buffer.sampleRate, 320);
   const samples = buffer.getChannelData(0);
   const mp3Data: Uint8Array[] = [];
 
+  const int16Array = floatTo16BitPCM(samples);
+
+
   const sampleBlockSize = 1152;
   for (let i = 0; i < samples.length; i += sampleBlockSize) {
-    const sampleChunk = (samples.subarray(i, i + sampleBlockSize).map(el => el * 10000));
+
+    const sampleChunk = int16Array.subarray(i, i + sampleBlockSize);
     const mp3buf = mp3Encoder.encodeBuffer(sampleChunk);
     if (mp3buf.length > 0) {
       mp3Data.push(mp3buf);
@@ -301,19 +321,21 @@ function audioBufferToMp3(buffer: AudioBuffer): Blob {
     mp3Data.push(mp3buf);
   }
 
-  return new Blob(mp3Data, { type: "audio/mp3" });
+  return new Blob(mp3Data as BlobPart[], { type: "audio/mp3" });
 }
 
 export async function exportMp3() {
   const buffer = await exportToBuffer();
-  const mp3Blob = audioBufferToMp3(buffer);
+  if (buffer) {
+    const mp3Blob = audioBufferToMp3(buffer);
 
-  const url = URL.createObjectURL(mp3Blob);
-  const a = document.createElement("a");
-  a.href = url;
-  a.download = "melody.mp3";
-  a.click();
-  URL.revokeObjectURL(url);
+    const url = URL.createObjectURL(mp3Blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "melody.mp3";
+    a.click();
+    URL.revokeObjectURL(url);
+  }
 }
 
 
