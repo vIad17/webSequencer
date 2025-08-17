@@ -45,17 +45,21 @@ const KnobInput = ({
   const handleMouseDown = (e: React.MouseEvent) => {
     e.preventDefault();
     const knobElement = e.currentTarget as HTMLElement;
-    var startValue = value ?? min;
+    let startValue = value ?? min;
+    let isFirstMove = true; // Track first movement
     
-    // Request pointer lock
     if (knobElement.requestPointerLock && lockMouse) {
       knobElement.requestPointerLock();
     }
 
     const handleMouseMove = (moveEvent: MouseEvent) => {
-      // Use movementX and movementY for precise tracking
+      if (lockMouse && isFirstMove) {
+        isFirstMove = false;
+        return;
+      }
+
       const deltaX = moveEvent.movementX || 0;
-      const deltaY = -(moveEvent.movementY || 0); // Inverted so up = increase
+      const deltaY = -(moveEvent.movementY || 0); 
       
       const delta = deltaX + deltaY;
       const range = max - min;
@@ -63,10 +67,8 @@ const KnobInput = ({
       const valueChange = (delta / sensitivity) * range;
       let newValue = startValue + valueChange;
       
-      // Clamp value to min/max
       newValue = Math.min(max, Math.max(min, newValue));
       
-      // Round to nearest step
       const stepDecimalPlaces = step.toString().split('.')[1]?.length || 0;
       const roundedValue = Math.round(newValue / step) * step;
       const formattedValue = Number(roundedValue.toFixed(stepDecimalPlaces));
@@ -76,7 +78,6 @@ const KnobInput = ({
     };
 
     const handleMouseUp = () => {
-      // Exit pointer lock
       if (document.exitPointerLock && lockMouse) {
         document.exitPointerLock();
       }
@@ -89,7 +90,6 @@ const KnobInput = ({
     document.addEventListener('mouseup', handleMouseUp);
   };
 
-  // Format displayed value
   const displayValue = value !== null ? formatValue(value) : 0;
 
   return value !== null ? (
