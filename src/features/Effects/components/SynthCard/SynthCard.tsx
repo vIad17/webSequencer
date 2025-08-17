@@ -96,7 +96,7 @@ const SynthCard = ({ name = '' }: SynthCardProps) => {
     const currentFn = waveTypes[currentWaveIndex].fn;
     
     // Fixed volume calculation - normalize volume to 0-1 range for amplitude scaling
-    const normalizedVolume = Math.max(0, (soundSettings.volume + 50) / 60);
+    const normalizedVolume = Math.max(0, (soundSettings.volume??0 + 50) / 60);
     
     const sineData = d3.range(0.001, cols, 0.005).map((x) => ({
       x,
