@@ -21,6 +21,7 @@ import { RootState } from 'src/shared/redux/store/store';
 
 import './SoundSettings.scss';
 import RangeSetting from './RangeSetting';
+import KnobInput from 'src/features/Effects/components/KnobInput/KnobInput';
 import EffectCard from 'src/features/Effects/components/EffectCard/EffectCard';
 
 interface SoundSettingsProps {
@@ -34,22 +35,42 @@ const SoundSettings = ({ className = '' }: SoundSettingsProps) => {
   return (
     <div className={`sound-settings ${className}`}>
       <ul className="sound-settings__list">
-        <RangeSetting
+        <KnobInput 
           value={soundSettings.volume}
           setValue={setVolume}
           min={-50}
           max={10}
           step={0.1}
           label="volume"
+          showValue={false}
+          lockMouse={false}
         />
-        <RangeSetting
+        {/* <RangeSetting
+          value={soundSettings.volume}
+          setValue={setVolume}
+          min={-50}
+          max={10}
+          step={0.1}
+          label="volume"
+        /> */}
+        <KnobInput 
           value={soundSettings.attack}
           setValue={setAttack}
           min={0}
           max={1}
           step={0.01}
           label="attack"
+          showValue={true}
+          lockMouse={true}
         />
+        {/* <RangeSetting
+          value={soundSettings.attack}
+          setValue={setAttack}
+          min={0}
+          max={1}
+          step={0.01}
+          label="attack"
+        /> */}
         <RangeSetting
           value={soundSettings.decay}
           setValue={setDecay}
