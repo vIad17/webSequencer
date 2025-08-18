@@ -11,24 +11,12 @@ import RangeSetting from 'src/components/SoundSettings/RangeSetting';
 import clsx from 'clsx';
 import { Icon } from 'src/shared/icons/Icon';
 import { IconType } from 'src/shared/icons/IconMap';
+import { graphSAW, graphSIN, graphSQR, graphTRI } from 'src/shared/functions/waveforms';
+
 
 interface SynthCardProps {
   className?: string;
   name: string;
-}
-
-// Waveform functions
-function graphSIN(x: number): number {
-  return Math.sin(x * Math.PI);
-}
-function graphTRI(x: number): number {
-  return Math.abs(((x + 1) % 2) - 1) * 2 - 1;
-}
-function graphSAW(x: number): number {
-  return (x % 1) * 2 - 1;
-}
-function graphSQR(x: number): number {
-  return Math.sign(Math.sin(x * Math.PI));
 }
 
 interface WaveType {

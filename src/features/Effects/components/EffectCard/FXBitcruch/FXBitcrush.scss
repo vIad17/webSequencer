@@ -1,0 +1,57 @@
+.grid-line {
+  stroke: #fff;
+  opacity: 0.2;
+  stroke-width: 2;
+}
+
+.synth {
+  display: flex;
+  flex-direction: column;
+  gap: 32px
+}
+
+.synth__header-title {
+  font-size: 18px;
+  color: var(--colors-ui-tertiary);
+}
+
+.synth__render {
+  position: relative;
+}
+
+.synth__top-menu {
+  display: flex;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  align-items: center;
+  justify-content: space-between;
+  z-index: 10;
+  padding: 8px 16px;
+}
+
+.synth__button {
+  border: none;
+  background: none;
+  padding: 0;
+  margin: 0;
+}
+
+.synth__name {
+  color: var(--colors-text-primary);
+}
+
+.synth__range-wrap {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  gap: 6px
+}
+
+.synth__range {
+  width: 100%;
+  list-style: none;
+}

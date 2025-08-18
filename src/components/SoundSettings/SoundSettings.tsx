@@ -24,6 +24,7 @@ import RangeSetting from './RangeSetting';
 import KnobInput from 'src/features/Effects/components/KnobInput/KnobInput';
 import EffectCard from 'src/features/Effects/components/EffectCard/EffectCard';
 import SynthCard from 'src/features/Effects/components/SynthCard/SynthCard';
+import FXBitcrush from 'src/features/Effects/components/EffectCard/FXBitcruch/FXBitcrush';
 
 interface SoundSettingsProps {
   className?: string;
@@ -36,6 +37,7 @@ const SoundSettings = ({ className = '' }: SoundSettingsProps) => {
   return (
     <div className={`sound-settings ${className}`}>
       <ul className="sound-settings__list">
+        <FXBitcrush name={''}></FXBitcrush>
         <SynthCard
           name="Synth"
         />
