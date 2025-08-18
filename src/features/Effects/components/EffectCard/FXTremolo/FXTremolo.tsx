@@ -1,8 +1,8 @@
 import { ReactNode, useRef, useEffect } from 'react';
 import * as d3 from 'd3';
-import './FXBitcrush.scss';
+import './FXTremolo.scss';
 
-import { setBits } from 'src/shared/redux/slices/soundSettingsSlice';
+import { setTremoloFrequency, setTremoloDepth } from 'src/shared/redux/slices/soundSettingsSlice';
 
 import { RootState } from 'src/shared/redux/store/store';
 import { useSelector, useDispatch } from 'react-redux';
@@ -11,12 +11,12 @@ import { graphSAW, graphSIN, graphSQR, graphTRI } from 'src/shared/functions/wav
 import EffectCard from '../EffectCard';
 import KnobInput from '../../KnobInput/KnobInput';
 
-interface FXBitcrushProps {
+interface FXTremoloProps {
   className?: string;
   name: string;
 }
 
-const FXBitcrush = ({ name = '', className }: FXBitcrushProps) => {
+const FXTremolo = ({ name = '', className }: FXTremoloProps) => {
   const svgRef = useRef<SVGSVGElement>(null);
   const dispatch = useDispatch();
   const soundSettings = useSelector((state: RootState) => state.soundSettings);
@@ -57,11 +57,10 @@ const FXBitcrush = ({ name = '', className }: FXBitcrushProps) => {
       .attr('x2', width)
       .attr('y2', (d) => yScale(d));
 
-    const bits = soundSettings.bits??16;
 
     const sineData = d3.range(0.001, cols, 0.005).map((x) => ({
       x,
-      y: Math.round((graphSIN(x)*1.5+2) * bits)/bits
+      y: (graphSIN((x-2)* (soundSettings.tremoloFrequency??1))*1.5*(soundSettings.tremoloDepth??1)+2)
     }));
 
     const lineGenerator = d3
@@ -91,21 +90,31 @@ const FXBitcrush = ({ name = '', className }: FXBitcrushProps) => {
       .attr('height', height);
 
     drawSketch(svg, width, height);
-  }, [soundSettings.bits]);
+  }, [soundSettings.tremoloDepth, soundSettings.tremoloFrequency]);
 
   return (
-    <EffectCard name={'Bitcrush'} children={
-      <div className="bitcrush-content">
+    <EffectCard name={'Tremolo'} children={
+      <div className="tremolo-content">
       <svg ref={svgRef} className="synth__graph" />
       <KnobInput 
-        value={soundSettings.bits ?? 16}
-        setValue={setBits}
-        min={1}
-        max={16}
-        step={0.1}
-        label="bits"
+        value={soundSettings.tremoloFrequency}
+        setValue={setTremoloFrequency}
+        min={0}
+        max={10}
+        step={0.01}
+        label="tremolo frequency"
         showValue={false}
-        lockMouse={true}
+        lockMouse={false}
+        />
+        <KnobInput 
+        value={soundSettings.tremoloDepth}
+        setValue={setTremoloDepth}
+        min={0}
+        max={1}
+        step={0.01}
+        label="tremolo depth"
+        showValue={false}
+        lockMouse={false}
         />
       </div>
       }>
@@ -113,4 +122,4 @@ const FXBitcrush = ({ name = '', className }: FXBitcrushProps) => {
   );
 };
 
-export default FXBitcrush;
+export default FXTremolo;
