@@ -4,13 +4,9 @@ import './FXBitcrush.scss';
 
 import { setBits } from 'src/shared/redux/slices/soundSettingsSlice';
 
-import { NonCustomOscillatorType } from 'tone/build/esm/source/oscillator/OscillatorInterface';
 import { RootState } from 'src/shared/redux/store/store';
 import { useSelector, useDispatch } from 'react-redux';
-import RangeSetting from 'src/components/SoundSettings/RangeSetting';
-import clsx from 'clsx';
-import { Icon } from 'src/shared/icons/Icon';
-import { IconType } from 'src/shared/icons/IconMap';
+
 import { graphSAW, graphSIN, graphSQR, graphTRI } from 'src/shared/functions/waveforms';
 import EffectCard from '../EffectCard';
 import KnobInput from '../../KnobInput/KnobInput';
@@ -112,7 +108,7 @@ const FXBitcrush = ({ name = '', className }: FXBitcrushProps) => {
         max={16}
         step={0.1}
         label="bits"
-        showValue={true}
+        showValue={false}
         lockMouse={true}
         />
       </div>
