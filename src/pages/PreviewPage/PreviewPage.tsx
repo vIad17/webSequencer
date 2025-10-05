@@ -1,16 +1,12 @@
-import { useEffect } from 'react';
-
-import TactsNumbers from 'src/components/TactsNumbers/TactsNumbers';
-import TimeStripe from 'src/components/TimeStripe/TimeStripe';
-import VerticalPiano from 'src/components/VerticalPiano/VerticalPiano';
+import { useEffect, useRef } from 'react';
+import clsx from 'clsx';
+import { useDispatch, useSelector } from 'react-redux';
 
 import DrawableField from 'src/features/DrawableField/DrawableField';
+import { RootState } from 'src/shared/redux/store/store';
+import { setElementHeigth } from 'src/shared/redux/slices/drawableFieldSlice';
 
 import './PreviewPage.scss';
-import { useDispatch, useSelector } from 'react-redux';
-import { RootState } from 'src/shared/redux/store/store';
-import clsx from 'clsx';
-import { setElementHeigth } from 'src/shared/redux/slices/drawableFieldSlice';
 
 interface InstrumentPageProps {
   className?: string;
@@ -25,6 +21,8 @@ const PreviewPage = ({ className = '' }: InstrumentPageProps) => {
   useSelector(
     (state: RootState) => state.drawableField.elementHeight
   );
+
+  const domRef = useRef<HTMLElement>(null);
 
   const dispatch = useDispatch();
 
@@ -48,28 +46,23 @@ const PreviewPage = ({ className = '' }: InstrumentPageProps) => {
 
     const windowHeight = window.innerHeight;
 
-    const aaa = windowHeight / (deltaNote + 3);
-    console.log(deltaNote, windowHeight, aaa);
+    const elementHeight = windowHeight / (deltaNote + 3);
 
-    dispatch(setElementHeigth(aaa));
+    dispatch(setElementHeigth(elementHeight));
 
-      document.querySelector('.preview')?.scrollTo({
-        top: aaa * notesArray[minNoteIndex]?.note - aaa
-      });
-    // }
+    document.querySelector('.preview')?.scrollTo({
+      top: elementHeight * notesArray[minNoteIndex]?.note - elementHeight
+    });
+
+    const preventInputScroll = (e: WheelEvent) => e.preventDefault();
+    domRef.current?.addEventListener('wheel', preventInputScroll);
+    return () => {
+      domRef.current?.removeEventListener('wheel', preventInputScroll);
+    };
   });
 
-  // useEffect(() => {
-  //   console.log("  FDSGDHF")
-  //   document.querySelector('.preview')?.scrollTo({
-  //     top: 200
-  //   })
-  // });
-
-  console.log(notesArray);
-
   return (
-    <main className={clsx('preview', className)}>
+    <main className={clsx('preview', className)} ref={domRef}>
       <DrawableField className="preview__drawable-field" isPreview={true} />
     </main>
   );
