@@ -1,12 +1,13 @@
 import { configureStore } from '@reduxjs/toolkit';
 
-import { currentMusicSlice } from 'src/shared/redux/slices/currentMusicSlice';
-import { melodyArraySlice } from 'src/shared/redux/slices/melodyArraySlice';
-import { notesArraySlice } from 'src/shared/redux/slices/notesArraySlice';
-import { settingsSlice } from 'src/shared/redux/slices/settingsSlice';
+import { currentMusicSlice } from '../slices/currentMusicSlice';
+import { melodyArraySlice } from '../slices/melodyArraySlice';
+import { notesArraySlice } from '../slices/notesArraySlice';
+import { settingsSlice } from '../slices/settingsSlice';
 import { soundSettingsSlice } from 'src/shared/redux/slices/soundSettingsSlice';
 import { drawableFieldSlice } from '../slices/drawableFieldSlice';
 import { copiedObjectsSlise } from '../slices/copiedObjectsSlise';
+import { progressSlice } from '../slices/progressSlice';
 
 const store = configureStore({
   reducer: {
@@ -16,7 +17,8 @@ const store = configureStore({
     [currentMusicSlice.name]: currentMusicSlice.reducer,
     [notesArraySlice.name]: notesArraySlice.reducer,
     [drawableFieldSlice.name]: drawableFieldSlice.reducer,
-    [copiedObjectsSlise.name]: copiedObjectsSlise.reducer
+    [copiedObjectsSlise.name]: copiedObjectsSlise.reducer,
+    [progressSlice.name]: progressSlice.reducer
   }
 });
 
