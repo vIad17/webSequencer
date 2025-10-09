@@ -1,4 +1,4 @@
-import { ReactNode, useRef, useEffect } from 'react';
+import { ReactNode, useRef, useEffect, useState } from 'react';
 import * as d3 from 'd3';
 import './SynthCard.scss';
 
@@ -39,6 +39,8 @@ const SynthCard = ({ name = '', className }: SynthCardProps) => {
   const svgRef = useRef<SVGSVGElement>(null);
   const dispatch = useDispatch();
   const soundSettings = useSelector((state: RootState) => state.soundSettings);
+
+  const [collapsed, setCollapsed] = useState(false);
 
   // Find the current wave index from Redux state
   const getCurrentWaveIndex = (): number => {
@@ -122,6 +124,10 @@ const SynthCard = ({ name = '', className }: SynthCardProps) => {
     dispatch(setWave(waveTypes[newIndex].name));
   };
 
+  const switchCollapsed = ()=> {
+    setCollapsed((prev) => !prev);
+  };
+
   useEffect(() => {
     const width = 230;
     const height = 130;
@@ -142,39 +148,46 @@ const SynthCard = ({ name = '', className }: SynthCardProps) => {
   const currentWaveName = waveTypes[getCurrentWaveIndex()]?.name || 'sine';
 
   return (
-    <div className={clsx('synth', className)}>
+    <div className={clsx('synth', className, { 'collapsed': collapsed })}>
       <header className="synth__header">
         <h5 className="synth__header-title">Oscillator</h5>
-        {/* <div className="synth__header-icons">
-          <EffectIcon icon="hide" />
-          <EffectIcon icon="mute" />
-        </div> */}
+        <button className="synth__header-button" onClick={() => switchCollapsed()}>
+          <Icon icon={IconType.Eye} interactable />
+        </button>
       </header>
-      <div className="synth__render">
+
+     
+
+      <div className={clsx('synth__content', { 'collapsed': collapsed })}>
         <div className="synth__top-menu">
-          <button className="synth__button" onClick={() => changeWave(false)}>
+          <button className="synth__button" onClick={() => changeWave(false)}>  
             <Icon icon={IconType.ArrowLeft} interactable />
           </button>
           <h3 className="synth__name">{currentWaveName.toUpperCase()}</h3>
           <button className="synth__button" onClick={() => changeWave(true)}>
             <Icon icon={IconType.ArrowRight} interactable />
           </button>
+        </div>  
+
+        <div className="synth__render">
+          <svg ref={svgRef} className="synth__graph" />
         </div>
-        <svg ref={svgRef} className="synth__graph" />
+        <div className="synth__range-wrap">
+          <Icon className="synth__range-icon" icon={IconType.Sound} />
+          <RangeSetting
+            className="synth__range"
+            value={soundSettings.volume}
+            setValue={(value) => dispatch(setVolume(value))} // Dispatch the action with value
+            min={-50}
+            max={10}
+            step={0.1}
+            label="volume"
+            hideText
+          />
+        </div>
       </div>
-      <div className="synth__range-wrap">
-        <Icon className="synth__range-icon" icon={IconType.Sound} />
-        <RangeSetting
-          className="synth__range"
-          value={soundSettings.volume}
-          setValue={(value) => dispatch(setVolume(value))} // Dispatch the action with value
-          min={-50}
-          max={10}
-          step={0.1}
-          label="volume"
-          hideText
-        />
-      </div>
+
+ 
     </div>
   );
 };

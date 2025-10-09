@@ -1,36 +1,90 @@
 .grid-line {
-  stroke: #fff;
+  stroke: var(--colors-text-primary);
   opacity: 0.2;
   stroke-width: 2;
 }
 
 .synth {
+  --collapseTransition: 0.3s;
+
   display: flex;
   flex-direction: column;
-  gap: 32px
+
+  width: 230px;
+  transition: width var(--collapseTransition);
+
+
+}
+.synth.collapsed{
+  width: 30px;
+}
+
+.synth__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: nowrap;
+
+  width: 100%;
+  transition: width var(--collapseTransition);
+}
+
+.collapsed .synth__header {
+  width: 30px;
 }
 
 .synth__header-title {
   font-size: 18px;
   color: var(--colors-ui-tertiary);
+
+  transform:matrix(1.00,0.00,0.00,1.00,0,0);
+  width: 0;
+  transition: transform var(--collapseTransition);
 }
 
-.synth__render {
-  position: relative;
+.collapsed .synth__header-title {
+  transform: matrix(0, -1, 1, 0, 15, 145);
+}
+
+.synth__header-button {
+  background-color: var(--colors-ui-secondary);
+    border-radius: 100%;
+    width: 35px;
+    height: 35px;
+    border: none;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.synth__content {
+  padding: 0px 0px;
+  opacity: 1;
+  transition: opacity var(--collapseTransition);
+  pointer-events: auto;
+}
+
+.synth__content.collapsed{
+  padding: 0px 0px;
+  opacity: 0;
+  pointer-events: none;
 }
 
 .synth__top-menu {
-  display: flex;
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  flex-direction: row;
-  flex-wrap: nowrap;
-  align-items: center;
-  justify-content: space-between;
-  z-index: 10;
-  padding: 8px 16px;
+    display: flex;
+
+    top: 0;
+    left: 0;
+    right: 0;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    align-items: center;
+    justify-content: space-between;
+    z-index: 10;
+    padding: 4px 10px;
+    margin-top: 12px;
+    background-color: rgba(0, 0, 0, 0.29);
 }
 
 .synth__button {
@@ -38,10 +92,21 @@
   background: none;
   padding: 0;
   margin: 0;
+
+  display: flex;
+  align-items: center;
 }
 
 .synth__name {
   color: var(--colors-text-primary);
+}
+
+.synth__render {
+  position: relative;
+}
+
+.synth__graph {
+  width: 100%;
 }
 
 .synth__range-wrap {

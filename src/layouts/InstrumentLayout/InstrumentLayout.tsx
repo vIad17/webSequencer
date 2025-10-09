@@ -13,9 +13,9 @@ const InstrumentLayout = () => (
       <div className="instrument-layout__content">
         <Outlet />
       </div>
-      <Sidebar className="instrument-layout__sidebar" />
+      {/* <Sidebar className="instrument-layout__sidebar" /> */}
     </div>
-    {/* <Footer className="instrument-layout__footer" /> */}
+    {<Footer className="instrument-layout__footer" />}
   </div>
 );
 
