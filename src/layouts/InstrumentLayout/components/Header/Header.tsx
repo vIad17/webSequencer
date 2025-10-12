@@ -25,7 +25,10 @@ import { useMIDIInputs } from '@react-midi/hooks';
 import { Icon } from 'src/shared/icons/Icon';
 import { IconType } from 'src/shared/icons/IconMap';
 import ProgressModal from 'src/components/Modals/ProgressModal/ProgressModal';
-import FileModal, { ModalItem } from 'src/components/Modals/FileModal/FileModal';
+import FileModal, {
+  ModalItem
+} from 'src/components/Modals/FileModal/FileModal';
+import Button from 'src/shared/ui/Button/Button';
 
 interface HeaderProps {
   className?: string;
@@ -244,7 +247,10 @@ const Header = ({ className = '' }: HeaderProps) => {
           </div>
         </div>
 
-        <div className="header__right"></div>
+        <div className="header__right">
+          <Button>Sign in</Button>
+          <Button>Sign up</Button>
+        </div>
       </header>
     </>
   );

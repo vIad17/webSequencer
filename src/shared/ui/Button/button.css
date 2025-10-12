@@ -1,0 +1,44 @@
+.header__right_button {
+  width: 7.875rem;
+  height: 2.375rem;
+  background:
+    linear-gradient(#000, #000) padding-box,
+    linear-gradient(90deg, #ff16a2, #df59ee, #4f54f1, #ff16a2) border-box;
+  background-size: 300% 100%;
+  cursor: pointer;
+  border: 1px solid transparent;
+  border-radius: 0.5rem;
+  color: white;
+  display: flex;
+  outline: none;
+  justify-content: center;
+  align-items: center;
+  font-family: var(--lato-medium);
+  font-size: 1.25rem;
+  transition: all 0.8s ease;
+  animation: gradientShift 3s ease infinite;
+  position: relative;
+}
+
+@keyframes gradientShift {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+.header__right_button:hover {
+  animation-duration: 0.3s;
+  box-shadow:
+    0 0 20px rgba(255, 22, 255, 0.8),
+    0 0 40px rgba(255, 22, 255, 0.4),
+    0 0 60px rgba(106, 0, 211, 0.2);
+
+  background: linear-gradient(90deg, #ff16ff 0%, #6a00d3 100%) border-box;
+  filter: brightness(1.1);
+}
