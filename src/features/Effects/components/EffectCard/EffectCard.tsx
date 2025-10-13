@@ -26,7 +26,7 @@ const EffectCard = ({className = "", name, width, canRemove = true, children }: 
   };
 
   return (
-  <div className={clsx('effect', className, { 'collapsed': collapsed }, { 'muted': muted })} style={{ width: `${width}px` }}>
+  <div className={clsx('effect', className, { 'collapsed': collapsed }, { 'muted': muted })} style={{ width: `${collapsed?35:width}px` }}>
     <header className="effect__header">
       <h5 className="effect__header-title">{name}</h5>
       <div className="effect__header_controls">

@@ -1,2 +1,11 @@
 
 
+.draggable-point {
+  //cursor: move;
+  fill: var(--colors-ui-primary);
+  stroke: none;
+  &:active {
+    fill: var(--colors-ui-accent);
+    //cursor: grabbing;
+  }
+}
