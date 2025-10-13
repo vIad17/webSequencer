@@ -11,9 +11,10 @@
   &__bt{
     background-color: transparent;
     border: none;
-    height: 80px;
-    width: 80px;
+    height: 70px;
+    width: 70px;
     padding: 0;
+    margin-bottom: -10px;
   }
 
   &__icon{
@@ -28,4 +29,9 @@
       stroke: var(--colors-ui-accent);
     }
   }
+}
+
+.knob__name {
+  color: var(--colors-text-primary);
+  font-size: 17px;
 }

@@ -83,7 +83,7 @@ const FXBitcrush = ({ name = '', className }: FXBitcrushProps) => {
 
   useEffect(() => {
     const width = 230;
-    const height = 130;
+    const height = 100;
 
     const svg = d3
       .select(svgRef.current)
@@ -96,17 +96,18 @@ const FXBitcrush = ({ name = '', className }: FXBitcrushProps) => {
   return (
     <EffectCard name={'Bitcrush'} children={
       <div className="bitcrush-content">
-      <svg ref={svgRef} className="synth__graph" />
-      <KnobInput 
-        value={soundSettings.bits ?? 16}
-        setValue={setBits}
-        min={1}
-        max={16}
-        step={0.1}
-        label="bits"
-        showValue={false}
-        lockMouse={true}
-        />
+        <svg ref={svgRef} className="synth__graph" />
+        
+        <KnobInput 
+          value={soundSettings.bits ?? 16}
+          setValue={setBits}
+          min={1}
+          max={16}
+          step={0.1}
+          label="bits"
+          showValue={false}
+          lockMouse={true}
+          />
       </div>
       }>
     </EffectCard>

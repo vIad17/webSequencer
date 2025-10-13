@@ -82,7 +82,7 @@ const FXTremolo = ({ name = '', className }: FXTremoloProps) => {
 
   useEffect(() => {
     const width = 230;
-    const height = 130;
+    const height = 100;
 
     const svg = d3
       .select(svgRef.current)
@@ -95,27 +95,29 @@ const FXTremolo = ({ name = '', className }: FXTremoloProps) => {
   return (
     <EffectCard name={'Tremolo'} children={
       <div className="tremolo-content">
-      <svg ref={svgRef} className="synth__graph" />
-      <KnobInput 
-        value={soundSettings.tremoloFrequency}
-        setValue={setTremoloFrequency}
-        min={0}
-        max={10}
-        step={0.01}
-        label="tremolo frequency"
-        showValue={false}
-        lockMouse={false}
-        />
-        <KnobInput 
-        value={soundSettings.tremoloDepth}
-        setValue={setTremoloDepth}
-        min={0}
-        max={1}
-        step={0.01}
-        label="tremolo depth"
-        showValue={false}
-        lockMouse={false}
-        />
+        <svg ref={svgRef} className="synth__graph" />
+        <div className='Effect_knobs_horizontal'>
+          <KnobInput 
+            value={soundSettings.tremoloFrequency}
+            setValue={setTremoloFrequency}
+            min={0}
+            max={10}
+            step={0.01}
+            label="frequency"
+            showValue={false}
+            lockMouse={true}
+          />
+          <KnobInput 
+            value={soundSettings.tremoloDepth}
+            setValue={setTremoloDepth}
+            min={0}
+            max={1}
+            step={0.01}
+            label="depth"
+            showValue={false}
+            lockMouse={true}
+          />
+        </div>
       </div>
       }>
     </EffectCard>

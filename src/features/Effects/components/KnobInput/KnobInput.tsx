@@ -94,13 +94,8 @@ const KnobInput = ({
 
   return value !== null ? (
     <div className="knob__element">
-      <button 
-        className="knob__bt"
-        onMouseDown={handleMouseDown}
-      >
-        <Icon
-        className='knob__icon'
-          icon={IconType.Knob} 
+      <button className="knob__bt" onMouseDown={handleMouseDown} >
+        <Icon className='knob__icon' icon={IconType.Knob} 
           style={{ transform: `rotate(${getRotationAngle()}deg)` }} 
         />
       </button>

@@ -1,5 +1,5 @@
 .sketch  {
-  border-radius: 8px;
+  border-radius: var(--border-radius-s);
   outline: solid 6px var(--colors-bg-primary);
   background: linear-gradient(#011d33 0%, #ed006f42 65%);
 }

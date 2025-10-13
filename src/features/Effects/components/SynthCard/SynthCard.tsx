@@ -156,7 +156,7 @@ const SynthCard = ({ name = '', className }: SynthCardProps) => {
         </button>
       </header>
 
-      <div className={'synth__content'}>
+      <div className="synth__content">
         <div className="synth__top-menu">
           <button className="synth__button" onClick={() => changeWave(false)}>  
             <Icon icon={IconType.ArrowLeft} interactable />
