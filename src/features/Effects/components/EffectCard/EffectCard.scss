@@ -1,10 +1,10 @@
 .effect {
-  --collapseTransition: 0.3s;
+  --collapseTransition: 2.3s;
 
   display: flex;
   flex-direction: column;
 
-  width: 230px;
+  width: fit-content;
   height: 250px;
   transition: width var(--collapseTransition);
 
@@ -76,6 +76,7 @@
 .effect__header-title {
   font-size: 18px;
   color: var(--colors-ui-primary);
+  white-space: nowrap;
 
   transform:matrix(1.00,0.00,0.00,1.00,0,0);
   width: 0;
@@ -112,6 +113,13 @@
   pointer-events: none;
 }
 
+.effect__content_inner{
+  display: flex;
+    flex-direction: column;
+    flex-wrap: nowrap;
+    align-items: center;
+}
+
 .muted{
   .muteBT .icon {
     & > * {
@@ -123,7 +131,6 @@
     &_interactable {
       &:hover * {
         opacity: 1.0;
-        
         // stroke: #ff0d00;
       }
 
@@ -140,6 +147,7 @@
     display: flex;
     flex-direction: row;
     justify-content: space-around;
+    width: 100%;
   }
 
   .grid-line {

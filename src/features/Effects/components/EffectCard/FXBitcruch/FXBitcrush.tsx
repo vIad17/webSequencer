@@ -94,20 +94,21 @@ const FXBitcrush = ({ name = '', className }: FXBitcrushProps) => {
   }, [soundSettings.bits]);
 
   return (
-    <EffectCard name={'Bitcrush'} children={
-      <div className="bitcrush-content">
+    <EffectCard name={'Bitcrush'} width={230} children={
+      <div className="effect__content_inner">
         <svg ref={svgRef} className="synth__graph" />
-        
-        <KnobInput 
-          value={soundSettings.bits ?? 16}
-          setValue={setBits}
-          min={1}
-          max={16}
-          step={0.1}
-          label="bits"
-          showValue={false}
-          lockMouse={true}
+        <div className='Effect_knobs_horizontal'>
+          <KnobInput 
+            value={soundSettings.bits ?? 16}
+            setValue={setBits}
+            min={1}
+            max={16}
+            step={0.1}
+            label="bits"
+            showValue={false}
+            lockMouse={true}
           />
+        </div>
       </div>
       }>
     </EffectCard>

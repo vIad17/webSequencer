@@ -7,11 +7,12 @@ import { IconType } from 'src/shared/icons/IconMap';
 interface EffectCardProps {
   className?: string;
   name: string;
+  width: number;
   canRemove?: boolean;
   children: ReactNode;
 }
 
-const EffectCard = ({className = "", name, canRemove = true, children }: EffectCardProps) => {
+const EffectCard = ({className = "", name, width, canRemove = true, children }: EffectCardProps) => {
 
   const [collapsed, setCollapsed] = useState(false);
   const [muted, setMuted] = useState(false);
@@ -25,7 +26,7 @@ const EffectCard = ({className = "", name, canRemove = true, children }: EffectC
   };
 
   return (
-  <div className={clsx('effect', className, { 'collapsed': collapsed }, { 'muted': muted })}>
+  <div className={clsx('effect', className, { 'collapsed': collapsed }, { 'muted': muted })} style={{ width: `${width}px` }}>
     <header className="effect__header">
       <h5 className="effect__header-title">{name}</h5>
       <div className="effect__header_controls">
@@ -39,8 +40,6 @@ const EffectCard = ({className = "", name, canRemove = true, children }: EffectC
           <Icon icon={IconType.X} interactable/>
         </button>
       </div>
-      
-      
     </header>
     <div className="effect__content">
       {children}

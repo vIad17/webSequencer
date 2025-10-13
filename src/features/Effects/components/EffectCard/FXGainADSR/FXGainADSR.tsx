@@ -1,8 +1,8 @@
 import { ReactNode, useRef, useEffect } from 'react';
 import * as d3 from 'd3';
-import './FXTremolo.scss';
+import './FXGainADSR.scss';
 
-import { setTremoloFrequency, setTremoloDepth } from 'src/shared/redux/slices/soundSettingsSlice';
+import { setAttack, setBits, setDecay, setRelease, setSustain } from 'src/shared/redux/slices/soundSettingsSlice';
 
 import { RootState } from 'src/shared/redux/store/store';
 import { useSelector, useDispatch } from 'react-redux';
@@ -11,12 +11,12 @@ import { graphSAW, graphSIN, graphSQR, graphTRI } from 'src/shared/functions/wav
 import EffectCard from '../EffectCard';
 import KnobInput from '../../KnobInput/KnobInput';
 
-interface FXTremoloProps {
+interface FXGainADSRProps {
   className?: string;
   name: string;
 }
 
-const FXTremolo = ({ name = '', className }: FXTremoloProps) => {
+const FXGainADSR = ({ name = '', className }: FXGainADSRProps) => {
   const svgRef = useRef<SVGSVGElement>(null);
   const dispatch = useDispatch();
   const soundSettings = useSelector((state: RootState) => state.soundSettings);
@@ -57,10 +57,19 @@ const FXTremolo = ({ name = '', className }: FXTremoloProps) => {
       .attr('x2', width)
       .attr('y2', (d) => yScale(d));
 
-
+    //const bits = soundSettings.bits??16;
+    //soundSettings.attack, soundSettings.decay, soundSettings.sustain, soundSettings.release
+    const attack = Math.max((soundSettings.attack ?? 0) /2., 0.0001);
+    const decay = Math.max((soundSettings.decay ?? 0) /2. , 0.0001);
+    const sustain = (soundSettings.sustain ?? 1 );
+    const release = Math.max((soundSettings.release ?? 0) /5., 0.0001);
     const sineData = d3.range(0.001, cols, 0.005).map((x) => ({
       x,
-      y: (graphSIN((x-2)* (soundSettings.tremoloFrequency??1))*1.5*(soundSettings.tremoloDepth??1)+2)
+      y: 4. * ((x<attack)?(x/attack): //attack
+      x<(attack+decay)?1-((x-attack)/decay)*(1-sustain): //dacay
+      x<(attack+decay+1)?sustain: //sustain
+      (1-(x-(attack+decay+1))/release)*sustain
+    ) //release
     }));
 
     const lineGenerator = d3
@@ -90,30 +99,50 @@ const FXTremolo = ({ name = '', className }: FXTremoloProps) => {
       .attr('height', height);
 
     drawSketch(svg, width, height);
-  }, [soundSettings.tremoloDepth, soundSettings.tremoloFrequency]);
+  }, [soundSettings.attack, soundSettings.decay, soundSettings.sustain, soundSettings.release]);
 
   return (
-    <EffectCard name={'Tremolo'} width={230} children={
+    <EffectCard name={'Gain ADSR'} width={280} children={
       <div className="effect__content_inner">
         <svg ref={svgRef} className="synth__graph" />
-        <div className='Effect_knobs_horizontal'>
-          <KnobInput 
-            value={soundSettings.tremoloFrequency}
-            setValue={setTremoloFrequency}
+        <div className="Effect_knobs_horizontal">
+           <KnobInput 
+            value={soundSettings.attack ?? 1}
+            setValue={setAttack}
             min={0}
-            max={10}
+            max={2}
             step={0.01}
-            label="frequency"
+            label="attack"
             showValue={false}
             lockMouse={true}
           />
           <KnobInput 
-            value={soundSettings.tremoloDepth}
-            setValue={setTremoloDepth}
+            value={soundSettings.decay ?? 1}
+            setValue={setDecay}
+            min={0}
+            max={2}
+            step={0.01}
+            label="decay"
+            showValue={false}
+            lockMouse={true}
+          />
+          <KnobInput 
+            value={soundSettings.sustain ?? 1}
+            setValue={setSustain}
             min={0}
             max={1}
             step={0.01}
-            label="depth"
+            label="sustain"
+            showValue={false}
+            lockMouse={true}
+          />
+          <KnobInput 
+            value={soundSettings.release ?? 1}
+            setValue={setRelease}
+            min={0}
+            max={5}
+            step={0.01}
+            label="release"
             showValue={false}
             lockMouse={true}
           />
@@ -124,4 +153,4 @@ const FXTremolo = ({ name = '', className }: FXTremoloProps) => {
   );
 };
 
-export default FXTremolo;
+export default FXGainADSR;

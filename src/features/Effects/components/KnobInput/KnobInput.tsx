@@ -41,22 +41,24 @@ const KnobInput = ({
     return percentage * 280 - 140; // -140° to +140°
   };
 
+
+  let isDragging = false;
+
   // Handle mouse drag interaction
   const handleMouseDown = (e: React.MouseEvent) => {
+    if (isDragging) return;
+    isDragging = true;
     e.preventDefault();
     const knobElement = e.currentTarget as HTMLElement;
     let startValue = value ?? min;
-    let isFirstMove = true; // Track first movement
     
     if (knobElement.requestPointerLock && lockMouse) {
       knobElement.requestPointerLock();
     }
 
     const handleMouseMove = (moveEvent: MouseEvent) => {
-      if (lockMouse && isFirstMove) {
-        isFirstMove = false;
-        return;
-      }
+      
+      //need to check for movement only when mouse is locked
 
       const deltaX = moveEvent.movementX || 0;
       const deltaY = -(moveEvent.movementY || 0); 
@@ -65,6 +67,9 @@ const KnobInput = ({
       const range = max - min;
       const sensitivity = 300;
       const valueChange = (delta / sensitivity) * range;
+
+      if(Math.abs(valueChange) > range ) return;
+
       let newValue = startValue + valueChange;
       
       newValue = Math.min(max, Math.max(min, newValue));
@@ -84,6 +89,8 @@ const KnobInput = ({
 
       document.removeEventListener('mousemove', handleMouseMove);
       document.removeEventListener('mouseup', handleMouseUp);
+
+      isDragging = false;
     };
 
     document.addEventListener('mousemove', handleMouseMove);
