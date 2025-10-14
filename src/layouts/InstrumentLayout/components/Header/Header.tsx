@@ -248,8 +248,12 @@ const Header = ({ className = '' }: HeaderProps) => {
         </div>
 
         <div className="header__right">
-          <Button>Sign in</Button>
-          <Button>Sign up</Button>
+          <Button type="header__right_login">
+            <a href="https://websequencer.kykit.ru:9001/login">Log in</a>
+          </Button>
+          <Button type="header__right_signup">
+            <a href="https://websequencer.kykit.ru:9001/register">Sign up</a>
+          </Button>
         </div>
       </header>
     </>
