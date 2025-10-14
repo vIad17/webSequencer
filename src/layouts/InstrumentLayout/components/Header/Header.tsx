@@ -20,6 +20,7 @@ import clsx from 'clsx';
 import { useMIDIInputs } from '@react-midi/hooks';
 import { Icon } from 'src/shared/icons/Icon';
 import { IconType } from 'src/shared/icons/IconMap';
+import { setIsSidebarOpen } from 'src/shared/redux/slices/effectsSidebarSlice';
 
 interface HeaderProps {
   className?: string;
@@ -37,6 +38,7 @@ const Header = ({ className = '' }: HeaderProps) => {
   });
 
   const settings = useSelector((state: RootState) => state.settings);
+  const isSidebarOpen = useSelector((state: RootState) => state.effectsSidebar.isOpen);
 
   const handleButtonClick = () => {
     document.getElementById('import-midi-file-input')?.click();
@@ -130,6 +132,16 @@ const Header = ({ className = '' }: HeaderProps) => {
     <header className={`header ${className}`}>
       <div className="header__left">
         <div ref={modalRef} className="header__left-item">
+          <button
+            className={clsx('header__left-button header__effects-button', {
+              'header__effects-button_active': isSidebarOpen
+            })}
+            onClick={() => {
+              dispatch(setIsSidebarOpen(!isSidebarOpen))
+            }}
+          >
+            Effect library
+          </button>
           <button
             className={clsx('header__left-button', {
               'header__left-button_active': fileOpen

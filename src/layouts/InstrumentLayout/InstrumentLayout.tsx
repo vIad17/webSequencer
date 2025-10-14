@@ -5,11 +5,13 @@ import Sidebar from 'src/layouts/InstrumentLayout/components/Sidebar/Sidebar';
 
 import './InstrumentLayout.scss';
 import Footer from './components/Footer/Footer';
+import EffectsSidebar from './components/EffectsSidebar/EffectsSidebar';
 
 const InstrumentLayout = () => (
   <div className="instrument-layout">
     <Header className="instrument-layout__header" />
-    <div className="instrument-layout__content">
+    <div className="instrument-layout__main">
+      <EffectsSidebar className='instrument-layout__effects-sidebar'></EffectsSidebar>
       <div className="instrument-layout__content">
         <Outlet />
       </div>

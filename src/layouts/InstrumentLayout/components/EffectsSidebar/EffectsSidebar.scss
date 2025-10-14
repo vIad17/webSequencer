@@ -1,0 +1,9 @@
+.effects-sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  overflow: hidden;
+
+  transition: width 0.3s ease;
+  width: var(--sidebar-width, 0px);
+}
