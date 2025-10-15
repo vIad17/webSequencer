@@ -113,7 +113,7 @@ const SynthCard = ({ name = '', className }: SynthCardProps) => {
       .attr('class', 'sine-wave')
       .attr('d', lineGenerator)
       .attr('fill', 'none')
-      .attr('stroke', '#FFFFFF')
+      .attr('stroke', 'var(--colors-ui-primary)')
       .attr('stroke-width', 3);
   };
 

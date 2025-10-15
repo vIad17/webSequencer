@@ -66,7 +66,7 @@ const FXDelay = ({ name = '', className }: FXDelayProps) => {
       .data(d3.range(cols*20 + 1))
       .enter()
       .append('line')
-      .attr('class', 'delay-line')
+      .attr('class', 'delay-line FXgraph-line')
       .attr('x1', (d) => xScaleDelay(d))
       .attr('y1', (d) => 50-(delayLineHeight*Math.pow((soundSettings.feedback ?? 0),d)))
       .attr('x2', (d) => xScaleDelay(d))

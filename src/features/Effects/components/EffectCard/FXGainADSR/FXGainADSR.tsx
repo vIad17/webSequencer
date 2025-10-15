@@ -99,12 +99,8 @@ const drawSketch = (
   svg
     .append('path')
     .datum(sineData)
-    .attr('class', 'sine-wave')
+    .attr('class', 'FXgraph-line')
     .attr('d', lineGenerator)
-    .attr('fill', 'none')
-    .attr('stroke', '#FFFFFF')
-    .attr('stroke-width', 3);
-
 
   const svgNode = svg.node();
 

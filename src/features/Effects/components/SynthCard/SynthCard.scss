@@ -1,5 +1,5 @@
 .grid-line {
-  stroke: var(--colors-text-primary);
+  stroke: var(--colors-ui-primary);
   opacity: 0.2;
   stroke-width: 2;
 }
@@ -35,7 +35,7 @@
 
 .synth__header-title {
   font-size: 18px;
-  color: var(--colors-ui-tertiary);
+  color: var(--colors-text-primary);
 
   transform:matrix(1.00,0.00,0.00,1.00,0,0);
   width: 0;

@@ -75,7 +75,7 @@
 
 .effect__header-title {
   font-size: 18px;
-  color: var(--colors-ui-primary);
+  color: var(--colors-text-primary);
   white-space: nowrap;
 
   transform:matrix(1.00,0.00,0.00,1.00,0,0);
@@ -154,6 +154,12 @@
     stroke: var(--colors-ui-primary);
     opacity: 0.2;
     stroke-width: 2;
+  }
+
+  .FXgraph-line{
+    stroke: var(--colors-ui-primary);
+    stroke-width: 3;
+    fill: none;
   }
 }
 
