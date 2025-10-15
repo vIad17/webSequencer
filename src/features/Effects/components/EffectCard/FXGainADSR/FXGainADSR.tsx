@@ -112,7 +112,8 @@ const drawSketch = (
   const drag = d3
     .drag<SVGCircleElement, { id: string; x: number; y: number }>()
     .on('start', function () {
-      d3.select(this).raise().attr('stroke', 'orange').attr('r', 6);
+      // d3.select(this).raise().attr('fill', 'orange').attr('r', 6);
+      d3.select(this).raise().attr('class', 'draggable-point active');
     })
     .on('drag', function (event, d) {
       const [mouseX, mouseY] = d3.pointer(event, svgNode);
@@ -130,31 +131,27 @@ const drawSketch = (
       let newRelease = soundSettings.release ?? 0;
 
       if (d.id === 'attack') {
-        newAttack = Math.min(Math.max(0, constrainedX * 2),2); // reverse your scaling: /2 → *2
+        newAttack = Math.min(Math.max(0, constrainedX * 2),2);
         d.x = constrainedX;
         d.y = 1;
+        dispatch(setAttack(newAttack));
       } else if (d.id === 'decay') {
         newSustain = Math.min(Math.max(0, Math.min(1, constrainedY/4)),1);
-        newDecay = Math.min(Math.max(0, (constrainedX - attack) * 2),2); // reverse /2 scaling
+        newDecay = Math.min(Math.max(0, (constrainedX - attack) * 2),2);
         d.x = constrainedX;
         d.y = newSustain;
+        dispatch(setDecay(newDecay));
+        dispatch(setSustain(newSustain));
       } else if (d.id === 'sustain') {
         newSustain = Math.max(0, Math.min(1, constrainedY/4));
         d.y = newSustain;
+        dispatch(setSustain(newSustain));
       } else if (d.id === 'release') {
         newRelease = Math.min(Math.max(0, (constrainedX-(attack + decay + 1)) * 5),5); 
         d.x = constrainedX;
         d.y = 0;
+        dispatch(setRelease(newRelease));
       }
-
-      // Dispatch updates
-      if (d.id === 'attack') dispatch(setAttack(newAttack));
-      if (d.id === 'decay') {
-        dispatch(setDecay(newDecay));
-        dispatch(setSustain(newSustain));
-      }
-      if (d.id === 'sustain') dispatch(setSustain(newSustain));
-      if (d.id === 'release') dispatch(setRelease(newRelease));
 
       // Update visual position
       d3.select(this)
@@ -162,7 +159,8 @@ const drawSketch = (
         .attr('cy', yScale(d.y));
     })
     .on('end', function () {
-      d3.select(this).attr('stroke', 'white').attr('r', 5);
+      // d3.select(this).attr('fill', 'white');
+      d3.select(this).attr('class', 'draggable-point');
     });
 
   // Draw draggable points

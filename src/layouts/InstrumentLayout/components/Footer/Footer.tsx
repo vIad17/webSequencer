@@ -9,6 +9,7 @@ import SynthCard from 'src/features/Effects/components/SynthCard/SynthCard';
 import FXBitcrush from 'src/features/Effects/components/EffectCard/FXBitcruch/FXBitcrush';
 import FXTremolo from 'src/features/Effects/components/EffectCard/FXTremolo/FXTremolo';
 import FXGainADSR from 'src/features/Effects/components/EffectCard/FXGainADSR/FXGainADSR';
+import FXDelay from 'src/features/Effects/components/EffectCard/FXDelay/FXDelay';
 //--
 
 interface FooterProps {
@@ -22,6 +23,7 @@ const Footer = ({ className = '' }: FooterProps) => (
       <FXBitcrush className='footer__effects_card' name={'Bitcrush'}></FXBitcrush>
       <FXTremolo name={''}></FXTremolo>
       <FXGainADSR name={''}></FXGainADSR>
+      <FXDelay name={''}></FXDelay>
     </div>
     <MySketch className="footer__sketch" />
   </div>
