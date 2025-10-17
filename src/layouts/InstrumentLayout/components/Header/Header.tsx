@@ -34,6 +34,10 @@ interface HeaderProps {
   className?: string;
 }
 
+const baseUrl = import.meta.env.VITE_NODE_ENV
+  ? import.meta.env.VITE_BASE_URL
+  : 'http://localhost:5173';
+
 const Header = ({ className = '' }: HeaderProps) => {
   const [myBpm, setMyBpm] = useState(120);
   const [myTacts, setMyTacts] = useState(8);
@@ -249,10 +253,10 @@ const Header = ({ className = '' }: HeaderProps) => {
 
         <div className="header__right">
           <Button type="header__right_login">
-            <a href="https://websequencer.kykit.ru:9001/login">Log in</a>
+            <a href={`${baseUrl}/login`}>Log in</a>
           </Button>
           <Button type="header__right_signup">
-            <a href="https://websequencer.kykit.ru:9001/register">Sign up</a>
+            <a href={`${baseUrl}/register`}>Sign up</a>
           </Button>
         </div>
       </header>

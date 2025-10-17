@@ -10,5 +10,8 @@ export default defineConfig(() => ({
   plugins: [react(), tsconfigPaths(), svgr()],
   test: {
     exclude: []
+  },
+  server: {
+    port: 5172
   }
 }));
