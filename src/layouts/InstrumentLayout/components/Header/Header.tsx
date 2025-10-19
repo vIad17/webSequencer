@@ -34,9 +34,7 @@ interface HeaderProps {
   className?: string;
 }
 
-const baseUrl = import.meta.env.VITE_NODE_ENV
-  ? import.meta.env.VITE_BASE_URL
-  : 'http://localhost:5173';
+const baseUrl = import.meta.env.VITE_BASE_URL;
 
 const Header = ({ className = '' }: HeaderProps) => {
   const [myBpm, setMyBpm] = useState(120);
