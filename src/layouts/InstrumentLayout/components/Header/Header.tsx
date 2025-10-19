@@ -25,11 +25,16 @@ import { useMIDIInputs } from '@react-midi/hooks';
 import { Icon } from 'src/shared/icons/Icon';
 import { IconType } from 'src/shared/icons/IconMap';
 import ProgressModal from 'src/components/Modals/ProgressModal/ProgressModal';
-import FileModal, { ModalItem } from 'src/components/Modals/FileModal/FileModal';
+import FileModal, {
+  ModalItem
+} from 'src/components/Modals/FileModal/FileModal';
+import Button from 'src/shared/ui/Button/Button';
 
 interface HeaderProps {
   className?: string;
 }
+
+const baseUrl = import.meta.env.VITE_BASE_URL;
 
 const Header = ({ className = '' }: HeaderProps) => {
   const [myBpm, setMyBpm] = useState(120);
@@ -244,7 +249,14 @@ const Header = ({ className = '' }: HeaderProps) => {
           </div>
         </div>
 
-        <div className="header__right"></div>
+        <div className="header__right">
+          <Button type="header__right_login">
+            <a href={`${baseUrl}/login`}>Log in</a>
+          </Button>
+          <Button type="header__right_signup">
+            <a href={`${baseUrl}/register`}>Sign up</a>
+          </Button>
+        </div>
       </header>
     </>
   );

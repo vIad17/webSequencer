@@ -22,6 +22,10 @@
 
   &__right {
     flex: 1;
+    display: flex;
+    justify-content: flex-end;
+    margin-right: 80px;
+    gap: 12px;
   }
 
   &__settings {
@@ -45,10 +49,9 @@
   &__icon {
     width: 32px;
     height: 32px;
-    & *{
+    & * {
       color: aqua;
     }
-      
   }
 
   &__icon-pause {
@@ -98,7 +101,8 @@
       color: var(--colors-ui-primary);
     }
 
-    &:active, &_active {
+    &:active,
+    &_active {
       color: var(--colors-ui-accent);
     }
   }

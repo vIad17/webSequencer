@@ -1,0 +1,55 @@
+.header__right_button {
+  width: 7.875rem;
+  height: 2.375rem;
+  cursor: pointer;
+  border-radius: 0.5rem;
+  display: flex;
+  outline: none;
+  border: 1px solid transparent;
+  justify-content: center;
+  align-items: center;
+  transition: all 0.2s ease;
+
+  &:hover {
+    animation-duration: 0.3s;
+    box-shadow:
+      0 0 20px rgba(255, 22, 255, 0.8),
+      0 0 40px rgba(255, 22, 255, 0.4),
+      0 0 60px rgba(106, 0, 211, 0.2);
+    filter: brightness(1.1);
+  }
+
+  & > a {
+    color: white;
+    text-decoration: none;
+    font-family: var(--lato-medium);
+    font-size: 1.25rem;
+  }
+}
+
+.header__right_login {
+  background:
+    linear-gradient(#000, #000) padding-box,
+    linear-gradient(90deg, #ff16a2, #df59ee, #4f54f1) border-box;
+
+  &:hover {
+    animation: gradientShift 3s ease infinite;
+    background-size: 300% 100%;
+  }
+}
+
+@keyframes gradientShift {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+.header__right_signup {
+  background: linear-gradient(90deg, #ff16ff 0%, #6a00d3 100%) border-box;
+}
