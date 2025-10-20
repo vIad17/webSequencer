@@ -61,7 +61,7 @@ jobs:
           envs: GITHUB_REF_NAME,GITHUB_REPOSITORY
           script: |
             # Конфигурация проекта
-            PROJECT_DIR="$HOME/WebSequencerApp"
+            PROJECT_DIR="$HOME/webSequencer"
             REPO="git@github.com:${GITHUB_REPOSITORY}.git"
 
             # Создаем/обновляем репозиторий
