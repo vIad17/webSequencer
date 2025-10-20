@@ -68,6 +68,7 @@ jobs:
             if [ ! -d "$PROJECT_DIR" ]; then
               echo "Cloning repository with branch ${GITHUB_REF_NAME}"
               git clone -b ${GITHUB_REF_NAME} "$REPO" "$PROJECT_DIR"
+              cd "$PROJECT_DIR"
             else
               echo "Updating repository to branch ${GITHUB_REF_NAME}"
               cd "$PROJECT_DIR"
@@ -79,6 +80,6 @@ jobs:
             docker network ls | grep websequencer-net || docker network create websequencer-net
 
             # Перезапускаем
-            cd "$PROJECT_DIR"
+            #cd "$PROJECT_DIR"
             docker compose down
             docker compose up -d --build
