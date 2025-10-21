@@ -251,10 +251,10 @@ const Header = ({ className = '' }: HeaderProps) => {
 
         <div className="header__right">
           <Button type="header__right_login">
-            <a href={`${baseUrl}/login`}>Log in</a>
+            <a href={`${baseUrl || ''}/login`}>Log in</a>
           </Button>
           <Button type="header__right_signup">
-            <a href={`${baseUrl}/register`}>Sign up</a>
+            <a href={`${baseUrl || ''}/register`}>Sign up</a>
           </Button>
         </div>
       </header>
