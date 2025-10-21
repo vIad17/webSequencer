@@ -309,6 +309,8 @@ const NoteManager = ({ className, isEditable = true }: NoteManagerProps) => {
 
   const ChangeSelectedNoteHandler = useCallback(
     (e: React.MouseEvent, i: number) => {
+      if (!isEditable) return;
+
       if (!notesArrayRef.current[i].isSelected) {
         if (e.shiftKey) {
           dispatch(addSelectedNote(i));
@@ -322,6 +324,8 @@ const NoteManager = ({ className, isEditable = true }: NoteManagerProps) => {
 
   const NoteMouseUpHandler = useCallback(
     (e: React.MouseEvent, index1: number) => {
+      if (!isEditable) return;
+
       if (!isDragg && !isResizing && !e.shiftKey) {
         dispatch(changeSelectedNote({ index: index1, isSelected: true }));
       }
@@ -351,6 +355,7 @@ const NoteManager = ({ className, isEditable = true }: NoteManagerProps) => {
         index={index}
         isSelected={element.isSelected}
         isActive={element.isActive}
+        isEditable={isEditable}
         onDrag={dragNoteHandler}
         onMouseDown={ChangeSelectedNoteHandler}
         onMouseUp={NoteMouseUpHandler}

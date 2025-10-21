@@ -1,0 +1,155 @@
+// Modal.scss
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(8px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  animation: fadeIn 0.2s ease-out;
+
+  .modal {
+    position: relative;
+    width: min(90vw, 400px);
+    padding: 20px;
+    background-color: #0A2C58;
+    border: 2px solid var(--colors-ui-primary);
+    border-radius: 12px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+    color: var(--colors-text-secondary);
+    animation: scaleIn 0.2s ease-out;
+
+    &__header {
+      font-size: 18px;
+      font-weight: 600;
+      margin-bottom: 16px;
+    }
+
+    &__body {
+      margin-bottom: 20px;
+    }
+
+    &__footer {
+      display: flex;
+      justify-content: flex-end;
+      gap: 12px;
+    }
+
+    &__input {
+      width: 100%;
+      padding: 10px 12px;
+      background-color: rgba(255, 255, 255, 0.1);
+      border: 1px solid var(--colors-ui-primary);
+      border-radius: 6px;
+      color: var(--colors-text-primary);
+      font-size: 16px;
+      line-height: 1.4;
+      outline: none;
+      box-sizing: border-box;
+      margin-bottom: 8px;
+
+      &:focus {
+        border-color: var(--colors-ui-accent);
+        box-shadow: 0 0 0 2px rgba(255, 0, 132, 0.2);
+      }
+
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    &__button {
+      padding: 8px 16px;
+      border: none;
+      border-radius: 6px;
+      font-size: 14px;
+      cursor: pointer;
+      transition: all 0.15s ease;
+
+      &_primary {
+        background-color: var(--colors-ui-accent);
+        color: white;
+
+        &:hover {
+          background-color: var(--colors-ui-primary);
+        }
+      }
+
+      &_secondary {
+        background-color: transparent;
+        color: var(--colors-text-secondary);
+
+        &:hover {
+          color: var(--colors-ui-primary);
+        }
+      }
+    }
+
+    &__progress-label {
+      
+      font-size: 18px;
+      color: var(--colors-text-secondary);
+      margin-bottom: 8px;
+    }
+
+    &__progress-bar-outer {
+      width: 100%;
+      height: 6px;
+      background-color: rgba(255, 255, 255, 0.1);
+      border-radius: 3px;
+      overflow: hidden;
+      margin-bottom: 8px;
+    }
+
+    &__progress-bar-inner {
+      height: 100%;
+      width: 0; // Controlled by JS
+      background-color: var(--colors-ui-accent);
+      border-radius: 3px;
+      transition: width 0.2s ease-out;
+      animation: progressBarFill 0.2s ease-out;
+    }
+
+    &__progress-percent {
+      text-align: center;
+      font-size: 14px;
+      color: var(--colors-ui-accent);
+      font-weight: 600;
+    }
+  }
+
+
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes scaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes progressBarFill {
+  from {
+    width: 0;
+  }
+}

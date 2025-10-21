@@ -1,0 +1,12 @@
+services:
+  sequencer:
+    build: .
+    container_name: sequencer
+    restart: unless-stopped
+    networks:
+      - websequencer-net
+
+networks:
+  websequencer-net:
+    external: true
+    name: websequencer-net

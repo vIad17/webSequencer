@@ -10,37 +10,30 @@ import {
   setIsPlaying
 } from 'src/shared/redux/slices/currentMusicSlice';
 import {
-  addSelectedNote,
   addPlayingNote,
-  changeSelectedNote,
   removePlayingNote,
   setActiveNote,
   removeActiveNotes
 } from 'src/shared/redux/slices/notesArraySlice';
 import store, { RootState } from 'src/shared/redux/store/store';
 
+import * as lamejs from '@breezystack/lamejs';
+
 import { parseArrayBuffer } from 'midi-json-parser';
 import { addNote } from 'src/shared/redux/slices/notesArraySlice';
 import { setBpm, setTacts } from 'src/shared/redux/slices/settingsSlice';
 
-/* creating a synth */
-const synth = new Tone.PolySynth(Tone.Synth, {
-  oscillator: {
-    type: 'sine'
-  },
-  envelope: {
-    attack: 0,
-    decay: 0,
-    sustain: 1,
-    release: 0.01
-  }
-}).connect(new Tone.Add(2));
+import { FXChain } from 'src/features/Effects/FXChain';
+import { setCurrentStep, setProgress } from 'src/shared/redux/slices/progressSlice';
 
+
+const chain = new FXChain();
+const synth = chain.getSynth();
 /* creating effects */
 
 // tremoloFrequency [0, 10]
 // tremoloDepth [0, 1]
-const tremolo = new Tone.Tremolo(0, 0).start(); // affects the gain
+const tremolo = new Tone.Tremolo(0, 0)//.start(); // affects the gain
 
 // delayTime [0, 1]
 // feedback [0, 1]
@@ -61,17 +54,14 @@ const lowFilter = new Tone.Filter(8000, 'highpass');
 
 const gain = new Tone.Gain(6);
 
-synth.chain(
-  tremolo,
-  delay,
-  dist,
-  crusher,
-  shifter,
-  highFilter,
-  lowFilter,
-  gain,
-  Tone.getDestination()
-);
+chain.appendFX(tremolo);
+chain.appendFX(delay);
+// chain.appendFX(dist);
+chain.appendFX(crusher);
+chain.appendFX(shifter);
+chain.appendFX(highFilter);
+chain.appendFX(lowFilter);
+// chain.appendFX(gain);
 
 /* creating a loop music */
 function playMusic(time: number) {
@@ -79,20 +69,19 @@ function playMusic(time: number) {
   const tactsCounter = store.getState().settings.tacts ?? 8;
   const notesArray = store.getState().notesArray.notesArray;
 
+  console.log("time", time)
+
   notesArray.forEach((note, index) => {
     if (note.attackTime === currentBit) {
       store.dispatch(setActiveNote({ index, isActive: true }));
       synth.triggerAttackRelease(
         pitchNotes[note.note],
         `0:0:${note.duration}`,
-        time
-      );
-      // store.dispatch(addPlayingNote(pitchNotes[note.note]));
+        time);
     }
     if (note.attackTime + note.duration <= currentBit) {
       note.isActive &&
         store.dispatch(setActiveNote({ index, isActive: false }));
-      // store.dispatch(removePlayingNote(pitchNotes[note.note]));
     }
   });
 
@@ -111,6 +100,13 @@ export function stopMusic() {
   store.dispatch(setIsPlaying(false));
   Tone.Transport.stop();
 }
+
+// Tone.Timeline()
+
+// const seq = new Tone.Sequence((time, note) => {
+// 	synth.triggerAttackRelease(note, 0.1, time);
+// }, ["C4", ["E4", "D4", "E4", "F4"], "G4", [244, "G4"]]).start(0);
+// Tone.Transport.start();
 
 export function rewindMusic(bit: number) {
   //console.log("Rewinding to: "+ bit)
@@ -250,6 +246,123 @@ keyboard.up((key: Key) => {
   const note = pitchNotes[108 - key.note];
   noteUp(note);
 });
+
+async function exportToBuffer() {
+  const notesArray = store.getState().notesArray.notesArray;
+  const tactsCounter = store.getState().settings.tacts ?? 8;
+
+  const bpm = store.getState().settings.bpm ?? 120;
+
+  store.dispatch(setCurrentStep("Exporting data to buffer"));
+  store.dispatch(setProgress(0));
+
+  const totalSteps = tactsCounter * 4;
+  const durationSeconds = ((tactsCounter * 4) / bpm) * 60;
+
+  const buffer = await Tone.Offline(({ transport }) => {
+    const chainOffline = chain.clone();
+    // const gain = new Tone.Gain(0.2);
+    // chainOffline.appendFX(gain);
+    const exportedSynth = chainOffline.getSynth();
+
+    notesArray
+      // .sort((a, b) => a.attackTime - b.attackTime)
+      .forEach((note) => {
+        const startTime = `0:0:${note.attackTime}`;
+        const durTime = `0:0:${note.duration}`;
+
+        exportedSynth.triggerAttackRelease(
+          pitchNotes[note.note],
+          durTime,
+          startTime
+        );
+      });
+
+    transport.start(0);
+  }, durationSeconds, 1, 48000);
+
+  store.dispatch(setProgress(100));
+  return buffer.get();
+}
+
+// function floatTo16BitPCM(float32Array) {
+//     const int16Array = new Int16Array(float32Array.length);
+//     for (let i = 0; i < float32Array.length; i++) {
+//         const s = Math.max(-1, Math.min(1, float32Array[i]));
+//         int16Array[i] = s < 0 ? s * 0x8000 : s * 0x7FFF;
+//     }
+//     return int16Array;
+// }
+
+// Alternative more concise version
+function floatTo16BitPCM(float32Array: Float32Array<ArrayBufferLike>) {
+  const int16Array = new Int16Array(float32Array.length);
+  for (let i = 0; i < float32Array.length; i++) {
+    int16Array[i] = float32Array[i] * 0x7FFF / 16;
+  }
+  return int16Array;
+}
+
+function audioBufferToMp3(buffer: AudioBuffer): Promise<Blob> {
+  const mp3Encoder = new lamejs.Mp3Encoder(buffer.numberOfChannels, buffer.sampleRate, 320);
+  const samples = buffer.getChannelData(0);
+  const mp3Data: Uint8Array[] = [];
+
+  const int16Array = floatTo16BitPCM(samples);
+  const sampleBlockSize = 1152;
+
+  return new Promise<Blob>((resolve) => {
+    let i = 0;
+
+    const processChunk = () => {
+      store.dispatch(setCurrentStep(`Encoding... ${Math.round((i / samples.length) * 100)}%`));
+
+      const end = Math.min(i + sampleBlockSize, samples.length);
+      const sampleChunk = int16Array.subarray(i, end);
+      const mp3buf = mp3Encoder.encodeBuffer(sampleChunk);
+      if (mp3buf.length > 0) {
+        mp3Data.push(mp3buf);
+      }
+
+      store.dispatch(setProgress((i / samples.length) * 100));
+
+      i += sampleBlockSize;
+
+      if (i < samples.length) {
+        setTimeout(processChunk, 0);
+      } else {
+        const mp3buf = mp3Encoder.flush();
+        if (mp3buf.length > 0) {
+          mp3Data.push(mp3buf);
+        }
+        store.dispatch(setCurrentStep("Done"));
+        store.dispatch(setProgress(100));
+        resolve(new Blob(mp3Data, { type: "audio/mp3" }));
+      }
+    };
+
+    processChunk();
+  }).then(blob => blob);
+}
+
+export async function exportMp3() {
+  const buffer = await exportToBuffer();
+  if (buffer) {
+    const mp3Blob = await audioBufferToMp3(buffer);
+
+    store.dispatch(setCurrentStep("Saving mp3"));
+    store.dispatch(setProgress(0));
+
+    const url = URL.createObjectURL(mp3Blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "untitledf1.mp3";
+    a.click();
+    URL.revokeObjectURL(url);
+    store.dispatch(setProgress(100));
+    store.dispatch(setCurrentStep(null));
+  }
+}
 
 /* creating a component */
 const SoundManager = () => {
