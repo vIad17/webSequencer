@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef } from 'react';
 
 export const useHandleClickOutside = (onClickOutside: () => void) => {
   const modalRef = useRef<HTMLDivElement>(null);
