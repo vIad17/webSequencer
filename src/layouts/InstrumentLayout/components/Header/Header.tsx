@@ -27,7 +27,6 @@ import { RootState } from 'src/shared/redux/store/store';
 import Button from 'src/shared/ui/Button/Button';
 
 import './Header.scss';
-import { useNavigate } from 'react-router-dom';
 
 interface HeaderProps {
   className?: string;
@@ -52,8 +51,6 @@ const Header = ({ className = '' }: HeaderProps) => {
   });
 
   const settings = useSelector((state: RootState) => state.settings);
-
-  const navigate = useNavigate();
 
   const handleButtonClick = () => {
     document.getElementById('import-midi-file-input')?.click();
@@ -148,7 +145,8 @@ const Header = ({ className = '' }: HeaderProps) => {
     {
       text: 'Profile',
       callback: () => {
-        navigate(`${baseUrl}/main/myprojects`);
+        localStorage.setItem('lastActiveNavButton', 'project');
+        window.location.href = '/main/myprojects';
       }
     },
     {
@@ -296,10 +294,10 @@ const Header = ({ className = '' }: HeaderProps) => {
           ) : (
             <>
               <Button type="header__right_login">
-                <a href={`${baseUrl}/login`}>Log in</a>
+                <a href="/login">Log in</a>
               </Button>
               <Button type="header__right_signup">
-                <a href={`${baseUrl}/register`}>Sign up</a>
+                <a href="/register">Sign up</a>
               </Button>
             </>
           )}
