@@ -21,7 +21,7 @@
   }
 
   &__right {
-    flex: 1;
+    position: relative;
     display: flex;
     justify-content: flex-end;
     margin-right: 80px;
@@ -114,6 +114,13 @@
     z-index: 50;
   }
 
+  &__right-button-modal {
+    top: 50px;
+    right: 0;
+    min-width: 170px;
+    z-index: 50;
+  }
+
   &__inputs-left-button-sub-modal {
     width: 280px;
   }
@@ -123,5 +130,26 @@
     left: 100%;
     margin-left: 20px;
     min-width: 170px;
+  }
+
+  &__right_profile {
+    background: transparent;
+    display: flex;
+    border: none;
+    color: white;
+    gap: 16px;
+    cursor: pointer;
+  }
+
+  &__right_avatar {
+    outline: 2px solid #041d32;
+    width: 1.6rem;
+    height: 1.6rem;
+    border-radius: 0.5rem;
+  }
+
+  &__right_username {
+    font-family: var(--lato-medium);
+    font-size: 1rem;
   }
 }

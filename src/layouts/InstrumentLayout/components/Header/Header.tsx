@@ -1,34 +1,32 @@
 import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
+import { useMIDIInputs } from '@react-midi/hooks';
+import clsx from 'clsx';
+import FileModal, {
+  ModalItem
+} from 'src/components/Modals/FileModal/FileModal';
+import ProfileModal from 'src/components/Modals/ProfileModal/ProfileModal';
+import ProgressModal from 'src/components/Modals/ProgressModal/ProgressModal';
 import * as Tone from 'tone';
+import avatar from 'src/shared/icons/svg/avatar.svg';
 
+import {
+  exportMp3,
+  openMIDI,
+  pauseMusic,
+  stopMusic
+} from 'src/app/SoundManager';
+import { useHandleClickOutside } from 'src/shared/hooks/useHandleClickOutside';
+import { Icon } from 'src/shared/icons/Icon';
+import { IconType } from 'src/shared/icons/IconMap';
 import { setIsPlaying } from 'src/shared/redux/slices/currentMusicSlice';
 import { setColumnsCount } from 'src/shared/redux/slices/drawableFieldSlice';
 import { setBpm, setTacts } from 'src/shared/redux/slices/settingsSlice';
 import { RootState } from 'src/shared/redux/store/store';
-
-import arrowRightIcon from './images/arrowRightIcon.svg';
-import checkIcon from './images/checkIcon.svg';
+import Button from 'src/shared/ui/Button/Button';
 
 import './Header.scss';
-import {
-  pauseMusic,
-  stopMusic,
-  openMIDI,
-  exportMp3
-} from 'src/app/SoundManager';
-import { useHandleClickOutside } from 'src/shared/hooks/useHandleClickOutside';
-import clsx from 'clsx';
-
-import { useMIDIInputs } from '@react-midi/hooks';
-import { Icon } from 'src/shared/icons/Icon';
-import { IconType } from 'src/shared/icons/IconMap';
-import ProgressModal from 'src/components/Modals/ProgressModal/ProgressModal';
-import FileModal, {
-  ModalItem
-} from 'src/components/Modals/FileModal/FileModal';
-import Button from 'src/shared/ui/Button/Button';
 
 interface HeaderProps {
   className?: string;
@@ -41,10 +39,15 @@ const Header = ({ className = '' }: HeaderProps) => {
   const [myTacts, setMyTacts] = useState(8);
   const [fileOpen, setFileOpen] = useState(false);
   const [inputModalOpen, setInputModalOpen] = useState(false);
+  const [profileDropdown, setProfileDropdown] = useState(false);
 
-  const { modalRef } = useHandleClickOutside(() => {
+  const { modalRef: fileModalRef } = useHandleClickOutside(() => {
     setFileOpen(false);
     setInputModalOpen(false);
+  });
+
+  const { modalRef: profileModalRef } = useHandleClickOutside(() => {
+    setProfileDropdown(false);
   });
 
   const settings = useSelector((state: RootState) => state.settings);
@@ -138,6 +141,23 @@ const Header = ({ className = '' }: HeaderProps) => {
     }
   ];
 
+  const ProfileData: ModalItem[] = [
+    {
+      text: 'Profile',
+      callback: () => {
+        localStorage.setItem('lastActiveNavButton', 'project');
+        window.location.href = '/main/myprojects';
+      }
+    },
+    {
+      text: 'Log out',
+      callback: () => {
+        localStorage.removeItem('accessToken');
+        window.location.reload();
+      }
+    }
+  ];
+
   const dispatch = useDispatch();
 
   return (
@@ -145,7 +165,7 @@ const Header = ({ className = '' }: HeaderProps) => {
       <ProgressModal />
       <header className={`header ${className}`}>
         <div className="header__left">
-          <div ref={modalRef} className="header__left-item">
+          <div ref={fileModalRef} className="header__left-item">
             <button
               className={clsx('header__left-button', {
                 'header__left-button_active': fileOpen
@@ -166,7 +186,7 @@ const Header = ({ className = '' }: HeaderProps) => {
         </div>
 
         <div className="header__center">
-          {(!!settings.bpm || !!settings.tacts) && (
+          {!!settings.bpm || !!settings.tacts ? (
             <div className="header__buttons">
               <button
                 className="header__button"
@@ -199,7 +219,7 @@ const Header = ({ className = '' }: HeaderProps) => {
                 />
               </button>
             </div>
-          )}
+          ) : null}
 
           <div className="header__inputs">
             {!!settings.bpm && (
@@ -249,13 +269,38 @@ const Header = ({ className = '' }: HeaderProps) => {
           </div>
         </div>
 
-        <div className="header__right">
-          <Button type="header__right_login">
-            <a href={`${baseUrl || ''}/login`}>Log in</a>
-          </Button>
-          <Button type="header__right_signup">
-            <a href={`${baseUrl || ''}/register`}>Sign up</a>
-          </Button>
+        <div className="header__right" ref={profileModalRef}>
+          {localStorage.getItem('accessToken') ? (
+            <>
+              <button
+                className="header__right_profile"
+                onClick={() => setProfileDropdown(!profileDropdown)}
+              >
+                <img
+                  className="header__right_avatar"
+                  src={avatar}
+                  alt="avatar"
+                />
+                <h2 className="header__right_username">
+                  {localStorage.getItem('username')}
+                </h2>
+              </button>
+              <ProfileModal
+                className={clsx('header__right-button-modal')}
+                modalActions={ProfileData}
+                isOpen={profileDropdown}
+              />
+            </>
+          ) : (
+            <>
+              <Button type="header__right_login">
+                <a href="/login">Log in</a>
+              </Button>
+              <Button type="header__right_signup">
+                <a href="/register">Sign up</a>
+              </Button>
+            </>
+          )}
         </div>
       </header>
     </>
