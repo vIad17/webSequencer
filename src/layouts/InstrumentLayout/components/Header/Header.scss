@@ -116,8 +116,8 @@
 
   &__right-button-modal {
     top: 50px;
-    left: 0;
-    width: 100%;
+    right: 0;
+    min-width: 170px;
     z-index: 50;
   }
 
