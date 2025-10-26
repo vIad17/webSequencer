@@ -27,6 +27,7 @@ import { RootState } from 'src/shared/redux/store/store';
 import Button from 'src/shared/ui/Button/Button';
 
 import './Header.scss';
+import { useNavigate } from 'react-router-dom';
 
 interface HeaderProps {
   className?: string;
@@ -41,13 +42,18 @@ const Header = ({ className = '' }: HeaderProps) => {
   const [inputModalOpen, setInputModalOpen] = useState(false);
   const [profileDropdown, setProfileDropdown] = useState(false);
 
-  const { modalRef } = useHandleClickOutside(() => {
+  const { modalRef: fileModalRef } = useHandleClickOutside(() => {
     setFileOpen(false);
     setInputModalOpen(false);
+  });
+
+  const { modalRef: profileModalRef } = useHandleClickOutside(() => {
     setProfileDropdown(false);
   });
 
   const settings = useSelector((state: RootState) => state.settings);
+
+  const navigate = useNavigate();
 
   const handleButtonClick = () => {
     document.getElementById('import-midi-file-input')?.click();
@@ -139,7 +145,12 @@ const Header = ({ className = '' }: HeaderProps) => {
   ];
 
   const ProfileData: ModalItem[] = [
-    { text: 'Profile', callback: () => {} },
+    {
+      text: 'Profile',
+      callback: () => {
+        navigate(`${baseUrl}/main/myprojects`);
+      }
+    },
     {
       text: 'Log out',
       callback: () => {
@@ -156,7 +167,7 @@ const Header = ({ className = '' }: HeaderProps) => {
       <ProgressModal />
       <header className={`header ${className}`}>
         <div className="header__left">
-          <div ref={modalRef} className="header__left-item">
+          <div ref={fileModalRef} className="header__left-item">
             <button
               className={clsx('header__left-button', {
                 'header__left-button_active': fileOpen
@@ -260,7 +271,7 @@ const Header = ({ className = '' }: HeaderProps) => {
           </div>
         </div>
 
-        <div className="header__right" ref={modalRef}>
+        <div className="header__right" ref={profileModalRef}>
           {localStorage.getItem('accessToken') ? (
             <>
               <button
