@@ -145,7 +145,6 @@ const Header = ({ className = '' }: HeaderProps) => {
     {
       text: 'Profile',
       callback: () => {
-        localStorage.setItem('lastActiveNavButton', 'project');
         window.location.href = '/main/myprojects';
       }
     },
