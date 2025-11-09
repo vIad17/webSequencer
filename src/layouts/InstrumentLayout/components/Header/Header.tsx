@@ -38,12 +38,17 @@ const Header = ({ className = '' }: HeaderProps) => {
   const [myBpm, setMyBpm] = useState(120);
   const [myTacts, setMyTacts] = useState(8);
   const [fileOpen, setFileOpen] = useState(false);
+  const [editOpen, setEditOpen] = useState(false);
   const [inputModalOpen, setInputModalOpen] = useState(false);
   const [profileDropdown, setProfileDropdown] = useState(false);
 
   const { modalRef: fileModalRef } = useHandleClickOutside(() => {
     setFileOpen(false);
     setInputModalOpen(false);
+  });
+
+  const { modalRef: editModalRef } = useHandleClickOutside(() => {
+    setEditOpen(false);
   });
 
   const { modalRef: profileModalRef } = useHandleClickOutside(() => {
@@ -141,6 +146,19 @@ const Header = ({ className = '' }: HeaderProps) => {
     }
   ];
 
+  const EditData: ModalItem[] = [
+    { 
+      text: 'Save', 
+      callback: () => {
+        console.log('Save clicked');
+        setEditOpen(false);
+      },
+      sideContent: (
+        <span className="modal__hotkey">Ctrl+S</span>
+      )
+    }
+  ];
+
   const ProfileData: ModalItem[] = [
     {
       text: 'Profile',
@@ -172,6 +190,7 @@ const Header = ({ className = '' }: HeaderProps) => {
               onClick={() => {
                 setFileOpen((prev) => !prev);
                 setInputModalOpen(false);
+                setEditOpen(false);
               }}
             >
               File
@@ -180,6 +199,26 @@ const Header = ({ className = '' }: HeaderProps) => {
               className={clsx('header__left-button-modal')}
               modalActions={FileData}
               isOpen={fileOpen}
+            />
+          </div>
+          
+          <div ref={editModalRef} className="header__second_left-item">
+            <button
+              className={clsx('header__second_left-button', {
+                'header__second_left-button_active': editOpen
+              })}
+              onClick={() => {
+                setEditOpen((prev) => !prev);
+                setFileOpen(false);
+                setInputModalOpen(false);
+              }}
+            >
+              Edit
+            </button>
+            <FileModal
+              className={clsx('header__second_left-button-modal')}
+              modalActions={EditData}
+              isOpen={editOpen}
             />
           </div>
         </div>
