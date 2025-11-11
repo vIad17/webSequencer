@@ -16,6 +16,7 @@ import {
   pauseMusic,
   stopMusic
 } from 'src/app/SoundManager';
+import $api from 'src/shared/api/axiosConfig';
 import { useHandleClickOutside } from 'src/shared/hooks/useHandleClickOutside';
 import { Icon } from 'src/shared/icons/Icon';
 import { IconType } from 'src/shared/icons/IconMap';
@@ -28,19 +29,23 @@ import Button from 'src/shared/ui/Button/Button';
 
 import './Header.scss';
 
-
 const mockGetAutosaveStatus = async (projectId: string): Promise<boolean> => {
   console.log(`Mock: Getting autosave status for project ${projectId}`);
   return Math.random() > 0.5;
 };
 
-const mockUpdateAutosaveStatus = async (projectId: string, isAutosave: boolean): Promise<void> => {
-  console.log(`Mock: Updating autosave status for project ${projectId} to ${isAutosave}`);
+const mockUpdateAutosaveStatus = async (
+  projectId: string,
+  isAutosave: boolean
+): Promise<void> => {
+  console.log(
+    `Mock: Updating autosave status for project ${projectId} to ${isAutosave}`
+  );
   return;
 };
 
 const getCurrentProjectId = (): string => {
-  return 'current-project-id'; 
+  return 'current-project-id';
 };
 
 interface HeaderProps {
@@ -179,7 +184,7 @@ const Header = ({ className = '' }: HeaderProps) => {
         />
       )
     },
-    
+
     {
       text: 'MIDI input',
       callback: () => {
@@ -205,7 +210,7 @@ const Header = ({ className = '' }: HeaderProps) => {
       callback: async () => {
         const projectId = getCurrentProjectId();
         const newAutosaveStatus = !isAutosaveEnabled;
-        
+
         try {
           await mockUpdateAutosaveStatus(projectId, newAutosaveStatus);
           setIsAutosaveEnabled(newAutosaveStatus);
@@ -213,7 +218,7 @@ const Header = ({ className = '' }: HeaderProps) => {
         } catch (error) {
           console.error('Failed to update autosave status:', error);
         }
-        
+
         setFileOpen(false);
       },
       sideContent: (
@@ -224,20 +229,17 @@ const Header = ({ className = '' }: HeaderProps) => {
           })}
         />
       )
-    },
-
+    }
   ];
 
   const EditData: ModalItem[] = [
-    { 
-      text: 'Save', 
+    {
+      text: 'Save',
       callback: () => {
         console.log('Save clicked');
         setEditOpen(false);
       },
-      sideContent: (
-        <span className="modal__hotkey">Ctrl+S</span>
-      )
+      sideContent: <span className="modal__hotkey">Ctrl+S</span>
     }
   ];
 
@@ -251,8 +253,8 @@ const Header = ({ className = '' }: HeaderProps) => {
     {
       text: 'Log out',
       callback: () => {
-        localStorage.removeItem('accessToken');
-        window.location.reload();
+        $api.post('/logout');
+        localStorage.clear();
       }
     }
   ];
@@ -283,7 +285,7 @@ const Header = ({ className = '' }: HeaderProps) => {
               isOpen={fileOpen}
             />
           </div>
-          
+
           <div ref={editModalRef} className="header__second_left-item">
             <button
               className={clsx('header__second_left-button', {
@@ -390,7 +392,8 @@ const Header = ({ className = '' }: HeaderProps) => {
         </div>
 
         <div className="header__right" ref={profileModalRef}>
-          {localStorage.getItem('accessToken') ? (
+          {localStorage.getItem('accessToken') &&
+          localStorage.getItem('username') ? (
             <>
               <button
                 className="header__right_profile"
