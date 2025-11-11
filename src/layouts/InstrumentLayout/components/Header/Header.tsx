@@ -9,7 +9,6 @@ import FileModal, {
 import ProfileModal from 'src/components/Modals/ProfileModal/ProfileModal';
 import ProgressModal from 'src/components/Modals/ProgressModal/ProgressModal';
 import * as Tone from 'tone';
-import avatar from 'src/shared/icons/svg/avatar.svg';
 
 import {
   exportMp3,
@@ -17,9 +16,11 @@ import {
   pauseMusic,
   stopMusic
 } from 'src/app/SoundManager';
+import $api from 'src/shared/api/axiosConfig';
 import { useHandleClickOutside } from 'src/shared/hooks/useHandleClickOutside';
 import { Icon } from 'src/shared/icons/Icon';
 import { IconType } from 'src/shared/icons/IconMap';
+import avatar from 'src/shared/icons/svg/avatar.svg';
 import { setIsPlaying } from 'src/shared/redux/slices/currentMusicSlice';
 import { setColumnsCount } from 'src/shared/redux/slices/drawableFieldSlice';
 import { setBpm, setTacts } from 'src/shared/redux/slices/settingsSlice';
@@ -31,8 +32,6 @@ import './Header.scss';
 interface HeaderProps {
   className?: string;
 }
-
-const baseUrl = import.meta.env.VITE_BASE_URL;
 
 const Header = ({ className = '' }: HeaderProps) => {
   const [myBpm, setMyBpm] = useState(120);
@@ -80,9 +79,15 @@ const Header = ({ className = '' }: HeaderProps) => {
 
   const { input, inputs, selectInput, selectedInputId } = useMIDIInputs();
 
+  async function getUserInfo() {
+    const response = await $api.get('/users/0');
+    localStorage.setItem('username', response.data.username);
+  }
+
   useEffect(() => {
     const midiInput = localStorage.getItem('midi-input');
     midiInput && selectInput(midiInput);
+    getUserInfo();
   }, [selectInput]);
 
   const midiDeviceModalData: ModalItem[] = inputs.map((el) => ({
@@ -151,8 +156,8 @@ const Header = ({ className = '' }: HeaderProps) => {
     {
       text: 'Log out',
       callback: () => {
-        localStorage.removeItem('accessToken');
-        window.location.reload();
+        $api.post('/logout');
+        localStorage.clear();
       }
     }
   ];
@@ -269,7 +274,8 @@ const Header = ({ className = '' }: HeaderProps) => {
         </div>
 
         <div className="header__right" ref={profileModalRef}>
-          {localStorage.getItem('accessToken') ? (
+          {localStorage.getItem('accessToken') &&
+          localStorage.getItem('username') ? (
             <>
               <button
                 className="header__right_profile"
