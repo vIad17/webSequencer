@@ -197,6 +197,7 @@ const Header = ({ className = '' }: HeaderProps) => {
   };
 
   const handleNameKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    e.stopPropagation();
     if (e.key === 'Enter' && tempName.trim() !== '') {
       setProjectName(tempName);
       setIsEditing(false);
