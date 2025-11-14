@@ -3,7 +3,8 @@
   "version": "0.3.0",
   "private": true,
   "scripts": {
-    "start": "vite",
+    "start": "vite dev",
+    "start:mock": "vite dev --mode=mock",
     "build": "tsc && vite build",
     "eslint": "eslint --fix --ext .ts,.tsx .",
     "stylelint": "stylelint --config .stylelintrc.json src/**/*.scss",
@@ -64,6 +65,7 @@
     "husky": "9.0.11",
     "husky-init": "8.0.0",
     "lint-staged": "15.2.2",
+    "msw": "^2.12.1",
     "prettier": "3.2.5",
     "schematics-scss-migrate": "2.3.17"
   },
@@ -95,6 +97,11 @@
       "last 1 chrome version",
       "last 1 firefox version",
       "last 1 safari version"
+    ]
+  },
+  "msw": {
+    "workerDirectory": [
+      "public"
     ]
   }
 }
