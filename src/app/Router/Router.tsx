@@ -13,8 +13,7 @@ const Router = () => (
   <BrowserRouter basename="/webSequencer">
     <Routes>
       <Route path="" element={<Layout />}>
-        <Route path="preview" element={<PreviewPage />}>
-        </Route>
+        <Route path="preview" element={<PreviewPage />}></Route>
         <Route path="" element={<InstrumentLayout />}>
           <Route path="old" element={<Main />} />
           <Route path="" element={<InstrumentPage />} />

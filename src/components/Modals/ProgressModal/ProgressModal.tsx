@@ -12,35 +12,38 @@ interface ProgressModalProps {
   // currentStep: string; // e.g., "Encoding audio...", "Finalizing file..."
 }
 
-  const ProgressModal = ({
-    className = '',
-  }: ProgressModalProps) => {
-    const progressSelector = useSelector((state: RootState) => state.progress);
+const ProgressModal = ({ className = '' }: ProgressModalProps) => {
+  const progressSelector = useSelector((state: RootState) => state.progress);
 
-    if (!progressSelector.currentStep || progressSelector.progress === null) return null;
+  if (!progressSelector?.currentStep || progressSelector.progress === null)
+    return null;
 
-    console.log(progressSelector);
+  console.log(progressSelector);
 
-    return (
-      <div className="modal-overlay" onClick={() => {}}>
-        <div className="modal" onClick={(e) => e.stopPropagation()}>
-          <div className="modal__header">Exporting MP3</div>
-          <div className="modal__body">
-            <div className="modal__progress-label">{progressSelector.currentStep}</div>
-            <div className="modal__progress-bar-outer">
-              <div
-                className="modal__progress-bar-inner"
-                style={{ width: `${progressSelector.progress}%` }}
-              />
-            </div>
-            <div className="modal__progress-percent">{Math.round(progressSelector.progress)}%</div>
+  return (
+    <div className="modal-overlay" onClick={() => {}}>
+      <div className="modal" onClick={(e) => e.stopPropagation()}>
+        <div className="modal__header">Exporting MP3</div>
+        <div className="modal__body">
+          <div className="modal__progress-label">
+            {progressSelector.currentStep}
           </div>
-          <div className="modal__footer">
-            <small>Please wait...</small>
+          <div className="modal__progress-bar-outer">
+            <div
+              className="modal__progress-bar-inner"
+              style={{ width: `${progressSelector.progress}%` }}
+            />
+          </div>
+          <div className="modal__progress-percent">
+            {Math.round(progressSelector.progress)}%
           </div>
         </div>
+        <div className="modal__footer">
+          <small>Please wait...</small>
+        </div>
       </div>
-    );
-  };
+    </div>
+  );
+};
 
 export default ProgressModal;

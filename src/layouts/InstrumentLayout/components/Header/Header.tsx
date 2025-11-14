@@ -19,8 +19,8 @@ import {
 import { useHandleClickOutside } from 'src/shared/hooks/useHandleClickOutside';
 import { Icon } from 'src/shared/icons/Icon';
 import { IconType } from 'src/shared/icons/IconMap';
-import avatar from 'src/shared/icons/svg/avatar.svg';
 import logo from 'src/shared/icons/png/logo.png';
+import avatar from 'src/shared/icons/svg/avatar.svg';
 import { setIsPlaying } from 'src/shared/redux/slices/currentMusicSlice';
 import { setColumnsCount } from 'src/shared/redux/slices/drawableFieldSlice';
 import { setBpm, setTacts } from 'src/shared/redux/slices/settingsSlice';
@@ -93,9 +93,41 @@ const Header = ({ className = '' }: HeaderProps) => {
 
   const { input, inputs, selectInput, selectedInputId } = useMIDIInputs();
 
+  async function getUserInfo() {
+    const res = await fetch('/users/0');
+    const data = await res.json();
+    localStorage.setItem('username', data.username);
+  }
+
+  async function login() {
+    const res = await fetch('/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ username: 'Artem', password: '1234' })
+    });
+
+    if (!res.ok) {
+      throw new Error('Login failed');
+    }
+
+    const data = await res.json();
+    localStorage.setItem('accessToken', data.accessToken);
+  }
+
   useEffect(() => {
-    const midiInput = localStorage.getItem('midi-input');
-    midiInput && selectInput(midiInput);
+    async function init() {
+      const midiInput = localStorage.getItem('midi-input');
+      midiInput && selectInput(midiInput);
+
+      const token = localStorage.getItem('accessToken');
+      if (!token) {
+        await login();
+      }
+
+      await getUserInfo();
+    }
+
+    init();
   }, [selectInput]);
 
   const midiDeviceModalData: ModalItem[] = inputs.map((el) => ({
