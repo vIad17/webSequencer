@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
 import { useMIDIInputs } from '@react-midi/hooks';
@@ -41,6 +41,11 @@ const Header = ({ className = '' }: HeaderProps) => {
   const [fileOpen, setFileOpen] = useState(false);
   const [inputModalOpen, setInputModalOpen] = useState(false);
   const [profileDropdown, setProfileDropdown] = useState(false);
+  
+  const [projectName, setProjectName] = useState('My first track!');
+  const [isEditing, setIsEditing] = useState(false);
+  const [tempName, setTempName] = useState(projectName);
+  const nameInputRef = useRef<HTMLInputElement>(null);
 
   const { modalRef: fileModalRef } = useHandleClickOutside(() => {
     setFileOpen(false);
@@ -171,6 +176,35 @@ const Header = ({ className = '' }: HeaderProps) => {
   if (isGetUserInfoLoading) return <div>Loading...</div>;
   if (isGetUserInfoError) return <div>Error: {isGetUserInfoError}</div>;
 
+  useEffect(() => {
+    if (isEditing && nameInputRef.current) {
+      nameInputRef.current.focus();
+    }
+  }, [isEditing]);
+
+  const handleNameClick = () => {
+    if (!isEditing) {
+      setIsEditing(true);
+      setTempName(projectName);
+    }
+  };
+
+  const handleNameBlur = () => {
+    if (tempName.trim() !== '') {
+      setProjectName(tempName);
+    }
+    setIsEditing(false);
+  };
+
+  const handleNameKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter' && tempName.trim() !== '') {
+      setProjectName(tempName);
+      setIsEditing(false);
+    } else if (e.key === 'Escape') {
+      setIsEditing(false);
+    }
+  };
+
   return (
     <>
       <ProgressModal />
@@ -199,7 +233,28 @@ const Header = ({ className = '' }: HeaderProps) => {
         <div className="header__center">
           <div className="header__logo-container">
             <img src={logo} alt="Project Logo" className="header__logo" />
-            <h2 className="header__project-name">My first track!</h2>
+            <div 
+              className={clsx("header__project-name-container", {
+                "header__project-name-container_editable": isEditing
+              })}
+              onClick={handleNameClick}
+            >
+              {isEditing ? (
+                <input
+                  ref={nameInputRef}
+                  type="text"
+                  value={tempName}
+                  onChange={(e) => setTempName(e.target.value)}
+                  onBlur={handleNameBlur}
+                  onKeyDown={handleNameKeyDown}
+                  className="header__project-input"
+                />
+              ) : (
+                <h2 className="header__project-name">
+                  {projectName}
+                </h2>
+              )}
+            </div>
           </div>
 
           <div className="header__controls">
