@@ -1,6 +1,7 @@
 import { useEffect, useState, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-
+import { toast } from 'react-hot-toast';
+import { z } from 'zod';
 import { useMIDIInputs } from '@react-midi/hooks';
 import clsx from 'clsx';
 import FileModal, {
@@ -30,6 +31,10 @@ import { fetchUserData } from 'src/shared/redux/thunks/userThunks';
 import Button from 'src/shared/ui/Button/Button';
 
 import './Header.scss';
+
+const projectNameSchema = z.string()
+  .min(3, 'Project name must be at least 3 characters')
+  .max(50, 'Project name must be no more than 50 characters');
 
 interface HeaderProps {
   className?: string;
@@ -190,18 +195,65 @@ const Header = ({ className = '' }: HeaderProps) => {
   };
 
   const handleNameBlur = () => {
-    if (tempName.trim() !== '') {
-      setProjectName(tempName);
+    try {
+      if (tempName.trim() === '') {
+        toast.error('Project name cannot be empty');
+        setTempName(projectName);
+      } else {
+        projectNameSchema.parse(tempName.trim());
+        setProjectName(tempName.trim());
+      }
+    } catch (error) {
+      let errorMessage = 'Invalid project name';
+      
+      if (error instanceof z.ZodError) {
+        if (error.issues && error.issues.length > 0 && error.issues[0]?.message) {
+          errorMessage = error.issues[0].message;
+        }
+      } else if (error instanceof Error) {
+        errorMessage = error.message;
+      }
+      
+      toast.error(errorMessage);
+      
+      if (projectName.trim() !== '') {
+        setTempName(projectName);
+      }
     }
     setIsEditing(false);
   };
 
   const handleNameKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     e.stopPropagation();
-    if (e.key === 'Enter' && tempName.trim() !== '') {
-      setProjectName(tempName);
-      setIsEditing(false);
+    
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      
+      try {
+        if (tempName.trim() === '') {
+          throw new Error('Project name cannot be empty');
+        }
+        projectNameSchema.parse(tempName.trim());
+        setProjectName(tempName.trim());
+        setIsEditing(false);
+      } catch (error) {
+        let errorMessage = 'Invalid project name';
+        
+        if (error instanceof z.ZodError) {
+          if (Array.isArray(error.issues) && error.issues.length > 0 && error.issues[0]?.message) {
+            errorMessage = error.issues[0].message;
+          } else {
+            errorMessage = 'Invalid project name format';
+          }
+        } else if (error instanceof Error) {
+          errorMessage = error.message;
+        }
+        
+        toast.error(errorMessage);
+      }
     } else if (e.key === 'Escape') {
+      e.preventDefault();
+      setTempName(projectName);
       setIsEditing(false);
     }
   };
@@ -249,6 +301,8 @@ const Header = ({ className = '' }: HeaderProps) => {
                   onBlur={handleNameBlur}
                   onKeyDown={handleNameKeyDown}
                   className="header__project-input"
+                  placeholder="Enter project name"
+                  maxLength={50}
                 />
               ) : (
                 <h2 className="header__project-name">
