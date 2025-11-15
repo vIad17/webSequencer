@@ -2,7 +2,6 @@ import { useEffect, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
 import { useMIDIInputs } from '@react-midi/hooks';
-import axios from 'axios';
 import clsx from 'clsx';
 import FileModal, {
   ModalItem
@@ -102,46 +101,9 @@ const Header = ({ className = '' }: HeaderProps) => {
 
   const { input, inputs, selectInput, selectedInputId } = useMIDIInputs();
 
-  async function login() {
-    try {
-      const response = await axios.post(
-        '/login',
-        {
-          username: 'Artem',
-          password: '1234'
-        },
-        {
-          headers: { 'Content-Type': 'application/json' }
-        }
-      );
-      localStorage.setItem('accessToken', response.data.accessToken);
-    } catch {
-      throw new Error('Login failed');
-    }
-  }
-
-  async function getUserInfo() {
-    const { data } = await $api.get('/users/0');
-    localStorage.setItem('username', data.username);
-  }
-
-  async function getMockUserInfo() {
-    const token = localStorage.getItem('accessToken');
-    if (!token) {
-      await login();
-    }
-
-    const { data } = await axios.get('/users/0');
-    localStorage.setItem('username', data.username);
-  }
-
   useEffect(() => {
     dispatch(fetchUserData());
   }, [dispatch]);
-
-  useEffect(() => {
-    getUserInfo();
-  });
 
   useEffect(() => {
     const midiInput = localStorage.getItem('midi-input');
@@ -255,7 +217,6 @@ const Header = ({ className = '' }: HeaderProps) => {
         </div>
 
         <div className="header__center">
-<<<<<<< HEAD
           {localStorage.getItem('accessToken') && (
             <div className="header__logo-container">
               <img src={logo} alt="Project Logo" className="header__logo" />
@@ -366,95 +327,6 @@ const Header = ({ className = '' }: HeaderProps) => {
                 </form>
               )}
             </div>
-=======
-          <div className="header__logo-container">
-            <img src={logo} alt="Project Logo" className="header__logo" />
-            <h2 className="header__project-name">My first track!</h2>
-          </div>
-
-          <div className="header__controls">
-            {!!settings.bpm || !!settings.tacts ? (
-              <div className="header__buttons">
-                <button
-                  className="header__button"
-                  onClick={() => {
-                    if (Tone.context.state === 'suspended') {
-                      Tone.context.resume();
-                    }
-                    Tone.Transport.start();
-                    dispatch(setIsPlaying(true));
-                  }}
-                >
-                  <Icon
-                    icon={IconType.Play}
-                    interactable
-                    className="header__icon header__icon-start"
-                  />
-                </button>
-                <button className="header__button" onClick={pauseMusic}>
-                  <Icon
-                    icon={IconType.Pause}
-                    interactable
-                    className="header__icon header__icon-pause"
-                  />
-                </button>
-                <button className="header__button" onClick={stopMusic}>
-                  <Icon
-                    icon={IconType.Repeat}
-                    interactable
-                    className="header__icon header__icon_stop"
-                  />
-                </button>
-              </div>
-            ) : null}
-
-            <div className="header__inputs">
-              {!!settings.bpm && (
-                <form
-                  className="header__input-form"
-                  onSubmit={(event) => {
-                    event.preventDefault();
-                    dispatch(setBpm(myBpm));
-                  }}
-                >
-                  bpm
-                  <input
-                    className="header__input"
-                    type="text"
-                    defaultValue={settings.bpm}
-                    onChange={(event) => {
-                      if (Number(event.target.value)) {
-                        setMyBpm(Number(event.target.value));
-                      }
-                    }}
-                  />
-                </form>
-              )}
-
-              {!!settings.tacts && (
-                <form
-                  className="header__input-form"
-                  onSubmit={(event) => {
-                    event.preventDefault();
-                    dispatch(setTacts(myTacts));
-                    dispatch(setColumnsCount(myTacts * 16));
-                  }}
-                >
-                  tacts
-                  <input
-                    className="header__input"
-                    type="text"
-                    defaultValue={settings.tacts}
-                    onChange={(event) => {
-                      if (Number(event.target.value)) {
-                        setMyTacts(Number(event.target.value));
-                      }
-                    }}
-                  />
-                </form>
-              )}
-            </div>
->>>>>>> 2310e54 (added logo and project name)
           </div>
         </div>
 
