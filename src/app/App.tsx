@@ -13,20 +13,7 @@ const App = () => (
       <Router />
       <SoundManager />
       <LiveMIDIInput />
-<<<<<<< HEAD
       <Toaster />
-=======
-      <Toaster
-        position="top-center"
-        toastOptions={{
-          duration: 3000,
-          style: {
-            background: '#333',
-            color: '#ffffff'
-          }
-        }}
-      />
->>>>>>> d39fdf3 (added toast and zod)
     </MIDIProvider>
   </div>
 );

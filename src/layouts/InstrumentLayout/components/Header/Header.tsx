@@ -28,7 +28,6 @@ import { setBpm, setTacts } from 'src/shared/redux/slices/settingsSlice';
 import { RootState, SequencerDispatch } from 'src/shared/redux/store/store';
 import { fetchUserData } from 'src/shared/redux/thunks/userThunks';
 import Button from 'src/shared/ui/Button/Button';
-
 import { useProjectName } from './hooks/useProjectName';
 
 import './Header.scss';
