@@ -22,12 +22,14 @@ import { Icon } from 'src/shared/icons/Icon';
 import { IconType } from 'src/shared/icons/IconMap';
 import logo from 'src/shared/icons/png/logo.png';
 import avatar from 'src/shared/icons/svg/avatar.svg';
+import logo from 'src/shared/icons/svg/logo.svg';
 import { setIsPlaying } from 'src/shared/redux/slices/currentMusicSlice';
 import { setColumnsCount } from 'src/shared/redux/slices/drawableFieldSlice';
 import { setBpm, setTacts } from 'src/shared/redux/slices/settingsSlice';
 import { RootState, SequencerDispatch } from 'src/shared/redux/store/store';
 import { fetchUserData } from 'src/shared/redux/thunks/userThunks';
 import Button from 'src/shared/ui/Button/Button';
+
 import { useProjectName } from './hooks/useProjectName';
 
 import './Header.scss';
