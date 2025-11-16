@@ -30,7 +30,6 @@ import { setColumnsCount } from 'src/shared/redux/slices/drawableFieldSlice';
 import { setBpm, setTacts } from 'src/shared/redux/slices/settingsSlice';
 import { RootState } from 'src/shared/redux/store/store';
 import Button from 'src/shared/ui/Button/Button';
-
 import { useProjectName } from './hooks/useProjectName';
 
 import './Header.scss';
