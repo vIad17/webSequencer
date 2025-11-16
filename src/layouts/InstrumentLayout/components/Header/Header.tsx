@@ -29,8 +29,10 @@ import { RootState } from 'src/shared/redux/store/store';
 import Button from 'src/shared/ui/Button/Button';
 
 import './Header.scss';
+import { useToast } from 'src/shared/hooks/useToast';
 
-const projectNameSchema = z.string()
+const projectNameSchema = z
+  .string()
   .min(3, 'Project name must be at least 3 characters')
   .max(50, 'Project name must be no more than 50 characters');
 
@@ -46,7 +48,7 @@ const Header = ({ className = '' }: HeaderProps) => {
   const [fileOpen, setFileOpen] = useState(false);
   const [inputModalOpen, setInputModalOpen] = useState(false);
   const [profileDropdown, setProfileDropdown] = useState(false);
-  
+
   const [projectName, setProjectName] = useState('My first track!');
   const [isEditing, setIsEditing] = useState(false);
   const [tempName, setTempName] = useState(projectName);
@@ -62,6 +64,8 @@ const Header = ({ className = '' }: HeaderProps) => {
   });
 
   const settings = useSelector((state: RootState) => state.settings);
+
+  const { toastError } = useToast();
 
   const handleButtonClick = () => {
     document.getElementById('import-midi-file-input')?.click();
@@ -186,7 +190,7 @@ const Header = ({ className = '' }: HeaderProps) => {
   const handleNameBlur = () => {
     try {
       if (tempName.trim() === '') {
-        toast.error('Project name cannot be empty');
+        toastError('Project name cannot be empty');
         setTempName(projectName);
       } else {
         projectNameSchema.parse(tempName.trim());
@@ -194,17 +198,21 @@ const Header = ({ className = '' }: HeaderProps) => {
       }
     } catch (error) {
       let errorMessage = 'Invalid project name';
-      
+
       if (error instanceof z.ZodError) {
-        if (error.issues && error.issues.length > 0 && error.issues[0]?.message) {
+        if (
+          error.issues &&
+          error.issues.length > 0 &&
+          error.issues[0]?.message
+        ) {
           errorMessage = error.issues[0].message;
         }
       } else if (error instanceof Error) {
         errorMessage = error.message;
       }
-      
-      toast.error(errorMessage);
-      
+
+      toastError(errorMessage);
+
       if (projectName.trim() !== '') {
         setTempName(projectName);
       }
@@ -214,10 +222,10 @@ const Header = ({ className = '' }: HeaderProps) => {
 
   const handleNameKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     e.stopPropagation();
-    
+
     if (e.key === 'Enter') {
       e.preventDefault();
-      
+
       try {
         if (tempName.trim() === '') {
           throw new Error('Project name cannot be empty');
@@ -227,9 +235,13 @@ const Header = ({ className = '' }: HeaderProps) => {
         setIsEditing(false);
       } catch (error) {
         let errorMessage = 'Invalid project name';
-        
+
         if (error instanceof z.ZodError) {
-          if (Array.isArray(error.issues) && error.issues.length > 0 && error.issues[0]?.message) {
+          if (
+            Array.isArray(error.issues) &&
+            error.issues.length > 0 &&
+            error.issues[0]?.message
+          ) {
             errorMessage = error.issues[0].message;
           } else {
             errorMessage = 'Invalid project name format';
@@ -237,8 +249,8 @@ const Header = ({ className = '' }: HeaderProps) => {
         } else if (error instanceof Error) {
           errorMessage = error.message;
         }
-        
-        toast.error(errorMessage);
+
+        toastError(errorMessage);
       }
     } else if (e.key === 'Escape') {
       e.preventDefault();
@@ -275,9 +287,9 @@ const Header = ({ className = '' }: HeaderProps) => {
         <div className="header__center">
           <div className="header__logo-container">
             <img src={logo} alt="Project Logo" className="header__logo" />
-            <div 
-              className={clsx("header__project-name-container", {
-                "header__project-name-container_editable": isEditing
+            <div
+              className={clsx('header__project-name-container', {
+                'header__project-name-container_editable': isEditing
               })}
               onClick={handleNameClick}
             >
@@ -294,9 +306,7 @@ const Header = ({ className = '' }: HeaderProps) => {
                   maxLength={50}
                 />
               ) : (
-                <h2 className="header__project-name">
-                  {projectName}
-                </h2>
+                <h2 className="header__project-name">{projectName}</h2>
               )}
             </div>
           </div>
