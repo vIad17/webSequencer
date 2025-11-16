@@ -1,7 +1,6 @@
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { toast } from 'react-hot-toast';
-import { z } from 'zod';
+
 import { useMIDIInputs } from '@react-midi/hooks';
 import clsx from 'clsx';
 import FileModal, {
@@ -30,13 +29,9 @@ import { RootState, SequencerDispatch } from 'src/shared/redux/store/store';
 import { fetchUserData } from 'src/shared/redux/thunks/userThunks';
 import Button from 'src/shared/ui/Button/Button';
 
-import './Header.scss';
-import { useToast } from 'src/shared/hooks/useToast';
+import { useProjectName } from './hooks/useProjectName';
 
-const projectNameSchema = z
-  .string()
-  .min(3, 'Project name must be at least 3 characters')
-  .max(50, 'Project name must be no more than 50 characters');
+import './Header.scss';
 
 interface HeaderProps {
   className?: string;
@@ -49,9 +44,6 @@ const Header = ({ className = '' }: HeaderProps) => {
   const [inputModalOpen, setInputModalOpen] = useState(false);
   const [profileDropdown, setProfileDropdown] = useState(false);
 
-  const [projectName, setProjectName] = useState('My first track!');
-  const [isEditing, setIsEditing] = useState(false);
-  const [tempName, setTempName] = useState(projectName);
   const nameInputRef = useRef<HTMLInputElement>(null);
 
   const { modalRef: fileModalRef } = useHandleClickOutside(() => {
@@ -71,7 +63,15 @@ const Header = ({ className = '' }: HeaderProps) => {
     error: isGetUserInfoError
   } = useSelector((state: RootState) => state.user);
 
-  const { toastError } = useToast();
+  const {
+    isEditing,
+    tempName,
+    projectName,
+    setTempName,
+    handleNameClick,
+    handleNameBlur,
+    handleNameKeyDown
+  } = useProjectName('My first track!');
 
   const handleButtonClick = () => {
     document.getElementById('import-midi-file-input')?.click();
@@ -191,85 +191,6 @@ const Header = ({ className = '' }: HeaderProps) => {
     }
   }, [isEditing]);
 
-  const handleNameClick = () => {
-    if (!isEditing) {
-      setIsEditing(true);
-      setTempName(projectName);
-    }
-  };
-
-  const handleNameBlur = () => {
-    try {
-      if (tempName.trim() === '') {
-        toastError('Project name cannot be empty');
-        setTempName(projectName);
-      } else {
-        projectNameSchema.parse(tempName.trim());
-        setProjectName(tempName.trim());
-      }
-    } catch (error) {
-      let errorMessage = 'Invalid project name';
-
-      if (error instanceof z.ZodError) {
-        if (
-          error.issues &&
-          error.issues.length > 0 &&
-          error.issues[0]?.message
-        ) {
-          errorMessage = error.issues[0].message;
-        }
-      } else if (error instanceof Error) {
-        errorMessage = error.message;
-      }
-
-      toastError(errorMessage);
-
-      if (projectName.trim() !== '') {
-        setTempName(projectName);
-      }
-    }
-    setIsEditing(false);
-  };
-
-  const handleNameKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    e.stopPropagation();
-
-    if (e.key === 'Enter') {
-      e.preventDefault();
-
-      try {
-        if (tempName.trim() === '') {
-          throw new Error('Project name cannot be empty');
-        }
-        projectNameSchema.parse(tempName.trim());
-        setProjectName(tempName.trim());
-        setIsEditing(false);
-      } catch (error) {
-        let errorMessage = 'Invalid project name';
-
-        if (error instanceof z.ZodError) {
-          if (
-            Array.isArray(error.issues) &&
-            error.issues.length > 0 &&
-            error.issues[0]?.message
-          ) {
-            errorMessage = error.issues[0].message;
-          } else {
-            errorMessage = 'Invalid project name format';
-          }
-        } else if (error instanceof Error) {
-          errorMessage = error.message;
-        }
-
-        toastError(errorMessage);
-      }
-    } else if (e.key === 'Escape') {
-      e.preventDefault();
-      setTempName(projectName);
-      setIsEditing(false);
-    }
-  };
-
   return (
     <>
       <ProgressModal />
@@ -296,31 +217,33 @@ const Header = ({ className = '' }: HeaderProps) => {
         </div>
 
         <div className="header__center">
-          <div className="header__logo-container">
-            <img src={logo} alt="Project Logo" className="header__logo" />
-            <div
-              className={clsx('header__project-name-container', {
-                'header__project-name-container_editable': isEditing
-              })}
-              onClick={handleNameClick}
-            >
-              {isEditing ? (
-                <input
-                  ref={nameInputRef}
-                  type="text"
-                  value={tempName}
-                  onChange={(e) => setTempName(e.target.value)}
-                  onBlur={handleNameBlur}
-                  onKeyDown={handleNameKeyDown}
-                  className="header__project-input"
-                  placeholder="Enter project name"
-                  maxLength={50}
-                />
-              ) : (
-                <h2 className="header__project-name">{projectName}</h2>
-              )}
+          {localStorage.getItem('accessToken') && (
+            <div className="header__logo-container">
+              <img src={logo} alt="Project Logo" className="header__logo" />
+              <div
+                className={clsx('header__project-name-container', {
+                  'header__project-name-container_editable': isEditing
+                })}
+                onClick={handleNameClick}
+              >
+                {isEditing ? (
+                  <input
+                    ref={nameInputRef}
+                    type="text"
+                    value={tempName}
+                    onChange={(e) => setTempName(e.target.value)}
+                    onBlur={handleNameBlur}
+                    onKeyDown={handleNameKeyDown}
+                    className="header__project-input"
+                    placeholder="Enter project name"
+                    maxLength={50}
+                  />
+                ) : (
+                  <h2 className="header__project-name">{projectName}</h2>
+                )}
+              </div>
             </div>
-          </div>
+          )}
 
           <div className="header__controls">
             {!!settings.bpm || !!settings.tacts ? (

@@ -1,15 +1,18 @@
 .instrument-layout {
   width: 100vw;
   height: 100dvh;
+  display: flex;
+  flex-direction: column;
 
   &__header {
-    height: 8%;
+    height: 20%;
   }
 
   &__content {
     display: flex;
+    justify-content: flex-end;
     width: 100%;
-    height: 92%;
+    height: 80%;
   }
 
   &__outlet {
