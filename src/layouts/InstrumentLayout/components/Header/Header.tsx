@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
 import { useMIDIInputs } from '@react-midi/hooks';
@@ -9,7 +9,6 @@ import FileModal, {
 import ProfileModal from 'src/components/Modals/ProfileModal/ProfileModal';
 import ProgressModal from 'src/components/Modals/ProgressModal/ProgressModal';
 import * as Tone from 'tone';
-import avatar from 'src/shared/icons/svg/avatar.svg';
 
 import {
   exportMp3,
@@ -20,11 +19,15 @@ import {
 import { useHandleClickOutside } from 'src/shared/hooks/useHandleClickOutside';
 import { Icon } from 'src/shared/icons/Icon';
 import { IconType } from 'src/shared/icons/IconMap';
+import avatar from 'src/shared/icons/svg/avatar.svg';
+import logo from 'src/shared/icons/svg/logo.svg';
 import { setIsPlaying } from 'src/shared/redux/slices/currentMusicSlice';
 import { setColumnsCount } from 'src/shared/redux/slices/drawableFieldSlice';
 import { setBpm, setTacts } from 'src/shared/redux/slices/settingsSlice';
 import { RootState } from 'src/shared/redux/store/store';
 import Button from 'src/shared/ui/Button/Button';
+
+import { useProjectName } from './hooks/useProjectName';
 
 import './Header.scss';
 
@@ -32,14 +35,14 @@ interface HeaderProps {
   className?: string;
 }
 
-const baseUrl = import.meta.env.VITE_BASE_URL;
-
 const Header = ({ className = '' }: HeaderProps) => {
   const [myBpm, setMyBpm] = useState(120);
   const [myTacts, setMyTacts] = useState(8);
   const [fileOpen, setFileOpen] = useState(false);
   const [inputModalOpen, setInputModalOpen] = useState(false);
   const [profileDropdown, setProfileDropdown] = useState(false);
+
+  const nameInputRef = useRef<HTMLInputElement>(null);
 
   const { modalRef: fileModalRef } = useHandleClickOutside(() => {
     setFileOpen(false);
@@ -51,6 +54,16 @@ const Header = ({ className = '' }: HeaderProps) => {
   });
 
   const settings = useSelector((state: RootState) => state.settings);
+
+  const {
+    isEditing,
+    tempName,
+    projectName,
+    setTempName,
+    handleNameClick,
+    handleNameBlur,
+    handleNameKeyDown
+  } = useProjectName('My first track!');
 
   const handleButtonClick = () => {
     document.getElementById('import-midi-file-input')?.click();
@@ -159,6 +172,12 @@ const Header = ({ className = '' }: HeaderProps) => {
 
   const dispatch = useDispatch();
 
+  useEffect(() => {
+    if (isEditing && nameInputRef.current) {
+      nameInputRef.current.focus();
+    }
+  }, [isEditing]);
+
   return (
     <>
       <ProgressModal />
@@ -185,86 +204,116 @@ const Header = ({ className = '' }: HeaderProps) => {
         </div>
 
         <div className="header__center">
-          {!!settings.bpm || !!settings.tacts ? (
-            <div className="header__buttons">
-              <button
-                className="header__button"
-                onClick={() => {
-                  if (Tone.context.state === 'suspended') {
-                    Tone.context.resume();
-                  }
-                  Tone.Transport.start();
-                  dispatch(setIsPlaying(true));
-                }}
+          {localStorage.getItem('accessToken') && (
+            <div className="header__logo-container">
+              <img src={logo} alt="Project Logo" className="header__logo" />
+              <div
+                className={clsx('header__project-name-container', {
+                  'header__project-name-container_editable': isEditing
+                })}
+                onClick={handleNameClick}
               >
-                <Icon
-                  icon={IconType.Play}
-                  interactable
-                  className="header__icon header__icon-start"
-                />
-              </button>
-              <button className="header__button" onClick={pauseMusic}>
-                <Icon
-                  icon={IconType.Pause}
-                  interactable
-                  className="header__icon header__icon-pause"
-                />
-              </button>
-              <button className="header__button" onClick={stopMusic}>
-                <Icon
-                  icon={IconType.Repeat}
-                  interactable
-                  className="header__icon header__icon_stop"
-                />
-              </button>
+                {isEditing ? (
+                  <input
+                    ref={nameInputRef}
+                    type="text"
+                    value={tempName}
+                    onChange={(e) => setTempName(e.target.value)}
+                    onBlur={handleNameBlur}
+                    onKeyDown={handleNameKeyDown}
+                    className="header__project-input"
+                    placeholder="Enter project name"
+                    maxLength={50}
+                  />
+                ) : (
+                  <h2 className="header__project-name">{projectName}</h2>
+                )}
+              </div>
             </div>
-          ) : null}
+          )}
 
-          <div className="header__inputs">
-            {!!settings.bpm && (
-              <form
-                className="header__input-form"
-                onSubmit={(event) => {
-                  event.preventDefault();
-                  dispatch(setBpm(myBpm));
-                }}
-              >
-                bpm
-                <input
-                  className="header__input"
-                  type="text"
-                  defaultValue={settings.bpm}
-                  onChange={(event) => {
-                    if (Number(event.target.value)) {
-                      setMyBpm(Number(event.target.value));
+          <div className="header__controls">
+            {!!settings.bpm || !!settings.tacts ? (
+              <div className="header__buttons">
+                <button
+                  className="header__button"
+                  onClick={() => {
+                    if (Tone.context.state === 'suspended') {
+                      Tone.context.resume();
                     }
+                    Tone.Transport.start();
+                    dispatch(setIsPlaying(true));
                   }}
-                />
-              </form>
-            )}
+                >
+                  <Icon
+                    icon={IconType.Play}
+                    interactable
+                    className="header__icon header__icon-start"
+                  />
+                </button>
+                <button className="header__button" onClick={pauseMusic}>
+                  <Icon
+                    icon={IconType.Pause}
+                    interactable
+                    className="header__icon header__icon-pause"
+                  />
+                </button>
+                <button className="header__button" onClick={stopMusic}>
+                  <Icon
+                    icon={IconType.Repeat}
+                    interactable
+                    className="header__icon header__icon_stop"
+                  />
+                </button>
+              </div>
+            ) : null}
 
-            {!!settings.tacts && (
-              <form
-                className="header__input-form"
-                onSubmit={(event) => {
-                  event.preventDefault();
-                  dispatch(setTacts(myTacts));
-                  dispatch(setColumnsCount(myTacts * 16));
-                }}
-              >
-                tacts
-                <input
-                  className="header__input"
-                  type="text"
-                  defaultValue={settings.tacts}
-                  onChange={(event) => {
-                    if (Number(event.target.value)) {
-                      setMyTacts(Number(event.target.value));
-                    }
+            <div className="header__inputs">
+              {!!settings.bpm && (
+                <form
+                  className="header__input-form"
+                  onSubmit={(event) => {
+                    event.preventDefault();
+                    dispatch(setBpm(myBpm));
                   }}
-                />
-              </form>
-            )}
+                >
+                  bpm
+                  <input
+                    className="header__input"
+                    type="text"
+                    defaultValue={settings.bpm}
+                    onChange={(event) => {
+                      if (Number(event.target.value)) {
+                        setMyBpm(Number(event.target.value));
+                      }
+                    }}
+                  />
+                </form>
+              )}
+
+              {!!settings.tacts && (
+                <form
+                  className="header__input-form"
+                  onSubmit={(event) => {
+                    event.preventDefault();
+                    dispatch(setTacts(myTacts));
+                    dispatch(setColumnsCount(myTacts * 16));
+                  }}
+                >
+                  tacts
+                  <input
+                    className="header__input"
+                    type="text"
+                    defaultValue={settings.tacts}
+                    onChange={(event) => {
+                      if (Number(event.target.value)) {
+                        setMyTacts(Number(event.target.value));
+                      }
+                    }}
+                  />
+                </form>
+              )}
+            </div>
           </div>
         </div>
 
