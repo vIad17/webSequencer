@@ -87,7 +87,6 @@ const Header = ({ className = '' }: HeaderProps) => {
         })} />
     )
   }));
-
   const FileData: ModalItem[] = [
     {
       text: 'Import MIDI File',
@@ -158,6 +157,24 @@ const Header = ({ className = '' }: HeaderProps) => {
             modalActions={FileData}
             isOpen={fileOpen}
           />
+          <div>
+            <button
+              className={clsx('header__left-button', {
+                'header__left-button_active': fileOpen
+              })}
+              onClick={() => {
+                setFileOpen((prev) => !prev);
+                setInputModalOpen(false);
+              }}
+            >
+              Edit
+            </button>
+            <Modal
+              className={clsx('header__left-button-modal')}
+              modalActions={FileData}
+              isOpen={fileOpen}
+            />
+          </div>
         </div>
       </div>
 
