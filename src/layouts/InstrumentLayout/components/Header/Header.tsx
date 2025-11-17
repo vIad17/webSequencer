@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
 import { useMIDIInputs } from '@react-midi/hooks';
+import axios from 'axios';
 import clsx from 'clsx';
 import FileModal, {
   ModalItem
@@ -16,6 +17,7 @@ import {
   pauseMusic,
   stopMusic
 } from 'src/app/SoundManager';
+import $api from 'src/shared/api/axiosConfig';
 import { useHandleClickOutside } from 'src/shared/hooks/useHandleClickOutside';
 import { Icon } from 'src/shared/icons/Icon';
 import { IconType } from 'src/shared/icons/IconMap';
@@ -78,41 +80,54 @@ const Header = ({ className = '' }: HeaderProps) => {
 
   const { input, inputs, selectInput, selectedInputId } = useMIDIInputs();
 
+  async function login() {
+    try {
+      const response = await axios.post(
+        '/login',
+        {
+          username: 'Artem',
+          password: '1234'
+        },
+        {
+          headers: { 'Content-Type': 'application/json' }
+        }
+      );
+      localStorage.setItem('accessToken', response.data.accessToken);
+    } catch {
+      throw new Error('Login failed');
+    }
+  }
+
   async function getUserInfo() {
-    const res = await fetch('/users/0');
-    const data = await res.json();
+    const { data } = await $api.get('/users/0');
     localStorage.setItem('username', data.username);
   }
 
-  async function login() {
-    const res = await fetch('/login', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ username: 'Artem', password: '1234' })
-    });
-
-    if (!res.ok) {
-      throw new Error('Login failed');
+  async function getMockUserInfo() {
+    const token = localStorage.getItem('accessToken');
+    if (!token) {
+      await login();
     }
 
-    const data = await res.json();
-    localStorage.setItem('accessToken', data.accessToken);
+    const { data } = await axios.get('/users/0');
+    localStorage.setItem('username', data.username);
   }
 
   useEffect(() => {
     async function init() {
-      const midiInput = localStorage.getItem('midi-input');
-      midiInput && selectInput(midiInput);
-
-      const token = localStorage.getItem('accessToken');
-      if (!token) {
-        await login();
+      if (import.meta.env.VITE_USE_MOCKS === 'true') {
+        getMockUserInfo();
+      } else {
+        getUserInfo();
       }
-
-      await getUserInfo();
     }
 
     init();
+  }, []);
+
+  useEffect(() => {
+    const midiInput = localStorage.getItem('midi-input');
+    midiInput && selectInput(midiInput);
   }, [selectInput]);
 
   const midiDeviceModalData: ModalItem[] = inputs.map((el) => ({
@@ -181,8 +196,8 @@ const Header = ({ className = '' }: HeaderProps) => {
     {
       text: 'Log out',
       callback: () => {
-        localStorage.removeItem('accessToken');
-        window.location.reload();
+        $api.post('/logout');
+        localStorage.clear();
       }
     }
   ];
@@ -299,7 +314,8 @@ const Header = ({ className = '' }: HeaderProps) => {
         </div>
 
         <div className="header__right" ref={profileModalRef}>
-          {localStorage.getItem('accessToken') ? (
+          {localStorage.getItem('accessToken') &&
+          localStorage.getItem('username') ? (
             <>
               <button
                 className="header__right_profile"
