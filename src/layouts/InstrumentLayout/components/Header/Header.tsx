@@ -138,6 +138,7 @@ const Header = ({ className = '' }: HeaderProps) => {
   }
 
   useEffect(() => {
+<<<<<<< HEAD
     async function init() {
       const midiInput = localStorage.getItem('midi-input');
       midiInput && selectInput(midiInput);
@@ -151,6 +152,14 @@ const Header = ({ className = '' }: HeaderProps) => {
     }
 
     init();
+=======
+    getUserInfo();
+  });
+
+  useEffect(() => {
+    const midiInput = localStorage.getItem('midi-input');
+    midiInput && selectInput(midiInput);
+>>>>>>> d6a92be (fix: move getUserInfo in separate useEffect)
   }, [selectInput]);
 
   const midiDeviceModalData: ModalItem[] = inputs.map((el) => ({
