@@ -141,6 +141,10 @@ const Header = ({ className = '' }: HeaderProps) => {
   }, []);
 
   useEffect(() => {
+    getUserInfo();
+  });
+
+  useEffect(() => {
     const midiInput = localStorage.getItem('midi-input');
     midiInput && selectInput(midiInput);
   }, [selectInput]);
