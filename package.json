@@ -6,6 +6,7 @@
     "start": "vite dev",
     "start:mock": "vite dev --mode=mock",
     "build": "tsc && vite build",
+    "msw:build": "tsc src/shared/lib/msw/mockServiceWorker.ts --target es2020 --outDir public",
     "eslint": "eslint --fix --ext .ts,.tsx .",
     "stylelint": "stylelint --config .stylelintrc.json src/**/*.scss",
     "test": "vitest",
