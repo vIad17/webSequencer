@@ -27,7 +27,11 @@ declare function getResponse(
 
 declare function sendToClient(
   client: Client,
+<<<<<<< HEAD
   message: string,
+=======
+  message: any,
+>>>>>>> 4d48279 (fix: add PO's wishes 🔧)
   transferrables?: Transferable[]
 ): Promise<any>;
 
