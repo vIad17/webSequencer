@@ -27,7 +27,7 @@ declare function getResponse(
 
 declare function sendToClient(
   client: Client,
-  message: any,
+  message: string,
   transferrables?: Transferable[]
 ): Promise<any>;
 

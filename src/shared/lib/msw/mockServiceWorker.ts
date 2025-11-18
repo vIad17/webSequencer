@@ -1,6 +1,3 @@
-/* eslint-disable */
-/* tslint:disable */
-
 /**
  * Mock Service Worker.
  * @see https://github.com/mswjs/msw
@@ -219,7 +216,7 @@ async function getResponse(
 
 function sendToClient(
   client: Client,
-  message: any,
+  message: string,
   transferrables: Transferable[] = []
 ): Promise<any> {
   return new Promise((resolve, reject) => {
