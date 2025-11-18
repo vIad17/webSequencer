@@ -1,9 +1,12 @@
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 /* eslint-disable */
 /* tslint:disable */
 
 >>>>>>> 4d48279 (fix: add PO's wishes 🔧)
+=======
+>>>>>>> dc8cd8e (fix: add .env with dev settings and remove comments in TS MSW config)
 /**
  * Mock Service Worker.
  * @see https://github.com/mswjs/msw
@@ -223,10 +226,14 @@ async function getResponse(
 function sendToClient(
   client: Client,
 <<<<<<< HEAD
+<<<<<<< HEAD
   message: string,
 =======
   message: any,
 >>>>>>> 4d48279 (fix: add PO's wishes 🔧)
+=======
+  message: string,
+>>>>>>> dc8cd8e (fix: add .env with dev settings and remove comments in TS MSW config)
   transferrables: Transferable[] = []
 ): Promise<any> {
   return new Promise((resolve, reject) => {
