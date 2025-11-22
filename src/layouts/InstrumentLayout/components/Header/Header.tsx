@@ -21,7 +21,7 @@ import { useHandleClickOutside } from 'src/shared/hooks/useHandleClickOutside';
 import { Icon } from 'src/shared/icons/Icon';
 import { IconType } from 'src/shared/icons/IconMap';
 import avatar from 'src/shared/icons/svg/avatar.svg';
-import logo from 'src/shared/icons/svg/logo.svg';
+import logo from 'src/shared/icons/png/logo.png';
 import { setIsPlaying } from 'src/shared/redux/slices/currentMusicSlice';
 import { setColumnsCount } from 'src/shared/redux/slices/drawableFieldSlice';
 import { setBpm, setTacts } from 'src/shared/redux/slices/settingsSlice';
