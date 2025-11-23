@@ -143,7 +143,7 @@ const Header = ({ className = '' }: HeaderProps) => {
   useEffect(() => {
     getUserInfo();
   });
-
+    
   useEffect(() => {
     const midiInput = localStorage.getItem('midi-input');
     midiInput && selectInput(midiInput);
@@ -369,7 +369,8 @@ const Header = ({ className = '' }: HeaderProps) => {
         </div>
 
         <div className="header__right" ref={profileModalRef}>
-          {localStorage.getItem('accessToken') ? (
+          {localStorage.getItem('accessToken') &&
+          localStorage.getItem('username') ? (
             <>
               <button
                 className="header__right_profile"
