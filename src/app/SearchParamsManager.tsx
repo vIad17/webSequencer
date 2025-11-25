@@ -1,6 +1,8 @@
+import axios from 'axios';
 import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { useSearchParams } from 'react-router-dom';
+import { useParams, useSearchParams } from 'react-router-dom';
+import $api from 'src/shared/api/axiosConfig';
 
 import { compress, decompress } from 'src/shared/functions/compress';
 import { setNotes } from 'src/shared/redux/slices/notesArraySlice';
@@ -29,7 +31,10 @@ const INITIAL_SETTINGS: SoundSettingsState = {
   wave: 'sine'
 };
 
+const DEFAULT_MAIN_SETTINGS = { bpm: 120, tacts: 8 };
+
 const SearchParamsManager = () => {
+  const { id } = useParams();
   const [searchParams, setSearchParams] = useSearchParams();
   const [pageIsStarted, setPageIsStarted] = useState(true);
 
@@ -41,28 +46,99 @@ const SearchParamsManager = () => {
     (state: RootState) => state.notesArray.notesArray
   );
 
-  useEffect(() => {
-    const param = searchParams.get('params');
-    if (!!param && pageIsStarted) {
-      const obj = JSON.parse(decompress(param));
-      dispatch(setNotes(obj.notesArray));
-      dispatch(setSoundSettings(obj?.soundSettings ?? INITIAL_SETTINGS));
-      dispatch(setSettings(obj?.settings ?? { bpm: 120, tacts: 8 }));
-    } else if (pageIsStarted) {
-      dispatch(setSoundSettings(INITIAL_SETTINGS));
-      dispatch(setSettings({ bpm: 120, tacts: 8 }));
+  async function getProjectById(id: string) {
+    if (import.meta.env.VITE_USE_MOCKS === 'true') {
+      const token = localStorage.getItem('accessToken');
+      if (token) {
+        const { data } = await axios.get(`/projects/${id}`);
+        return data.link;
+      }
+    } else {
+      const { data } = await $api.get(`/projects/${id}`);
+      return data.link;
     }
-    setPageIsStarted(false);
-  }, []);
+  }
+
+  async function updateLink(link: string) {
+    if (import.meta.env.VITE_USE_MOCKS === 'true') {
+      const token = localStorage.getItem('accessToken');
+      if (token) {
+        await axios.put(`/projects/${id}`, {
+          link
+        });
+      }
+    } else {
+      await $api.put(`/projects/${id}`, {
+        link
+      });
+    }
+  }
 
   useEffect(() => {
-    const storedNotesArray = notesArray?.map((note) => ({
-      note: note.note,
-      attackTime: note.attackTime,
-      duration: note.duration
-    }));
+    if (!pageIsStarted) return;
+
+    const loadFromObject = (obj: any) => {
+      const safeNotes = Array.isArray(obj?.notesArray) ? obj.notesArray : [];
+      const safeSound = obj?.soundSettings ?? INITIAL_SETTINGS;
+      const safeSettings = obj?.settings ?? DEFAULT_MAIN_SETTINGS;
+
+      dispatch(setNotes(safeNotes));
+      dispatch(setSoundSettings(safeSound));
+      dispatch(setSettings(safeSettings));
+    };
+
+    const initializePage = async () => {
+      try {
+        if (id) {
+          const projectLink = await getProjectById(id);
+          if (projectLink) {
+            const obj = JSON.parse(decompress(decodeURIComponent(projectLink)));
+            loadFromObject(obj);
+          } else {
+            dispatch(setSoundSettings(INITIAL_SETTINGS));
+            dispatch(setSettings(DEFAULT_MAIN_SETTINGS));
+          }
+        } else {
+          const param = searchParams.get('params');
+          if (param) {
+            const obj = JSON.parse(decompress(param));
+            loadFromObject(obj);
+          } else {
+            dispatch(setSoundSettings(INITIAL_SETTINGS));
+            dispatch(setSettings(DEFAULT_MAIN_SETTINGS));
+          }
+        }
+      } catch (error) {
+        console.error('Error loading project:', error);
+        dispatch(setSoundSettings(INITIAL_SETTINGS));
+        dispatch(setSettings(DEFAULT_MAIN_SETTINGS));
+      } finally {
+        setPageIsStarted(false);
+      }
+    };
+
+    initializePage();
+  }, [pageIsStarted, id, searchParams, dispatch]);
+
+  useEffect(() => {
+    if (pageIsStarted) return;
+
+    const storedNotesArray = Array.isArray(notesArray)
+      ? notesArray.map((note) => ({
+          note: note.note,
+          attackTime: note.attackTime,
+          duration: note.duration
+        }))
+      : [];
+
     const obj = { notesArray: storedNotesArray, settings, soundSettings };
-    !pageIsStarted && setSearchParams('params=' + compress(obj));
+    const compressed = compress(obj);
+
+    if (id) {
+      updateLink(compressed);
+    } else {
+      setSearchParams('params=' + compressed);
+    }
   }, [notesArray, settings, soundSettings]);
 
   return <></>;

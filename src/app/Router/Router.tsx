@@ -11,11 +11,12 @@ const Router = () => (
   <BrowserRouter>
     <Routes>
       <Route path="" element={<Layout />}>
-        <Route path="preview" element={<PreviewPage />}></Route>
+        <Route path="preview" element={<PreviewPage />} />
         <Route path="" element={<InstrumentLayout />}>
           <Route path="old" element={<Main />} />
-          <Route path="" element={<InstrumentPage />} />
-          <Route path="*" element={<Navigate to="/" />} />
+          <Route index element={<InstrumentPage />} />
+          <Route path=":id" element={<InstrumentPage />} />
+          <Route path="*" element={<Navigate to="/" replace />} />
         </Route>
       </Route>
     </Routes>
