@@ -1,6 +1,6 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
-interface SettingsState {
+export interface SettingsState {
   bpm: number | null;
   tacts: number | null;
 }
