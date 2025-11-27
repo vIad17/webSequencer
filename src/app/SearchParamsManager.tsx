@@ -2,13 +2,17 @@ import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useParams, useSearchParams } from 'react-router-dom';
 
-import axios from 'axios';
-
 import $api from 'src/shared/api/axiosConfig';
 import $mockApi from 'src/shared/api/axiosMockConfig';
 import { compress, decompress } from 'src/shared/functions/compress';
-import { setNotes } from 'src/shared/redux/slices/notesArraySlice';
-import { setSettings } from 'src/shared/redux/slices/settingsSlice';
+import {
+  NotesArrayState,
+  setNotes
+} from 'src/shared/redux/slices/notesArraySlice';
+import {
+  setSettings,
+  SettingsState
+} from 'src/shared/redux/slices/settingsSlice';
 import {
   setSoundSettings,
   SoundSettingsState
@@ -34,6 +38,12 @@ const INITIAL_SETTINGS: SoundSettingsState = {
 };
 
 const DEFAULT_MAIN_SETTINGS = { bpm: 120, tacts: 8 };
+
+interface LoadableData {
+  notesArray?: NotesArrayState;
+  soundSettings?: SoundSettingsState;
+  settings?: SettingsState;
+}
 
 const SearchParamsManager = () => {
   const { id } = useParams();
@@ -70,48 +80,48 @@ const SearchParamsManager = () => {
     }
   }
 
+  const loadFromObject = (obj: LoadableData) => {
+    const safeNotes = Array.isArray(obj?.notesArray) ? obj.notesArray : [];
+    const safeSound = obj?.soundSettings ?? INITIAL_SETTINGS;
+    const safeSettings = obj?.settings ?? DEFAULT_MAIN_SETTINGS;
+
+    dispatch(setNotes(safeNotes));
+    dispatch(setSoundSettings(safeSound));
+    dispatch(setSettings(safeSettings));
+  };
+
+  const initializePage = async () => {
+    try {
+      if (id) {
+        const projectLink = await getProjectById(id);
+        if (projectLink) {
+          const obj = JSON.parse(decompress(decodeURIComponent(projectLink)));
+          loadFromObject(obj);
+        } else {
+          dispatch(setSoundSettings(INITIAL_SETTINGS));
+          dispatch(setSettings(DEFAULT_MAIN_SETTINGS));
+        }
+      } else {
+        const param = searchParams.get('params');
+        if (param) {
+          const obj = JSON.parse(decompress(param));
+          loadFromObject(obj);
+        } else {
+          dispatch(setSoundSettings(INITIAL_SETTINGS));
+          dispatch(setSettings(DEFAULT_MAIN_SETTINGS));
+        }
+      }
+    } catch (error) {
+      console.error('Error loading project:', error);
+      dispatch(setSoundSettings(INITIAL_SETTINGS));
+      dispatch(setSettings(DEFAULT_MAIN_SETTINGS));
+    } finally {
+      setPageIsStarted(false);
+    }
+  };
+
   useEffect(() => {
     if (!pageIsStarted) return;
-
-    const loadFromObject = (obj: any) => {
-      const safeNotes = Array.isArray(obj?.notesArray) ? obj.notesArray : [];
-      const safeSound = obj?.soundSettings ?? INITIAL_SETTINGS;
-      const safeSettings = obj?.settings ?? DEFAULT_MAIN_SETTINGS;
-
-      dispatch(setNotes(safeNotes));
-      dispatch(setSoundSettings(safeSound));
-      dispatch(setSettings(safeSettings));
-    };
-
-    const initializePage = async () => {
-      try {
-        if (id) {
-          const projectLink = await getProjectById(id);
-          if (projectLink) {
-            const obj = JSON.parse(decompress(decodeURIComponent(projectLink)));
-            loadFromObject(obj);
-          } else {
-            dispatch(setSoundSettings(INITIAL_SETTINGS));
-            dispatch(setSettings(DEFAULT_MAIN_SETTINGS));
-          }
-        } else {
-          const param = searchParams.get('params');
-          if (param) {
-            const obj = JSON.parse(decompress(param));
-            loadFromObject(obj);
-          } else {
-            dispatch(setSoundSettings(INITIAL_SETTINGS));
-            dispatch(setSettings(DEFAULT_MAIN_SETTINGS));
-          }
-        }
-      } catch (error) {
-        console.error('Error loading project:', error);
-        dispatch(setSoundSettings(INITIAL_SETTINGS));
-        dispatch(setSettings(DEFAULT_MAIN_SETTINGS));
-      } finally {
-        setPageIsStarted(false);
-      }
-    };
 
     initializePage();
   }, [pageIsStarted, id, searchParams, dispatch]);
