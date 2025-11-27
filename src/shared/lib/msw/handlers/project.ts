@@ -17,7 +17,7 @@ export const projectHandler = [
         tagNames: ['science', 'innovation', 'tech'],
         isVisible: false,
         link: 'H4sIAAAAAAAAA3WPz26DMAyH38XnHIDuD%2bI2aeoLdLdphwBuYy0kNHFaIcS7z8A6tZO4%2bXO%2b/GyP4DxjfAtBD1B9jgtClZcKNLNuvj%2boE356VtCmoJm8E5rUlrjbbYmvj2KxKf5LLPJH8UtBRGZypwjVCHXfyZ8iUyBfWFrlJIJPrj3cWRdv0xyW3bKXssVmvlqqmCJrknwZFtCijqvMATtv/T7gOaFrhvvmO/ZsfnOsHtZthY6Ibf03giL7sO4uWNO8Yv6ioCduzMHQkZcH6697soxBDhY0dDI3LrNMOld9kXiI5BCm6QdKUb1vtwEAAA==',
-        userId: 3,
+        userId: 2,
         autosave: true
       },
       3: {
@@ -25,7 +25,7 @@ export const projectHandler = [
         tagNames: ['space', 'research'],
         isVisible: true,
         link: '',
-        userId: 2,
+        userId: 1,
         autosave: false
       }
     };

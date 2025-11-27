@@ -2,11 +2,13 @@ import { Outlet } from 'react-router-dom';
 
 import SearchParamsManager from 'src/app/SearchParamsManager';
 
-const Layout = () => (
-  <>
-    <SearchParamsManager />
-    <Outlet />
-  </>
-);
+const Layout = () => {
+  return (
+    <>
+      <SearchParamsManager />
+      <Outlet />
+    </>
+  );
+};
 
 export default Layout;

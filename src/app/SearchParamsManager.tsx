@@ -17,7 +17,8 @@ import {
   setSoundSettings,
   SoundSettingsState
 } from 'src/shared/redux/slices/soundSettingsSlice';
-import { RootState } from 'src/shared/redux/store/store';
+import { RootState, SequencerDispatch } from 'src/shared/redux/store/store';
+import { fetchProjectData } from 'src/shared/redux/thunks/projectThunks';
 
 const INITIAL_SETTINGS: SoundSettingsState = {
   volume: 0,
@@ -50,23 +51,17 @@ const SearchParamsManager = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const [pageIsStarted, setPageIsStarted] = useState(true);
 
-  const dispatch = useDispatch();
+  const dispatch = useDispatch<SequencerDispatch>();
 
   const soundSettings = useSelector((state: RootState) => state.soundSettings);
   const settings = useSelector((state: RootState) => state.settings);
   const notesArray = useSelector(
     (state: RootState) => state.notesArray.notesArray
   );
-
-  async function getProjectById(id: string) {
-    if (import.meta.env.VITE_USE_MOCKS === 'true') {
-      const { data } = await $mockApi.get(`/projects/${id}`);
-      return data.link;
-    } else {
-      const { data } = await $api.get(`/projects/${id}`);
-      return data.link;
-    }
-  }
+  const { id: user_id } = useSelector((state: RootState) => state.user);
+  const { link: projectLink, userId } = useSelector(
+    (state: RootState) => state.project
+  );
 
   async function updateLink(link: string) {
     if (import.meta.env.VITE_USE_MOCKS === 'true') {
@@ -79,6 +74,12 @@ const SearchParamsManager = () => {
       });
     }
   }
+
+  useEffect(() => {
+    if (id) {
+      dispatch(fetchProjectData(id));
+    }
+  }, [dispatch, id]);
 
   const loadFromObject = (obj: LoadableData) => {
     const safeNotes = Array.isArray(obj?.notesArray) ? obj.notesArray : [];
@@ -93,7 +94,6 @@ const SearchParamsManager = () => {
   const initializePage = async () => {
     try {
       if (id) {
-        const projectLink = await getProjectById(id);
         if (projectLink) {
           const obj = JSON.parse(decompress(decodeURIComponent(projectLink)));
           loadFromObject(obj);
@@ -123,8 +123,10 @@ const SearchParamsManager = () => {
   useEffect(() => {
     if (!pageIsStarted) return;
 
+    if (id && projectLink === null) return;
+
     initializePage();
-  }, [pageIsStarted, id, searchParams, dispatch]);
+  }, [pageIsStarted, id, searchParams, projectLink]);
 
   useEffect(() => {
     if (pageIsStarted) return;
@@ -141,7 +143,21 @@ const SearchParamsManager = () => {
     const compressed = compress(obj);
 
     if (id) {
-      updateLink(compressed);
+      try {
+        if (user_id !== userId) {
+          console.error('У вас нет прав изменять этот проект');
+          return;
+        }
+
+        updateLink(compressed);
+      } catch (e) {
+        if (e.response?.status === 403) {
+          console.error('Нет прав (403 Forbidden)');
+          return;
+        }
+
+        console.error('Ошибка при обновлении ссылки');
+      }
     } else {
       setSearchParams('params=' + compressed);
     }
