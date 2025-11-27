@@ -2,7 +2,6 @@ import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
 import { useMIDIInputs } from '@react-midi/hooks';
-import axios from 'axios';
 import clsx from 'clsx';
 import FileModal, {
   ModalItem
@@ -18,6 +17,7 @@ import {
   stopMusic
 } from 'src/app/SoundManager';
 import $api from 'src/shared/api/axiosConfig';
+import $mockApi from 'src/shared/api/axiosMockConfig';
 import { useHandleClickOutside } from 'src/shared/hooks/useHandleClickOutside';
 import { Icon } from 'src/shared/icons/Icon';
 import { IconType } from 'src/shared/icons/IconMap';
@@ -116,50 +116,23 @@ const Header = ({ className = '' }: HeaderProps) => {
   };
 
   const { input, inputs, selectInput, selectedInputId } = useMIDIInputs();
-        
-  async function login() {
-    try {
-      const response = await axios.post(
-        '/login',
-        {
-          username: 'Artem',
-          password: '1234'
-        },
-        {
-          headers: { 'Content-Type': 'application/json' }
-        }
-      );
-      localStorage.setItem('accessToken', response.data.accessToken);
-    } catch {
-      throw new Error('Login failed');
-    }
-  }
 
   async function getUserInfo() {
-    const { data } = await $api.get('/users/0');
-    localStorage.setItem('username', data.username);
+    if (import.meta.env.VITE_USE_MOCKS === 'true') {
+      const { data } = await $mockApi.get('/users/0');
+      localStorage.setItem('username', data.username);
+    } else {
+      const { data } = await $api.get('/users/0');
+      localStorage.setItem('username', data.username);
+    }
   }
 
-  async function getMockUserInfo() {
-    const token = localStorage.getItem('accessToken');
-    if (!token) {
-      await login();
-    }
-
-    const { data } = await axios.get('/users/0');
-    localStorage.setItem('username', data.username);
+  async function initGettingUserInfo() {
+    await getUserInfo();
   }
 
   useEffect(() => {
-    async function init() {
-      if (import.meta.env.VITE_USE_MOCKS === 'true') {
-        getMockUserInfo();
-      } else {
-        getUserInfo();
-      }
-    }
-
-    init();
+    initGettingUserInfo();
   }, []);
 
   useEffect(() => {
