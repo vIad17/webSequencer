@@ -17,7 +17,6 @@ import {
   stopMusic
 } from 'src/app/SoundManager';
 import $api from 'src/shared/api/axiosConfig';
-import $mockApi from 'src/shared/api/axiosMockConfig';
 import { useHandleClickOutside } from 'src/shared/hooks/useHandleClickOutside';
 import { Icon } from 'src/shared/icons/Icon';
 import { IconType } from 'src/shared/icons/IconMap';
@@ -25,7 +24,8 @@ import avatar from 'src/shared/icons/svg/avatar.svg';
 import { setIsPlaying } from 'src/shared/redux/slices/currentMusicSlice';
 import { setColumnsCount } from 'src/shared/redux/slices/drawableFieldSlice';
 import { setBpm, setTacts } from 'src/shared/redux/slices/settingsSlice';
-import { RootState } from 'src/shared/redux/store/store';
+import { RootState, SequencerDispatch } from 'src/shared/redux/store/store';
+import { fetchUserData } from 'src/shared/redux/thunks/userThunks';
 import Button from 'src/shared/ui/Button/Button';
 
 import './Header.scss';
@@ -75,7 +75,11 @@ const Header = ({ className = '' }: HeaderProps) => {
     setProfileDropdown(false);
   });
 
+  const dispatch = useDispatch<SequencerDispatch>();
   const settings = useSelector((state: RootState) => state.settings);
+  const { username, isLoading, error } = useSelector(
+    (state: RootState) => state.user
+  );
 
   useEffect(() => {
     const loadAutosaveStatus = async () => {
@@ -117,23 +121,9 @@ const Header = ({ className = '' }: HeaderProps) => {
 
   const { input, inputs, selectInput, selectedInputId } = useMIDIInputs();
 
-  async function getUserInfo() {
-    if (import.meta.env.VITE_USE_MOCKS === 'true') {
-      const { data } = await $mockApi.get('/users/0');
-      localStorage.setItem('username', data.username);
-    } else {
-      const { data } = await $api.get('/users/0');
-      localStorage.setItem('username', data.username);
-    }
-  }
-
-  async function initGettingUserInfo() {
-    await getUserInfo();
-  }
-
   useEffect(() => {
-    initGettingUserInfo();
-  }, []);
+    dispatch(fetchUserData());
+  }, [dispatch]);
 
   useEffect(() => {
     const midiInput = localStorage.getItem('midi-input');
@@ -246,7 +236,8 @@ const Header = ({ className = '' }: HeaderProps) => {
     }
   ];
 
-  const dispatch = useDispatch();
+  if (isLoading) return <div>Загрузка...</div>;
+  if (error) return <div>Ошибка: {error}</div>;
 
   return (
     <>
@@ -379,8 +370,7 @@ const Header = ({ className = '' }: HeaderProps) => {
         </div>
 
         <div className="header__right" ref={profileModalRef}>
-          {localStorage.getItem('accessToken') &&
-          localStorage.getItem('username') ? (
+          {localStorage.getItem('accessToken') && username ? (
             <>
               <button
                 className="header__right_profile"
@@ -391,9 +381,7 @@ const Header = ({ className = '' }: HeaderProps) => {
                   src={avatar}
                   alt="avatar"
                 />
-                <h2 className="header__right_username">
-                  {localStorage.getItem('username')}
-                </h2>
+                <h2 className="header__right_username">{username}</h2>
               </button>
               <ProfileModal
                 className={clsx('header__right-button-modal')}
