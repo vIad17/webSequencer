@@ -1,9 +1,11 @@
-import axios from 'axios';
 import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useParams, useSearchParams } from 'react-router-dom';
-import $api from 'src/shared/api/axiosConfig';
 
+import axios from 'axios';
+
+import $api from 'src/shared/api/axiosConfig';
+import $mockApi from 'src/shared/api/axiosMockConfig';
 import { compress, decompress } from 'src/shared/functions/compress';
 import { setNotes } from 'src/shared/redux/slices/notesArraySlice';
 import { setSettings } from 'src/shared/redux/slices/settingsSlice';
@@ -48,11 +50,8 @@ const SearchParamsManager = () => {
 
   async function getProjectById(id: string) {
     if (import.meta.env.VITE_USE_MOCKS === 'true') {
-      const token = localStorage.getItem('accessToken');
-      if (token) {
-        const { data } = await axios.get(`/projects/${id}`);
-        return data.link;
-      }
+      const { data } = await $mockApi.get(`/projects/${id}`);
+      return data.link;
     } else {
       const { data } = await $api.get(`/projects/${id}`);
       return data.link;
@@ -61,12 +60,9 @@ const SearchParamsManager = () => {
 
   async function updateLink(link: string) {
     if (import.meta.env.VITE_USE_MOCKS === 'true') {
-      const token = localStorage.getItem('accessToken');
-      if (token) {
-        await axios.put(`/projects/${id}`, {
-          link
-        });
-      }
+      await $mockApi.put(`/projects/${id}`, {
+        link
+      });
     } else {
       await $api.put(`/projects/${id}`, {
         link
