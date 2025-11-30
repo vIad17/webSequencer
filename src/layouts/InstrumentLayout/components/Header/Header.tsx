@@ -163,7 +163,6 @@ const Header = ({ className = '' }: HeaderProps) => {
         />
       )
     },
-
     {
       text: 'MIDI input',
       callback: () => {
