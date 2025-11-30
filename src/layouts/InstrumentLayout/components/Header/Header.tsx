@@ -28,6 +28,21 @@ import Button from 'src/shared/ui/Button/Button';
 
 import './Header.scss';
 
+
+const mockGetAutosaveStatus = async (projectId: string): Promise<boolean> => {
+  console.log(`Mock: Getting autosave status for project ${projectId}`);
+  return Math.random() > 0.5;
+};
+
+const mockUpdateAutosaveStatus = async (projectId: string, isAutosave: boolean): Promise<void> => {
+  console.log(`Mock: Updating autosave status for project ${projectId} to ${isAutosave}`);
+  return;
+};
+
+const getCurrentProjectId = (): string => {
+  return 'current-project-id'; 
+};
+
 interface HeaderProps {
   className?: string;
 }
@@ -41,6 +56,7 @@ const Header = ({ className = '' }: HeaderProps) => {
   const [editOpen, setEditOpen] = useState(false);
   const [inputModalOpen, setInputModalOpen] = useState(false);
   const [profileDropdown, setProfileDropdown] = useState(false);
+  const [isAutosaveEnabled, setIsAutosaveEnabled] = useState(false);
 
   const { modalRef: fileModalRef } = useHandleClickOutside(() => {
     setFileOpen(false);
@@ -56,6 +72,18 @@ const Header = ({ className = '' }: HeaderProps) => {
   });
 
   const settings = useSelector((state: RootState) => state.settings);
+
+  useEffect(() => {
+    const loadAutosaveStatus = async () => {
+      if (localStorage.getItem('accessToken')) {
+        const projectId = getCurrentProjectId();
+        const autosaveStatus = await mockGetAutosaveStatus(projectId);
+        setIsAutosaveEnabled(autosaveStatus);
+      }
+    };
+
+    loadAutosaveStatus();
+  }, []);
 
   const handleButtonClick = () => {
     document.getElementById('import-midi-file-input')?.click();
@@ -121,10 +149,7 @@ const Header = ({ className = '' }: HeaderProps) => {
         />
       )
     },
-    // {
-    //   text: 'Autosave',
-    //   callback: () => { }
-    // },
+    
     {
       text: 'MIDI input',
       callback: () => {
@@ -143,7 +168,34 @@ const Header = ({ className = '' }: HeaderProps) => {
           />
         </>
       )
-    }
+    },
+
+    {
+      text: 'Autosave',
+      callback: async () => {
+        const projectId = getCurrentProjectId();
+        const newAutosaveStatus = !isAutosaveEnabled;
+        
+        try {
+          await mockUpdateAutosaveStatus(projectId, newAutosaveStatus);
+          setIsAutosaveEnabled(newAutosaveStatus);
+          console.log(`Autosave ${newAutosaveStatus ? 'enabled' : 'disabled'}`);
+        } catch (error) {
+          console.error('Failed to update autosave status:', error);
+        }
+        
+        setFileOpen(false);
+      },
+      sideContent: (
+        <Icon
+          icon={IconType.Check}
+          className={clsx('modal__side-icon', 'modal__check-icon', {
+            'modal__side-icon_hidden': !isAutosaveEnabled
+          })}
+        />
+      )
+    },
+
   ];
 
   const EditData: ModalItem[] = [

@@ -116,7 +116,7 @@
     z-index: 50;
   }
 
-  // +++ ДОБАВЛЕНО: стили для second_left-item элементов
+
   &__second_left-item {
     width: fit-content;
     position: relative;
@@ -166,7 +166,6 @@
     min-width: 170px;
   }
 
-  // +++ ДОБАВЛЕНО: стили для sub-modal в second_left элементах
   &__second_left-button-sub-modal {
     top: 0;
     left: 100%;
@@ -201,3 +200,4 @@
   font-size: 12px;
   margin-left: 8px;
 }
+
