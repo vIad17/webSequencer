@@ -24,7 +24,7 @@ export const fetchProjectData = (project_id: string) => async (dispatch) => {
     const userData = await getProjectById(project_id);
 
     if (!userData) {
-      throw new Error('Ошибка при получении данных проекта');
+      throw new Error("Error receiving project's data");
     }
 
     dispatch(setProjectData(userData));
