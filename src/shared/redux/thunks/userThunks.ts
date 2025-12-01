@@ -24,7 +24,7 @@ export const fetchUserData = () => async (dispatch) => {
     const userData = await getUserInfo();
 
     if (!userData) {
-      throw new Error('Ошибка при получении данных пользователя');
+      throw new Error("Error receiving user's data");
     }
 
     dispatch(setUserData(userData));
