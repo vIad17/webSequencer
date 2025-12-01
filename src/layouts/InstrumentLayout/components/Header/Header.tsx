@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
 import { useMIDIInputs } from '@react-midi/hooks';
+import axios from 'axios';
 import clsx from 'clsx';
 import FileModal, {
   ModalItem
@@ -115,51 +116,55 @@ const Header = ({ className = '' }: HeaderProps) => {
   };
 
   const { input, inputs, selectInput, selectedInputId } = useMIDIInputs();
+        
+  async function login() {
+    try {
+      const response = await axios.post(
+        '/login',
+        {
+          username: 'Artem',
+          password: '1234'
+        },
+        {
+          headers: { 'Content-Type': 'application/json' }
+        }
+      );
+      localStorage.setItem('accessToken', response.data.accessToken);
+    } catch {
+      throw new Error('Login failed');
+    }
+  }
 
   async function getUserInfo() {
-    const res = await fetch('/users/0');
-    const data = await res.json();
+    const { data } = await $api.get('/users/0');
     localStorage.setItem('username', data.username);
   }
 
-  async function login() {
-    const res = await fetch('/login', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ username: 'Artem', password: '1234' })
-    });
-
-    if (!res.ok) {
-      throw new Error('Login failed');
+  async function getMockUserInfo() {
+    const token = localStorage.getItem('accessToken');
+    if (!token) {
+      await login();
     }
 
-    const data = await res.json();
-    localStorage.setItem('accessToken', data.accessToken);
+    const { data } = await axios.get('/users/0');
+    localStorage.setItem('username', data.username);
   }
 
   useEffect(() => {
-<<<<<<< HEAD
     async function init() {
-      const midiInput = localStorage.getItem('midi-input');
-      midiInput && selectInput(midiInput);
-
-      const token = localStorage.getItem('accessToken');
-      if (!token) {
-        await login();
+      if (import.meta.env.VITE_USE_MOCKS === 'true') {
+        getMockUserInfo();
+      } else {
+        getUserInfo();
       }
-
-      await getUserInfo();
     }
 
     init();
-=======
-    getUserInfo();
-  });
+  }, []);
 
   useEffect(() => {
     const midiInput = localStorage.getItem('midi-input');
     midiInput && selectInput(midiInput);
->>>>>>> d6a92be (fix: move getUserInfo in separate useEffect)
   }, [selectInput]);
 
   const midiDeviceModalData: ModalItem[] = inputs.map((el) => ({
