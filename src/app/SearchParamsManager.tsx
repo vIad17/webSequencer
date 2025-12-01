@@ -1,15 +1,24 @@
 import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { useSearchParams } from 'react-router-dom';
+import { useParams, useSearchParams } from 'react-router-dom';
 
+import $api from 'src/shared/api/axiosConfig';
+import $mockApi from 'src/shared/api/axiosMockConfig';
 import { compress, decompress } from 'src/shared/functions/compress';
-import { setNotes } from 'src/shared/redux/slices/notesArraySlice';
-import { setSettings } from 'src/shared/redux/slices/settingsSlice';
+import {
+  NotesArrayState,
+  setNotes
+} from 'src/shared/redux/slices/notesArraySlice';
+import {
+  setSettings,
+  SettingsState
+} from 'src/shared/redux/slices/settingsSlice';
 import {
   setSoundSettings,
   SoundSettingsState
 } from 'src/shared/redux/slices/soundSettingsSlice';
-import { RootState } from 'src/shared/redux/store/store';
+import { RootState, SequencerDispatch } from 'src/shared/redux/store/store';
+import { fetchProjectData } from 'src/shared/redux/thunks/projectThunks';
 
 const INITIAL_SETTINGS: SoundSettingsState = {
   volume: 0,
@@ -29,40 +38,129 @@ const INITIAL_SETTINGS: SoundSettingsState = {
   wave: 'sine'
 };
 
+const DEFAULT_MAIN_SETTINGS = { bpm: 120, tacts: 8 };
+
+interface LoadableData {
+  notesArray?: NotesArrayState;
+  soundSettings?: SoundSettingsState;
+  settings?: SettingsState;
+}
+
 const SearchParamsManager = () => {
+  const { id } = useParams();
   const [searchParams, setSearchParams] = useSearchParams();
   const [pageIsStarted, setPageIsStarted] = useState(true);
 
-  const dispatch = useDispatch();
+  const dispatch = useDispatch<SequencerDispatch>();
 
   const soundSettings = useSelector((state: RootState) => state.soundSettings);
   const settings = useSelector((state: RootState) => state.settings);
   const notesArray = useSelector(
     (state: RootState) => state.notesArray.notesArray
   );
+  const { id: user_id } = useSelector((state: RootState) => state.user);
+  const { link: projectLink, userId } = useSelector(
+    (state: RootState) => state.project
+  );
 
-  useEffect(() => {
-    const param = searchParams.get('params');
-    if (!!param && pageIsStarted) {
-      const obj = JSON.parse(decompress(param));
-      dispatch(setNotes(obj.notesArray));
-      dispatch(setSoundSettings(obj?.soundSettings ?? INITIAL_SETTINGS));
-      dispatch(setSettings(obj?.settings ?? { bpm: 120, tacts: 8 }));
-    } else if (pageIsStarted) {
-      dispatch(setSoundSettings(INITIAL_SETTINGS));
-      dispatch(setSettings({ bpm: 120, tacts: 8 }));
+  async function updateLink(link: string) {
+    if (import.meta.env.VITE_USE_MOCKS === 'true') {
+      await $mockApi.put(`/projects/${id}`, {
+        link
+      });
+    } else {
+      await $api.put(`/projects/${id}`, {
+        link
+      });
     }
-    setPageIsStarted(false);
-  }, []);
+  }
 
   useEffect(() => {
-    const storedNotesArray = notesArray?.map((note) => ({
-      note: note.note,
-      attackTime: note.attackTime,
-      duration: note.duration
-    }));
+    if (id) {
+      dispatch(fetchProjectData(id));
+    }
+  }, [dispatch, id]);
+
+  const loadFromObject = (obj: LoadableData) => {
+    const safeNotes = Array.isArray(obj?.notesArray) ? obj.notesArray : [];
+    const safeSound = obj?.soundSettings ?? INITIAL_SETTINGS;
+    const safeSettings = obj?.settings ?? DEFAULT_MAIN_SETTINGS;
+
+    dispatch(setNotes(safeNotes));
+    dispatch(setSoundSettings(safeSound));
+    dispatch(setSettings(safeSettings));
+  };
+
+  const initializePage = async () => {
+    try {
+      if (id) {
+        if (projectLink) {
+          const obj = JSON.parse(decompress(decodeURIComponent(projectLink)));
+          loadFromObject(obj);
+        } else {
+          dispatch(setSoundSettings(INITIAL_SETTINGS));
+          dispatch(setSettings(DEFAULT_MAIN_SETTINGS));
+        }
+      } else {
+        const param = searchParams.get('params');
+        if (param) {
+          const obj = JSON.parse(decompress(param));
+          loadFromObject(obj);
+        } else {
+          dispatch(setSoundSettings(INITIAL_SETTINGS));
+          dispatch(setSettings(DEFAULT_MAIN_SETTINGS));
+        }
+      }
+    } catch (error) {
+      console.error('Error loading project:', error);
+      dispatch(setSoundSettings(INITIAL_SETTINGS));
+      dispatch(setSettings(DEFAULT_MAIN_SETTINGS));
+    } finally {
+      setPageIsStarted(false);
+    }
+  };
+
+  useEffect(() => {
+    if (!pageIsStarted) return;
+
+    if (id && projectLink === null) return;
+
+    initializePage();
+  }, [pageIsStarted, id, searchParams, projectLink]);
+
+  useEffect(() => {
+    if (pageIsStarted) return;
+
+    const storedNotesArray = Array.isArray(notesArray)
+      ? notesArray.map((note) => ({
+          note: note.note,
+          attackTime: note.attackTime,
+          duration: note.duration
+        }))
+      : [];
+
     const obj = { notesArray: storedNotesArray, settings, soundSettings };
-    !pageIsStarted && setSearchParams('params=' + compress(obj));
+    const compressed = compress(obj);
+
+    if (id) {
+      try {
+        if (user_id !== userId) {
+          console.error("You haven't permissions to modify the project");
+          return;
+        }
+
+        updateLink(compressed);
+      } catch (e) {
+        if (e.response?.status === 403) {
+          console.error('No permissions (403 Forbidden)');
+          return;
+        }
+
+        console.error('Error for updating link');
+      }
+    } else {
+      setSearchParams('params=' + compressed);
+    }
   }, [notesArray, settings, soundSettings]);
 
   return <></>;

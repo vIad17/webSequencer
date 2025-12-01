@@ -7,7 +7,7 @@ export const authHandler = [
     if (username === 'Artem' && password === '1234') {
       return HttpResponse.json(
         {
-          id: 99,
+          id: 2,
           accessToken: 'mock-token-abc123'
         },
         { status: 200 }

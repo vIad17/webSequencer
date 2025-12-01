@@ -2,7 +2,6 @@ import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
 import { useMIDIInputs } from '@react-midi/hooks';
-import axios from 'axios';
 import clsx from 'clsx';
 import FileModal, {
   ModalItem
@@ -25,7 +24,8 @@ import avatar from 'src/shared/icons/svg/avatar.svg';
 import { setIsPlaying } from 'src/shared/redux/slices/currentMusicSlice';
 import { setColumnsCount } from 'src/shared/redux/slices/drawableFieldSlice';
 import { setBpm, setTacts } from 'src/shared/redux/slices/settingsSlice';
-import { RootState } from 'src/shared/redux/store/store';
+import { RootState, SequencerDispatch } from 'src/shared/redux/store/store';
+import { fetchUserData } from 'src/shared/redux/thunks/userThunks';
 import Button from 'src/shared/ui/Button/Button';
 
 import './Header.scss';
@@ -50,7 +50,13 @@ const Header = ({ className = '' }: HeaderProps) => {
     setProfileDropdown(false);
   });
 
+  const dispatch = useDispatch<SequencerDispatch>();
   const settings = useSelector((state: RootState) => state.settings);
+  const {
+    username,
+    isLoading: isGetUserInfoLoading,
+    error: isGetUserInfoError
+  } = useSelector((state: RootState) => state.user);
 
   const handleButtonClick = () => {
     document.getElementById('import-midi-file-input')?.click();
@@ -80,50 +86,9 @@ const Header = ({ className = '' }: HeaderProps) => {
 
   const { input, inputs, selectInput, selectedInputId } = useMIDIInputs();
 
-  async function login() {
-    try {
-      const response = await axios.post(
-        '/login',
-        {
-          username: 'Artem',
-          password: '1234'
-        },
-        {
-          headers: { 'Content-Type': 'application/json' }
-        }
-      );
-      localStorage.setItem('accessToken', response.data.accessToken);
-    } catch {
-      throw new Error('Login failed');
-    }
-  }
-
-  async function getUserInfo() {
-    const { data } = await $api.get('/users/0');
-    localStorage.setItem('username', data.username);
-  }
-
-  async function getMockUserInfo() {
-    const token = localStorage.getItem('accessToken');
-    if (!token) {
-      await login();
-    }
-
-    const { data } = await axios.get('/users/0');
-    localStorage.setItem('username', data.username);
-  }
-
   useEffect(() => {
-    async function init() {
-      if (import.meta.env.VITE_USE_MOCKS === 'true') {
-        getMockUserInfo();
-      } else {
-        getUserInfo();
-      }
-    }
-
-    init();
-  }, []);
+    dispatch(fetchUserData());
+  }, [dispatch]);
 
   useEffect(() => {
     const midiInput = localStorage.getItem('midi-input');
@@ -202,7 +167,8 @@ const Header = ({ className = '' }: HeaderProps) => {
     }
   ];
 
-  const dispatch = useDispatch();
+  if (isGetUserInfoLoading) return <div>Loading...</div>;
+  if (isGetUserInfoError) return <div>Error: {isGetUserInfoError}</div>;
 
   return (
     <>
@@ -314,8 +280,7 @@ const Header = ({ className = '' }: HeaderProps) => {
         </div>
 
         <div className="header__right" ref={profileModalRef}>
-          {localStorage.getItem('accessToken') &&
-          localStorage.getItem('username') ? (
+          {localStorage.getItem('accessToken') && username ? (
             <>
               <button
                 className="header__right_profile"
@@ -326,9 +291,7 @@ const Header = ({ className = '' }: HeaderProps) => {
                   src={avatar}
                   alt="avatar"
                 />
-                <h2 className="header__right_username">
-                  {localStorage.getItem('username')}
-                </h2>
+                <h2 className="header__right_username">{username}</h2>
               </button>
               <ProfileModal
                 className={clsx('header__right-button-modal')}
