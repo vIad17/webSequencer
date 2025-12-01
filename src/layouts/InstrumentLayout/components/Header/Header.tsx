@@ -52,9 +52,11 @@ const Header = ({ className = '' }: HeaderProps) => {
 
   const dispatch = useDispatch<SequencerDispatch>();
   const settings = useSelector((state: RootState) => state.settings);
-  const { username, isLoading, error } = useSelector(
-    (state: RootState) => state.user
-  );
+  const {
+    username,
+    isLoading: isGetUserInfoLoading,
+    error: isGetUserInfoError
+  } = useSelector((state: RootState) => state.user);
 
   const handleButtonClick = () => {
     document.getElementById('import-midi-file-input')?.click();
@@ -165,8 +167,8 @@ const Header = ({ className = '' }: HeaderProps) => {
     }
   ];
 
-  if (isLoading) return <div>Loading...</div>;
-  if (error) return <div>Error: {error}</div>;
+  if (isGetUserInfoLoading) return <div>Loading...</div>;
+  if (isGetUserInfoError) return <div>Error: {isGetUserInfoError}</div>;
 
   return (
     <>
