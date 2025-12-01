@@ -236,8 +236,8 @@ const Header = ({ className = '' }: HeaderProps) => {
     }
   ];
 
-  if (isLoading) return <div>Загрузка...</div>;
-  if (error) return <div>Ошибка: {error}</div>;
+  if (isLoading) return <div>Loading...</div>;
+  if (error) return <div>Error: {error}</div>;
 
   return (
     <>

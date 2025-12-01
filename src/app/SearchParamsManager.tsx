@@ -145,18 +145,18 @@ const SearchParamsManager = () => {
     if (id) {
       try {
         if (user_id !== userId) {
-          console.error('У вас нет прав изменять этот проект');
+          console.error("You haven't permissions to modify the project");
           return;
         }
 
         updateLink(compressed);
       } catch (e) {
         if (e.response?.status === 403) {
-          console.error('Нет прав (403 Forbidden)');
+          console.error('No permissions (403 Forbidden)');
           return;
         }
 
-        console.error('Ошибка при обновлении ссылки');
+        console.error('Error for updating link');
       }
     } else {
       setSearchParams('params=' + compressed);
