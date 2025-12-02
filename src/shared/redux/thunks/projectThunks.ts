@@ -1,5 +1,4 @@
-import $api from 'src/shared/api/axiosConfig';
-import $mockApi from 'src/shared/api/axiosMockConfig';
+import { apiClient } from 'src/shared/api/apiClient';
 import {
   setError,
   setLoading,
@@ -7,13 +6,8 @@ import {
 } from 'src/shared/redux/slices/projectSlice';
 
 async function getProjectById(id: string) {
-  if (import.meta.env.VITE_USE_MOCKS === 'true') {
-    const { data } = await $mockApi.get(`/projects/${id}`);
-    return data;
-  } else {
-    const { data } = await $api.get(`/projects/${id}`);
-    return data;
-  }
+  const { data } = await apiClient.get(`/projects/${id}`);
+  return data;
 }
 
 export const fetchProjectData = (project_id: string) => async (dispatch) => {
