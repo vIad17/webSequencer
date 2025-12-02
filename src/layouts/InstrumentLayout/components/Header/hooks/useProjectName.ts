@@ -1,16 +1,34 @@
-import { useCallback, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 
 import { projectNameSchema } from 'src/layouts/InstrumentLayout/components/Header/lib/schema';
 import { z } from 'zod';
 
+import $api from 'src/shared/api/axiosConfig';
 import { useToast } from 'src/shared/hooks/useToast';
 
-export const useProjectName = (initialName: string) => {
+export const useProjectName = (initialName: string, projectId?: number) => {
   const [projectName, setProjectName] = useState(initialName);
   const [isEditing, setIsEditing] = useState(false);
   const [tempName, setTempName] = useState(projectName);
+  const [isLoading, setIsLoading] = useState(false);
 
   const { toastError } = useToast();
+
+  useEffect(() => {
+    if (projectId && import.meta.env.VITE_USE_MOCKS === 'true') {
+      setIsLoading(true);
+      $api
+        .get(`/projects/${projectId}/name`)
+        .then((response) => {
+          setProjectName(response.data.name);
+          setTempName(response.data.name);
+        })
+        .catch((error) => {
+          toastError('Failed to load project name');
+        })
+        .finally(() => setIsLoading(false));
+    }
+  }, [projectId]);
 
   const handleNameValidation = useCallback(
     (name: string): { isValid: boolean; error?: string } => {
@@ -31,13 +49,13 @@ export const useProjectName = (initialName: string) => {
   );
 
   const handleNameClick = useCallback(() => {
-    if (!isEditing) {
+    if (!isEditing && !isLoading) {
       setIsEditing(true);
       setTempName(projectName);
     }
-  }, [isEditing, projectName]);
+  }, [isEditing, projectName, isLoading]);
 
-  const handleNameBlur = useCallback(() => {
+  const handleNameBlur = useCallback(async () => {
     const validation = handleNameValidation(tempName);
 
     if (!validation.isValid) {
@@ -45,16 +63,24 @@ export const useProjectName = (initialName: string) => {
       setTempName(projectName);
     } else if (tempName.trim() === '') {
       toastError('Project name cannot be empty');
-      setProjectName(projectName);
-    } else {
-      setProjectName(tempName.trim());
+      setTempName(projectName);
+    } else if (tempName.trim() !== projectName && projectId) {
+      try {
+        await $api.put(`/projects/${projectId}`, {
+          name: tempName.trim()
+        });
+        setProjectName(tempName.trim());
+      } catch (error) {
+        toastError('Failed to update project name');
+        setTempName(projectName);
+      }
     }
 
     setIsEditing(false);
-  }, [tempName, projectName, handleNameValidation, toastError]);
+  }, [tempName, projectName, projectId, handleNameValidation, toastError]);
 
   const handleNameKeyDown = useCallback(
-    (e: React.KeyboardEvent<HTMLInputElement>) => {
+    async (e: React.KeyboardEvent<HTMLInputElement>) => {
       e.stopPropagation();
 
       if (e.key === 'Enter') {
@@ -64,25 +90,41 @@ export const useProjectName = (initialName: string) => {
 
         if (!validation.isValid) {
           toastError(validation.error!);
-        } else if (tempName.trim() === '') {
-          toastError('Project name cannot be empty');
-        } else {
-          setProjectName(tempName.trim());
-          setIsEditing(false);
+          return;
         }
+
+        if (tempName.trim() === '') {
+          toastError('Project name cannot be empty');
+          return;
+        }
+
+        if (tempName.trim() !== projectName && projectId) {
+          try {
+            await $api.put(`/projects/${projectId}`, {
+              name: tempName.trim()
+            });
+            setProjectName(tempName.trim());
+          } catch (error) {
+            toastError('Failed to update project name');
+            return;
+          }
+        }
+
+        setIsEditing(false);
       } else if (e.key === 'Escape') {
         e.preventDefault();
         setTempName(projectName);
         setIsEditing(false);
       }
     },
-    [tempName, projectName, handleNameValidation, toastError]
+    [tempName, projectName, projectId, handleNameValidation, toastError]
   );
 
   return {
     projectName,
     isEditing,
     tempName,
+    isLoading,
     setIsEditing,
     setTempName,
     handleNameClick,

@@ -43,6 +43,7 @@ const Header = ({ className = '' }: HeaderProps) => {
   const [fileOpen, setFileOpen] = useState(false);
   const [inputModalOpen, setInputModalOpen] = useState(false);
   const [profileDropdown, setProfileDropdown] = useState(false);
+  const [username, setUsername] = useState<string | null>(null);
 
   const nameInputRef = useRef<HTMLInputElement>(null);
 
@@ -57,21 +58,28 @@ const Header = ({ className = '' }: HeaderProps) => {
 
   const dispatch = useDispatch<SequencerDispatch>();
   const settings = useSelector((state: RootState) => state.settings);
+
   const {
     username,
     isLoading: isGetUserInfoLoading,
     error: isGetUserInfoError
   } = useSelector((state: RootState) => state.user);
 
+  const currentProject = useSelector(
+    (state: RootState) => state.currentProject || {}
+  );
+  const projectId = currentProject.id || 1;
+
   const {
+    projectName,
     isEditing,
     tempName,
-    projectName,
+    isLoading,
     setTempName,
     handleNameClick,
     handleNameBlur,
     handleNameKeyDown
-  } = useProjectName('My first track!');
+  } = useProjectName('Untitled Project', projectId);
 
   const handleButtonClick = () => {
     document.getElementById('import-midi-file-input')?.click();
@@ -222,7 +230,8 @@ const Header = ({ className = '' }: HeaderProps) => {
               <img src={logo} alt="Project Logo" className="header__logo" />
               <div
                 className={clsx('header__project-name-container', {
-                  'header__project-name-container_editable': isEditing
+                  'header__project-name-container_editable': isEditing,
+                  'header__project-name-container_loading': isLoading
                 })}
                 onClick={handleNameClick}
               >
@@ -237,6 +246,7 @@ const Header = ({ className = '' }: HeaderProps) => {
                     className="header__project-input"
                     placeholder="Enter project name"
                     maxLength={50}
+                    disabled={isLoading}
                   />
                 ) : (
                   <h2 className="header__project-name">{projectName}</h2>
