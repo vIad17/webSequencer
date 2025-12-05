@@ -1,34 +1,36 @@
 import { useCallback, useEffect, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { useParams } from 'react-router-dom';
 
 import { projectNameSchema } from 'src/layouts/InstrumentLayout/components/Header/lib/schema';
 import { z } from 'zod';
 
-import $api from 'src/shared/api/axiosConfig';
+import { apiClient } from 'src/shared/api/apiClient';
 import { useToast } from 'src/shared/hooks/useToast';
+import { setProjectName } from 'src/shared/redux/slices/projectNameSlice';
+import { RootState, SequencerDispatch } from 'src/shared/redux/store/store';
+import { fetchProjectName } from 'src/shared/redux/thunks/projectThunks';
 
-export const useProjectName = (initialName: string, projectId?: number) => {
-  const [projectName, setProjectName] = useState(initialName);
+export const useProjectName = (initialName: string) => {
+  const { id } = useParams();
   const [isEditing, setIsEditing] = useState(false);
-  const [tempName, setTempName] = useState(projectName);
-  const [isLoading, setIsLoading] = useState(false);
+  const [tempName, setTempName] = useState(initialName);
+  const dispatch = useDispatch<SequencerDispatch>();
+
+  const { name } = useSelector((state: RootState) => state.project_name);
 
   const { toastError } = useToast();
 
   useEffect(() => {
-    if (projectId && import.meta.env.VITE_USE_MOCKS === 'true') {
-      setIsLoading(true);
-      $api
-        .get(`/projects/${projectId}/name`)
-        .then((response) => {
-          setProjectName(response.data.name);
-          setTempName(response.data.name);
-        })
-        .catch((error) => {
-          toastError('Failed to load project name');
-        })
-        .finally(() => setIsLoading(false));
+    if (id) {
+      try {
+        dispatch(fetchProjectName(id));
+        setTempName(name);
+      } catch (error) {
+        toastError('Failed to load project name');
+      }
     }
-  }, [projectId]);
+  }, [id]);
 
   const handleNameValidation = useCallback(
     (name: string): { isValid: boolean; error?: string } => {
@@ -49,35 +51,35 @@ export const useProjectName = (initialName: string, projectId?: number) => {
   );
 
   const handleNameClick = useCallback(() => {
-    if (!isEditing && !isLoading) {
+    if (!isEditing) {
       setIsEditing(true);
-      setTempName(projectName);
+      setTempName(name);
     }
-  }, [isEditing, projectName, isLoading]);
+  }, [isEditing, name]);
 
   const handleNameBlur = useCallback(async () => {
     const validation = handleNameValidation(tempName);
 
     if (!validation.isValid) {
       toastError(validation.error!);
-      setTempName(projectName);
+      setTempName(name);
     } else if (tempName.trim() === '') {
       toastError('Project name cannot be empty');
-      setTempName(projectName);
-    } else if (tempName.trim() !== projectName && projectId) {
+      setTempName(name);
+    } else if (tempName.trim() !== name && id) {
       try {
-        await $api.put(`/projects/${projectId}`, {
+        await apiClient.put(`/projects/${id}`, {
           name: tempName.trim()
         });
         setProjectName(tempName.trim());
       } catch (error) {
         toastError('Failed to update project name');
-        setTempName(projectName);
+        setTempName(name);
       }
     }
 
     setIsEditing(false);
-  }, [tempName, projectName, projectId, handleNameValidation, toastError]);
+  }, [tempName, name, id, handleNameValidation, toastError]);
 
   const handleNameKeyDown = useCallback(
     async (e: React.KeyboardEvent<HTMLInputElement>) => {
@@ -98,9 +100,9 @@ export const useProjectName = (initialName: string, projectId?: number) => {
           return;
         }
 
-        if (tempName.trim() !== projectName && projectId) {
+        if (tempName.trim() !== name && id) {
           try {
-            await $api.put(`/projects/${projectId}`, {
+            await apiClient.put(`/projects/${id}`, {
               name: tempName.trim()
             });
             setProjectName(tempName.trim());
@@ -113,18 +115,17 @@ export const useProjectName = (initialName: string, projectId?: number) => {
         setIsEditing(false);
       } else if (e.key === 'Escape') {
         e.preventDefault();
-        setTempName(projectName);
+        setTempName(name);
         setIsEditing(false);
       }
     },
-    [tempName, projectName, projectId, handleNameValidation, toastError]
+    [tempName, name, id, handleNameValidation, toastError]
   );
 
   return {
-    projectName,
+    name,
     isEditing,
     tempName,
-    isLoading,
     setIsEditing,
     setTempName,
     handleNameClick,

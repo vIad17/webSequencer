@@ -43,7 +43,6 @@ const Header = ({ className = '' }: HeaderProps) => {
   const [fileOpen, setFileOpen] = useState(false);
   const [inputModalOpen, setInputModalOpen] = useState(false);
   const [profileDropdown, setProfileDropdown] = useState(false);
-  const [username, setUsername] = useState<string | null>(null);
 
   const nameInputRef = useRef<HTMLInputElement>(null);
 
@@ -65,21 +64,17 @@ const Header = ({ className = '' }: HeaderProps) => {
     error: isGetUserInfoError
   } = useSelector((state: RootState) => state.user);
 
-  const currentProject = useSelector(
-    (state: RootState) => state.currentProject || {}
-  );
-  const projectId = currentProject.id || 1;
+  const { isLoading } = useSelector((state: RootState) => state.project_name);
 
   const {
-    projectName,
+    name,
     isEditing,
     tempName,
-    isLoading,
     setTempName,
     handleNameClick,
     handleNameBlur,
     handleNameKeyDown
-  } = useProjectName('Untitled Project', projectId);
+  } = useProjectName('Untitled Project');
 
   const handleButtonClick = () => {
     document.getElementById('import-midi-file-input')?.click();
@@ -117,6 +112,12 @@ const Header = ({ className = '' }: HeaderProps) => {
     const midiInput = localStorage.getItem('midi-input');
     midiInput && selectInput(midiInput);
   }, [selectInput]);
+
+  useEffect(() => {
+    if (isEditing && nameInputRef.current) {
+      nameInputRef.current.focus();
+    }
+  }, [isEditing]);
 
   const midiDeviceModalData: ModalItem[] = inputs.map((el) => ({
     text: el.name,
@@ -193,12 +194,6 @@ const Header = ({ className = '' }: HeaderProps) => {
   if (isGetUserInfoLoading) return <div>Loading...</div>;
   if (isGetUserInfoError) return <div>Error: {isGetUserInfoError}</div>;
 
-  useEffect(() => {
-    if (isEditing && nameInputRef.current) {
-      nameInputRef.current.focus();
-    }
-  }, [isEditing]);
-
   return (
     <>
       <ProgressModal />
@@ -249,7 +244,7 @@ const Header = ({ className = '' }: HeaderProps) => {
                     disabled={isLoading}
                   />
                 ) : (
-                  <h2 className="header__project-name">{projectName}</h2>
+                  <h2 className="header__project-name">{name || tempName}</h2>
                 )}
               </div>
             </div>
