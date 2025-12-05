@@ -11,6 +11,7 @@ export default defineConfig(({ mode }) => {
   console.log(`API MODE: ${env.VITE_API_MODE}`);
 
   return {
+    base: '/webSequencer',
     plugins: [react(), tsconfigPaths(), svgr()],
     define: {
       'process.env': env
