@@ -11,6 +11,10 @@ async function getProjectById(id: string) {
 }
 
 export const fetchProjectData = (project_id: string) => async (dispatch) => {
+  if (!localStorage.getItem('accessToken')) {
+    dispatch(setLoading(false));
+    return;
+  }
   try {
     dispatch(setLoading(true));
     dispatch(setError(null));
@@ -23,7 +27,8 @@ export const fetchProjectData = (project_id: string) => async (dispatch) => {
 
     dispatch(setProjectData(userData));
   } catch (error) {
-    dispatch(setError(error.message));
+    console.warn('Failed to fetch user data:', error.message);
+    dispatch(setError(null));
   } finally {
     dispatch(setLoading(false));
   }

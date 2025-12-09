@@ -11,6 +11,11 @@ async function getUserInfo() {
 }
 
 export const fetchUserData = () => async (dispatch) => {
+  if (!localStorage.getItem('accessToken')) {
+    dispatch(setLoading(false));
+    return;
+  }
+
   try {
     dispatch(setLoading(true));
     dispatch(setError(null));
@@ -23,7 +28,8 @@ export const fetchUserData = () => async (dispatch) => {
 
     dispatch(setUserData(userData));
   } catch (error) {
-    dispatch(setError(error.message));
+    console.warn('Failed to fetch user data:', error.message);
+    dispatch(setError(null));
   } finally {
     dispatch(setLoading(false));
   }
