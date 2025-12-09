@@ -41,8 +41,7 @@ const PreviewPage = ({ className = '' }: InstrumentPageProps) => {
       0
     );
 
-    const deltaNote =
-      notesArray[maxNoteIndex]?.note - notesArray[minNoteIndex]?.note;
+    const deltaNote = Math.max(notesArray[maxNoteIndex]?.note - notesArray[minNoteIndex]?.note, 12);
 
     const windowHeight = window.innerHeight;
 
