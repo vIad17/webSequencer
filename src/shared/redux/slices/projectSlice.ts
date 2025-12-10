@@ -7,8 +7,7 @@ const initialState = {
   link: null,
   userId: null,
   autosave: false,
-  isLoading: false,
-  error: null
+  isLoading: false
 };
 
 export const projectSlice = createSlice({
@@ -35,12 +34,9 @@ export const projectSlice = createSlice({
     },
     setLoading: (state, action) => {
       state.isLoading = action.payload;
-    },
-    setError: (state, action) => {
-      state.error = action.payload;
     }
   }
 });
 
-export const { setProjectData, clearProjectData, setLoading, setError } =
+export const { setProjectData, clearProjectData, setLoading } =
   projectSlice.actions;
