@@ -1,9 +1,5 @@
 import { apiClient } from 'src/shared/api/apiClient';
-import {
-  setError,
-  setLoading,
-  setUserData
-} from 'src/shared/redux/slices/userSlice';
+import { setLoading, setUserData } from 'src/shared/redux/slices/userSlice';
 
 async function getUserInfo() {
   const { data } = await apiClient.get('/users/0');
@@ -18,7 +14,6 @@ export const fetchUserData = () => async (dispatch) => {
 
   try {
     dispatch(setLoading(true));
-    dispatch(setError(null));
 
     const userData = await getUserInfo();
 
@@ -29,7 +24,6 @@ export const fetchUserData = () => async (dispatch) => {
     dispatch(setUserData(userData));
   } catch (error) {
     console.warn('Failed to fetch user data:', error.message);
-    dispatch(setError(null));
   } finally {
     dispatch(setLoading(false));
   }

@@ -1,6 +1,5 @@
 import { apiClient } from 'src/shared/api/apiClient';
 import {
-  setError,
   setLoading,
   setProjectData
 } from 'src/shared/redux/slices/projectSlice';
@@ -17,18 +16,16 @@ export const fetchProjectData = (project_id: string) => async (dispatch) => {
   }
   try {
     dispatch(setLoading(true));
-    dispatch(setError(null));
 
-    const userData = await getProjectById(project_id);
+    const projectData = await getProjectById(project_id);
 
-    if (!userData) {
+    if (!projectData) {
       throw new Error("Error receiving project's data");
     }
 
-    dispatch(setProjectData(userData));
+    dispatch(setProjectData(projectData));
   } catch (error) {
-    console.warn('Failed to fetch user data:', error.message);
-    dispatch(setError(null));
+    console.warn('Failed to fetch project data:', error.message);
   } finally {
     dispatch(setLoading(false));
   }
