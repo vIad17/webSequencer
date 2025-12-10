@@ -8,7 +8,7 @@ export const startMockServiceWorker = async () => {
   await worker.start({
     onUnhandledRequest: 'warn',
     serviceWorker: {
-      url: '/mockServiceWorker.js'
+      url: '/webSequencer/mockServiceWorker.js'
     }
   });
 

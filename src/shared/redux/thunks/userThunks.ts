@@ -1,5 +1,4 @@
-import $api from 'src/shared/api/axiosConfig';
-import $mockApi from 'src/shared/api/axiosMockConfig';
+import { apiClient } from 'src/shared/api/apiClient';
 import {
   setError,
   setLoading,
@@ -7,13 +6,8 @@ import {
 } from 'src/shared/redux/slices/userSlice';
 
 async function getUserInfo() {
-  if (import.meta.env.VITE_USE_MOCKS === 'true') {
-    const { data } = await $mockApi.get('/users/0');
-    return data;
-  } else {
-    const { data } = await $api.get('/users/0');
-    return data;
-  }
+  const { data } = await apiClient.get('/users/0');
+  return data;
 }
 
 export const fetchUserData = () => async (dispatch) => {

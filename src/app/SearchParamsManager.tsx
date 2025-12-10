@@ -2,8 +2,7 @@ import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useParams, useSearchParams } from 'react-router-dom';
 
-import $api from 'src/shared/api/axiosConfig';
-import $mockApi from 'src/shared/api/axiosMockConfig';
+import { apiClient } from 'src/shared/api/apiClient';
 import { compress, decompress } from 'src/shared/functions/compress';
 import {
   NotesArrayState,
@@ -64,15 +63,9 @@ const SearchParamsManager = () => {
   );
 
   async function updateLink(link: string) {
-    if (import.meta.env.VITE_USE_MOCKS === 'true') {
-      await $mockApi.put(`/projects/${id}`, {
-        link
-      });
-    } else {
-      await $api.put(`/projects/${id}`, {
-        link
-      });
-    }
+    await apiClient.put(`/projects/${id}`, {
+      link
+    });
   }
 
   useEffect(() => {
