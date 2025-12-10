@@ -30,28 +30,72 @@ import Button from 'src/shared/ui/Button/Button';
 
 import './Header.scss';
 
-const mockGetAutosaveStatus = async (projectId: string): Promise<boolean> => {
-  console.log(`Mock: Getting autosave status for project ${projectId}`);
-  return Math.random() > 0.5;
+const mockGetAutosaveStatus = async (projectId: number): Promise<boolean> => {
+  const response = await fetch(`/projects/${projectId}`);
+  if (!response.ok) {
+    throw new Error(`Failed to fetch project ${projectId}`);
+  }
+  const project = await response.json();
+  return project.autosave;
 };
 
 const mockUpdateAutosaveStatus = async (
-  projectId: string,
+  projectId: number,
   isAutosave: boolean
 ): Promise<void> => {
-  console.log(
-    `Mock: Updating autosave status for project ${projectId} to ${isAutosave}`
-  );
-  return;
+  await fetch(`/projects/${projectId}`, {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ 
+      name: '', 
+      link: '', 
+      autosave: isAutosave 
+    }),
+  });
 };
 
-const getCurrentProjectId = (): string => {
-  return 'current-project-id';
+const getCurrentProjectId = async (): Promise<number> => {
+  try {
+    const storedProjectId = localStorage.getItem('currentProjectId');
+    
+    if (storedProjectId) {
+      return parseInt(storedProjectId, 10);
+    }
+    
+    const response = await fetch('/projects/1');
+    if (response.ok) {
+      const project = await response.json();
+      return project.id || 1;
+    }
+    
+
+    console.warn('Не удалось получить ID проекта из мокового API, используем значение по умолчанию: 1');
+    return 1;
+  } catch (error) {
+    console.error('Ошибка при получении ID проекта:', error);
+    return 1;
+  }
 };
 
 interface HeaderProps {
   className?: string;
 }
+
+const loadAutosaveStatus = async (
+  setAutosaveEnabled: (value: boolean) => void
+): Promise<void> => {
+  if (localStorage.getItem('accessToken')) {
+    try {
+      const projectId = await getCurrentProjectId();
+      const autosaveStatus = await mockGetAutosaveStatus(projectId);
+      setAutosaveEnabled(autosaveStatus);
+    } catch (error) {
+      console.error('Failed to load autosave status:', error);
+    }
+  }
+};
 
 const Header = ({ className = '' }: HeaderProps) => {
   const [myBpm, setMyBpm] = useState(120);
@@ -61,6 +105,7 @@ const Header = ({ className = '' }: HeaderProps) => {
   const [inputModalOpen, setInputModalOpen] = useState(false);
   const [profileDropdown, setProfileDropdown] = useState(false);
   const [isAutosaveEnabled, setIsAutosaveEnabled] = useState(false);
+  const [currentProjectId, setCurrentProjectId] = useState<number | null>(null);
 
   const { modalRef: fileModalRef } = useHandleClickOutside(() => {
     setFileOpen(false);
@@ -84,16 +129,24 @@ const Header = ({ className = '' }: HeaderProps) => {
   } = useSelector((state: RootState) => state.user);
 
   useEffect(() => {
-    const loadAutosaveStatus = async () => {
-      if (localStorage.getItem('accessToken')) {
-        const projectId = getCurrentProjectId();
-        const autosaveStatus = await mockGetAutosaveStatus(projectId);
-        setIsAutosaveEnabled(autosaveStatus);
+    const initializeProjectId = async () => {
+      try {
+        const projectId = await getCurrentProjectId();
+        setCurrentProjectId(projectId);
+        console.log('Текущий ID проекта:', projectId);
+      } catch (error) {
+        console.error('Ошибка инициализации ID проекта:', error);
       }
     };
-
-    loadAutosaveStatus();
+    
+    initializeProjectId();
   }, []);
+
+  useEffect(() => {
+    if (currentProjectId !== null) {
+      loadAutosaveStatus(setIsAutosaveEnabled);
+    }
+  }, [currentProjectId]);
 
   const handleButtonClick = () => {
     document.getElementById('import-midi-file-input')?.click();
@@ -186,11 +239,15 @@ const Header = ({ className = '' }: HeaderProps) => {
     {
       text: 'Autosave',
       callback: async () => {
-        const projectId = getCurrentProjectId();
+        if (currentProjectId === null) {
+          console.error('ID проекта не инициализирован');
+          return;
+        }
+        
         const newAutosaveStatus = !isAutosaveEnabled;
 
         try {
-          await mockUpdateAutosaveStatus(projectId, newAutosaveStatus);
+          await mockUpdateAutosaveStatus(currentProjectId, newAutosaveStatus);
           setIsAutosaveEnabled(newAutosaveStatus);
           console.log(`Autosave ${newAutosaveStatus ? 'enabled' : 'disabled'}`);
         } catch (error) {

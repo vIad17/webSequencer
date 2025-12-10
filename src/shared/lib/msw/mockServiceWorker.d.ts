@@ -27,15 +27,9 @@ declare function getResponse(
 
 declare function sendToClient(
   client: Client,
-<<<<<<< HEAD
-<<<<<<< HEAD
+
   message: string,
-=======
-  message: any,
->>>>>>> 4d48279 (fix: add PO's wishes 🔧)
-=======
-  message: string,
->>>>>>> dc8cd8e (fix: add .env with dev settings and remove comments in TS MSW config)
+
   transferrables?: Transferable[]
 ): Promise<any>;
 
