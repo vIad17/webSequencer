@@ -8,7 +8,7 @@ import Main from 'src/pages/Main/OldMain';
 import PreviewPage from 'src/pages/PreviewPage/PreviewPage';
 
 const Router = () => (
-  <BrowserRouter basename="/webSequencer/">
+  <BrowserRouter basename="/webSequencer">
     <Routes>
       <Route path="" element={<Layout />}>
         <Route path=":id/preview" element={<PreviewPage />} />
