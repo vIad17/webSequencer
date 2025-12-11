@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import { useParams } from 'react-router-dom';
 
 import { useMIDIInputs } from '@react-midi/hooks';
 import clsx from 'clsx';
@@ -16,6 +17,7 @@ import {
   pauseMusic,
   stopMusic
 } from 'src/app/SoundManager';
+import { apiClient } from 'src/shared/api/apiClient';
 import $api from 'src/shared/api/axiosConfig';
 import { useHandleClickOutside } from 'src/shared/hooks/useHandleClickOutside';
 import { Icon } from 'src/shared/icons/Icon';
@@ -35,15 +37,22 @@ interface HeaderProps {
 }
 
 const Header = ({ className = '' }: HeaderProps) => {
+  const { id } = useParams();
   const [myBpm, setMyBpm] = useState(120);
   const [myTacts, setMyTacts] = useState(8);
   const [fileOpen, setFileOpen] = useState(false);
+  const [editOpen, setEditOpen] = useState(false);
   const [inputModalOpen, setInputModalOpen] = useState(false);
   const [profileDropdown, setProfileDropdown] = useState(false);
+  const [isAutosaveEnabled, setIsAutosaveEnabled] = useState(false);
 
   const { modalRef: fileModalRef } = useHandleClickOutside(() => {
     setFileOpen(false);
     setInputModalOpen(false);
+  });
+
+  const { modalRef: editModalRef } = useHandleClickOutside(() => {
+    setEditOpen(false);
   });
 
   const { modalRef: profileModalRef } = useHandleClickOutside(() => {
@@ -53,6 +62,32 @@ const Header = ({ className = '' }: HeaderProps) => {
   const dispatch = useDispatch<SequencerDispatch>();
   const settings = useSelector((state: RootState) => state.settings);
   const { username } = useSelector((state: RootState) => state.user);
+
+  const getAutosaveStatus = async () => {
+    const { autosave } = await apiClient.get(`/projects/${id}`);
+    return autosave;
+  };
+
+  const updateAutosaveStatus = async (isAutosave: boolean) => {
+    await apiClient.put(`/projects/${id}`, {
+      isAutosave
+    });
+  };
+
+  const loadAutosaveStatus = async () => {
+    try {
+      const autosaveStatus = await getAutosaveStatus();
+      setIsAutosaveEnabled(autosaveStatus);
+    } catch (error) {
+      console.error('Failed to load autosave status:', error);
+    }
+  };
+
+  useEffect(() => {
+    if (id) {
+      loadAutosaveStatus();
+    }
+  }, []);
 
   const handleButtonClick = () => {
     document.getElementById('import-midi-file-input')?.click();
@@ -122,10 +157,6 @@ const Header = ({ className = '' }: HeaderProps) => {
         />
       )
     },
-    // {
-    //   text: 'Autosave',
-    //   callback: () => { }
-    // },
     {
       text: 'MIDI input',
       callback: () => {
@@ -144,6 +175,41 @@ const Header = ({ className = '' }: HeaderProps) => {
           />
         </>
       )
+    },
+
+    {
+      text: 'Autosave',
+      callback: async () => {
+        const newAutosaveStatus = !isAutosaveEnabled;
+
+        try {
+          await updateAutosaveStatus(newAutosaveStatus);
+          setIsAutosaveEnabled(newAutosaveStatus);
+        } catch (error) {
+          console.error('Failed to update autosave status:', error);
+        }
+
+        setFileOpen(false);
+      },
+      sideContent: (
+        <Icon
+          icon={isAutosaveEnabled == true ? IconType.Check : IconType.X}
+          className={clsx('modal__side-icon', 'modal__check-icon', {
+            'modal__side-icon_hidden': !isAutosaveEnabled
+          })}
+        />
+      )
+    }
+  ];
+
+  const EditData: ModalItem[] = [
+    {
+      text: 'Save',
+      callback: () => {
+        console.log('Save clicked');
+        setEditOpen(false);
+      },
+      sideContent: <span className="modal__hotkey">Ctrl+S</span>
     }
   ];
 
@@ -176,6 +242,7 @@ const Header = ({ className = '' }: HeaderProps) => {
               onClick={() => {
                 setFileOpen((prev) => !prev);
                 setInputModalOpen(false);
+                setEditOpen(false);
               }}
             >
               File
@@ -184,6 +251,26 @@ const Header = ({ className = '' }: HeaderProps) => {
               className={clsx('header__left-button-modal')}
               modalActions={FileData}
               isOpen={fileOpen}
+            />
+          </div>
+
+          <div ref={editModalRef} className="header__second_left-item">
+            <button
+              className={clsx('header__second_left-button', {
+                'header__second_left-button_active': editOpen
+              })}
+              onClick={() => {
+                setEditOpen((prev) => !prev);
+                setFileOpen(false);
+                setInputModalOpen(false);
+              }}
+            >
+              Edit
+            </button>
+            <FileModal
+              className={clsx('header__second_left-button-modal')}
+              modalActions={EditData}
+              isOpen={editOpen}
             />
           </div>
         </div>

@@ -44,7 +44,7 @@ export const projectHandler = [
 
   http.put('/projects/:id', async ({ request, params }) => {
     const { id } = params;
-    const { name = '', link = '' } = await request.json();
+    const { name = '', link = '', autosave = false } = await request.json();
     return HttpResponse.json({
       status: 200
     });
