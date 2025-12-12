@@ -1,19 +1,8 @@
 import { apiClient } from 'src/shared/api/apiClient';
 import {
-  setProjectLink,
-  setProjectLinkError,
-  setProjectLinkLoading
-} from 'src/shared/redux/slices/projectLinkSlice';
-import {
-  setProjectName,
-  setProjectNameError,
-  setProjectNameLoading
-} from 'src/shared/redux/slices/projectNameSlice';
-import {
-  setProjectUserId,
-  setProjectUserIdError,
-  setProjectUserIdLoading
-} from 'src/shared/redux/slices/projectUserIdSlice';
+  setLoading,
+  setProjectData
+} from 'src/shared/redux/slices/projectSlice';
 
 async function getProjectName(id: string) {
   const { data } = await apiClient.get(`/projects/${id}/name`);
@@ -44,6 +33,28 @@ export const fetchProjectName = (project_id: string) => async (dispatch) => {
     dispatch(setProjectName(projectName));
   } catch (error) {
     dispatch(setProjectNameError(error.message));
+  } finally {
+    dispatch(setProjectNameLoading(false));
+  }
+};
+
+export const fetchProjectData = (project_id: string) => async (dispatch) => {
+  if (!localStorage.getItem('accessToken')) {
+    dispatch(setLoading(false));
+    return;
+  }
+  try {
+    dispatch(setLoading(true));
+
+    const projectData = await getProjectById(project_id);
+
+    if (!projectData) {
+      throw new Error("Error receiving project's data");
+    }
+
+    dispatch(setProjectData(projectData));
+  } catch (error) {
+    console.warn('Failed to fetch project data:', error.message);
   } finally {
     dispatch(setProjectNameLoading(false));
   }

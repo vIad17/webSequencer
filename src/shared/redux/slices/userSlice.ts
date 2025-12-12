@@ -5,8 +5,7 @@ const initialState = {
   username: '',
   avatar_id: null,
   bio: '',
-  isLoading: false,
-  error: null
+  isLoading: false
 };
 
 export const userSlice = createSlice({
@@ -28,12 +27,8 @@ export const userSlice = createSlice({
     },
     setLoading: (state, action) => {
       state.isLoading = action.payload;
-    },
-    setError: (state, action) => {
-      state.error = action.payload;
     }
   }
 });
 
-export const { setUserData, clearUserData, setLoading, setError } =
-  userSlice.actions;
+export const { setUserData, clearUserData, setLoading } = userSlice.actions;

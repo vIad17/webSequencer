@@ -191,9 +191,6 @@ const Header = ({ className = '' }: HeaderProps) => {
     }
   ];
 
-  if (isGetUserInfoLoading) return <div>Loading...</div>;
-  if (isGetUserInfoError) return <div>Error: {isGetUserInfoError}</div>;
-
   return (
     <>
       <ProgressModal />
