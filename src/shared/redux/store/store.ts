@@ -6,10 +6,13 @@ import { drawableFieldSlice } from 'src/shared/redux/slices/drawableFieldSlice';
 import { melodyArraySlice } from 'src/shared/redux/slices/melodyArraySlice';
 import { notesArraySlice } from 'src/shared/redux/slices/notesArraySlice';
 import { progressSlice } from 'src/shared/redux/slices/progressSlice';
-import { projectSlice } from 'src/shared/redux/slices/projectSlice';
 import { settingsSlice } from 'src/shared/redux/slices/settingsSlice';
 import { soundSettingsSlice } from 'src/shared/redux/slices/soundSettingsSlice';
 import { userSlice } from 'src/shared/redux/slices/userSlice';
+
+import { projectLinkSlice } from '../slices/projectLinkSlice';
+import { projectNameSlice } from '../slices/projectNameSlice';
+import { projectUserIdSlice } from '../slices/projectUserIdSlice';
 
 const store = configureStore({
   reducer: {
@@ -22,7 +25,9 @@ const store = configureStore({
     [copiedObjectsSlise.name]: copiedObjectsSlise.reducer,
     [progressSlice.name]: progressSlice.reducer,
     [userSlice.name]: userSlice.reducer,
-    [projectSlice.name]: projectSlice.reducer
+    [projectNameSlice.name]: projectNameSlice.reducer,
+    [projectLinkSlice.name]: projectLinkSlice.reducer,
+    [projectUserIdSlice.name]: projectUserIdSlice.reducer
   }
 });
 
