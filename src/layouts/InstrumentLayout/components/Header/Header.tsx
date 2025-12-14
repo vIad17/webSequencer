@@ -182,39 +182,26 @@ const Header = ({ className = '' }: HeaderProps) => {
     },
 
     {
-      text: 'Autosave',
-      callback: async () => {
-        const newAutosaveStatus = !isAutosaveEnabled;
+  text: 'Autosave',
+  callback: async () => {
+    const newAutosaveStatus = !isAutosaveEnabled;
 
-        try {
-          await updateAutosaveStatus(newAutosaveStatus);
-          setIsAutosaveEnabled(newAutosaveStatus);
-        } catch (error) {
-          console.error('Failed to update autosave status:', error);
-        }
-
-        setFileOpen(false);
-      },
-      sideContent: (
-        <Icon
-          icon={isAutosaveEnabled == true ? IconType.Check : IconType.X}
-          className={clsx('modal__side-icon', 'modal__check-icon', {
-            'modal__side-icon_hidden': !isAutosaveEnabled
-          })}
-        />
-      )
+    try {
+      await updateAutosaveStatus(newAutosaveStatus);
+      setIsAutosaveEnabled(newAutosaveStatus);
+    } catch (error) {
+      console.error('Failed to update autosave status:', error);
     }
-  ];
 
-  const EditData: ModalItem[] = [
-    {
-      text: 'Save',
-      callback: () => {
-        console.log('Save clicked');
-        setEditOpen(false);
-      },
-      sideContent: <span className="modal__hotkey">Ctrl+S</span>
-    }
+    setFileOpen(false);
+  },
+  sideContent: isAutosaveEnabled ? (
+    <Icon
+      icon={IconType.Check}
+      className={clsx('modal__side-icon', 'modal__check-icon')}
+    />
+  ) : null
+}
   ];
 
   const ProfileData: ModalItem[] = [
