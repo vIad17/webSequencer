@@ -1,13 +1,8 @@
 import { http, HttpResponse } from 'msw';
 
-type LoginRequestBody = {
-  username: string;
-  password: string;
-};
-
 export const authHandler = [
   http.post('/login', async ({ request }) => {
-    const { username, password } = (await request.json()) as LoginRequestBody;
+    const { username, password } = await request.json();
 
     if (username === 'Artem' && password === '1234') {
       return HttpResponse.json(
