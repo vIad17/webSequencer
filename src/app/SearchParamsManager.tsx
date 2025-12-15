@@ -17,7 +17,7 @@ import {
   SoundSettingsState
 } from 'src/shared/redux/slices/soundSettingsSlice';
 import { RootState, SequencerDispatch } from 'src/shared/redux/store/store';
-import { fetchProjectData } from 'src/shared/redux/thunks/projectThunks';
+import { fetchProjectLink } from 'src/shared/redux/thunks/projectThunks';
 
 const INITIAL_SETTINGS: SoundSettingsState = {
   volume: 0,
@@ -58,9 +58,13 @@ const SearchParamsManager = () => {
     (state: RootState) => state.notesArray.notesArray
   );
   const { id: user_id } = useSelector((state: RootState) => state.user);
-  const { link: projectLink, userId } = useSelector(
-    (state: RootState) => state.project
-  );
+  const {
+    link: projectLink,
+    isLoading: isGetProjectLinkLoading,
+    error: isGetProjectLinkError
+  } = useSelector((state: RootState) => state.project_link);
+
+  const { userId } = useSelector((state: RootState) => state.project_user_id);
 
   async function updateLink(link: string) {
     await apiClient.put(`/projects/${id}`, {
@@ -70,7 +74,7 @@ const SearchParamsManager = () => {
 
   useEffect(() => {
     if (id) {
-      dispatch(fetchProjectData(id));
+      dispatch(fetchProjectLink(id));
     }
   }, [dispatch, id]);
 
