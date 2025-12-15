@@ -204,6 +204,17 @@ const Header = ({ className = '' }: HeaderProps) => {
 }
   ];
 
+  const EditData: ModalItem[] = [
+    {
+      text: 'Save',
+      callback: () => {
+        console.log('Save clicked');
+        setEditOpen(false);
+      },
+      sideContent: <span className="modal__hotkey">Ctrl+S</span>
+    }
+  ]
+
   const ProfileData: ModalItem[] = [
     {
       text: 'Profile',
