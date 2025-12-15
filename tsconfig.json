@@ -23,7 +23,8 @@
     "dist",
     "build",
     "vite.config.ts",
-    "**/*.config.ts"
+    "**/*.config.ts",
+    "**/mockServiceWorker.ts"
   ],
   "references": [{ "path": "./tsconfig.node.json" }]
 }

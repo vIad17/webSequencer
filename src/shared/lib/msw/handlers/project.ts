@@ -1,9 +1,10 @@
 import { http, HttpResponse } from 'msw';
+import { Project, UpdateProjectBody } from 'src/types/project';
 
 export const projectHandler = [
   http.get('/projects/:id', ({ params }) => {
-    const { id } = params;
-    const projects = {
+    const id = Array.isArray(params.id) ? params.id[0] : params.id;
+    const projects: Record<string, Omit<Project, 'isLoading'>> = {
       1: {
         name: 'Atomic Pulse',
         tagNames: ['space', 'experimental', 'vaporwave'],
@@ -30,7 +31,7 @@ export const projectHandler = [
       }
     };
 
-    const project = projects[id] || {
+    const project = projects[id] ?? {
       name: 'Unknown Project',
       tagNames: [],
       isVisible: false,
@@ -43,8 +44,9 @@ export const projectHandler = [
   }),
 
   http.put('/projects/:id', async ({ request, params }) => {
-    const { id } = params;
-    const { name = '', link = '' } = await request.json();
+    const id = Array.isArray(params.id) ? params.id[0] : params.id;
+    const { name = '', link = '' } =
+      (await request.json()) as UpdateProjectBody;
     return HttpResponse.json({
       status: 200
     });

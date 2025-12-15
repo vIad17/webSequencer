@@ -15,7 +15,7 @@ interface RetryConfig extends AxiosRequestConfig {
 }
 
 $api.interceptors.request.use(
-  (config: AxiosRequestConfig) => {
+  (config) => {
     const accessToken = localStorage.getItem('accessToken');
 
     if (accessToken && config.headers) {
