@@ -2,8 +2,7 @@ import { createSlice } from '@reduxjs/toolkit';
 
 const initialState = {
   link: null,
-  isLoading: false,
-  error: null
+  isLoading: false
 };
 
 export const projectLinkSlice = createSlice({
@@ -19,16 +18,9 @@ export const projectLinkSlice = createSlice({
     },
     setProjectLinkLoading: (state, action) => {
       state.isLoading = action.payload;
-    },
-    setProjectLinkError: (state, action) => {
-      state.error = action.payload;
     }
   }
 });
 
-export const {
-  setProjectLink,
-  clearProjectLink,
-  setProjectLinkLoading,
-  setProjectLinkError
-} = projectLinkSlice.actions;
+export const { setProjectLink, setProjectLinkLoading } =
+  projectLinkSlice.actions;

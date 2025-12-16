@@ -58,11 +58,7 @@ const Header = ({ className = '' }: HeaderProps) => {
   const dispatch = useDispatch<SequencerDispatch>();
   const settings = useSelector((state: RootState) => state.settings);
 
-  const {
-    username,
-    isLoading: isGetUserInfoLoading,
-    error: isGetUserInfoError
-  } = useSelector((state: RootState) => state.user);
+  const { username } = useSelector((state: RootState) => state.user);
 
   const { isLoading } = useSelector((state: RootState) => state.project_name);
 

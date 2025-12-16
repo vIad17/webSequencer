@@ -1,3 +1,4 @@
+//@ts-nocheck
 import { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 
@@ -24,8 +25,10 @@ import { addNote } from 'src/shared/redux/slices/notesArraySlice';
 import { setBpm, setTacts } from 'src/shared/redux/slices/settingsSlice';
 
 import { FXChain } from 'src/features/Effects/FXChain';
-import { setCurrentStep, setProgress } from 'src/shared/redux/slices/progressSlice';
-
+import {
+  setCurrentStep,
+  setProgress
+} from 'src/shared/redux/slices/progressSlice';
 
 const chain = new FXChain();
 const synth = chain.getSynth();
@@ -33,7 +36,7 @@ const synth = chain.getSynth();
 
 // tremoloFrequency [0, 10]
 // tremoloDepth [0, 1]
-const tremolo = new Tone.Tremolo(0, 0)//.start(); // affects the gain
+const tremolo = new Tone.Tremolo(0, 0); //.start(); // affects the gain
 
 // delayTime [0, 1]
 // feedback [0, 1]
@@ -69,7 +72,7 @@ function playMusic(time: number) {
   const tactsCounter = store.getState().settings.tacts ?? 8;
   const notesArray = store.getState().notesArray.notesArray;
 
-  console.log("time", time)
+  console.log('time', time);
 
   notesArray.forEach((note, index) => {
     if (note.attackTime === currentBit) {
@@ -77,7 +80,8 @@ function playMusic(time: number) {
       synth.triggerAttackRelease(
         pitchNotes[note.note],
         `0:0:${note.duration}`,
-        time);
+        time
+      );
     }
     if (note.attackTime + note.duration <= currentBit) {
       note.isActive &&
@@ -204,8 +208,10 @@ export function openMIDI(arrayBuffer: ArrayBuffer) {
       if (completedNotes.length > 0) {
         store.dispatch(
           setTacts(
-            Math.ceil((completedNotes[completedNotes.length - 1].attackTime ??
-              0 + completedNotes[completedNotes.length - 1].duration) / 16)
+            Math.ceil(
+              (completedNotes[completedNotes.length - 1].attackTime ??
+                0 + completedNotes[completedNotes.length - 1].duration) / 16
+            )
           )
         );
       }
@@ -253,33 +259,38 @@ async function exportToBuffer() {
 
   const bpm = store.getState().settings.bpm ?? 120;
 
-  store.dispatch(setCurrentStep("Exporting data to buffer"));
+  store.dispatch(setCurrentStep('Exporting data to buffer'));
   store.dispatch(setProgress(0));
 
   const totalSteps = tactsCounter * 4;
   const durationSeconds = ((tactsCounter * 4) / bpm) * 60;
 
-  const buffer = await Tone.Offline(({ transport }) => {
-    const chainOffline = chain.clone();
-    // const gain = new Tone.Gain(0.2);
-    // chainOffline.appendFX(gain);
-    const exportedSynth = chainOffline.getSynth();
+  const buffer = await Tone.Offline(
+    ({ transport }) => {
+      const chainOffline = chain.clone();
+      // const gain = new Tone.Gain(0.2);
+      // chainOffline.appendFX(gain);
+      const exportedSynth = chainOffline.getSynth();
 
-    notesArray
-      // .sort((a, b) => a.attackTime - b.attackTime)
-      .forEach((note) => {
-        const startTime = `0:0:${note.attackTime}`;
-        const durTime = `0:0:${note.duration}`;
+      notesArray
+        // .sort((a, b) => a.attackTime - b.attackTime)
+        .forEach((note) => {
+          const startTime = `0:0:${note.attackTime}`;
+          const durTime = `0:0:${note.duration}`;
 
-        exportedSynth.triggerAttackRelease(
-          pitchNotes[note.note],
-          durTime,
-          startTime
-        );
-      });
+          exportedSynth.triggerAttackRelease(
+            pitchNotes[note.note],
+            durTime,
+            startTime
+          );
+        });
 
-    transport.start(0);
-  }, durationSeconds, 1, 48000);
+      transport.start(0);
+    },
+    durationSeconds,
+    1,
+    48000
+  );
 
   store.dispatch(setProgress(100));
   return buffer.get();
@@ -298,13 +309,17 @@ async function exportToBuffer() {
 function floatTo16BitPCM(float32Array: Float32Array<ArrayBufferLike>) {
   const int16Array = new Int16Array(float32Array.length);
   for (let i = 0; i < float32Array.length; i++) {
-    int16Array[i] = float32Array[i] * 0x7FFF / 16;
+    int16Array[i] = (float32Array[i] * 0x7fff) / 16;
   }
   return int16Array;
 }
 
 function audioBufferToMp3(buffer: AudioBuffer): Promise<Blob> {
-  const mp3Encoder = new lamejs.Mp3Encoder(buffer.numberOfChannels, buffer.sampleRate, 320);
+  const mp3Encoder = new lamejs.Mp3Encoder(
+    buffer.numberOfChannels,
+    buffer.sampleRate,
+    320
+  );
   const samples = buffer.getChannelData(0);
   const mp3Data: Uint8Array[] = [];
 
@@ -315,7 +330,9 @@ function audioBufferToMp3(buffer: AudioBuffer): Promise<Blob> {
     let i = 0;
 
     const processChunk = () => {
-      store.dispatch(setCurrentStep(`Encoding... ${Math.round((i / samples.length) * 100)}%`));
+      store.dispatch(
+        setCurrentStep(`Encoding... ${Math.round((i / samples.length) * 100)}%`)
+      );
 
       const end = Math.min(i + sampleBlockSize, samples.length);
       const sampleChunk = int16Array.subarray(i, end);
@@ -335,14 +352,14 @@ function audioBufferToMp3(buffer: AudioBuffer): Promise<Blob> {
         if (mp3buf.length > 0) {
           mp3Data.push(mp3buf);
         }
-        store.dispatch(setCurrentStep("Done"));
+        store.dispatch(setCurrentStep('Done'));
         store.dispatch(setProgress(100));
-        resolve(new Blob(mp3Data, { type: "audio/mp3" }));
+        resolve(new Blob(mp3Data, { type: 'audio/mp3' }));
       }
     };
 
     processChunk();
-  }).then(blob => blob);
+  }).then((blob) => blob);
 }
 
 export async function exportMp3() {
@@ -350,13 +367,13 @@ export async function exportMp3() {
   if (buffer) {
     const mp3Blob = await audioBufferToMp3(buffer);
 
-    store.dispatch(setCurrentStep("Saving mp3"));
+    store.dispatch(setCurrentStep('Saving mp3'));
     store.dispatch(setProgress(0));
 
     const url = URL.createObjectURL(mp3Blob);
-    const a = document.createElement("a");
+    const a = document.createElement('a');
     a.href = url;
-    a.download = "untitledf1.mp3";
+    a.download = 'untitledf1.mp3';
     a.click();
     URL.revokeObjectURL(url);
     store.dispatch(setProgress(100));

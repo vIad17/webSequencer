@@ -1,7 +1,9 @@
 import { http, HttpResponse } from 'msw';
 
-const projects = {
-  1: {
+import { Project, UpdateRequestBody } from 'src/shared/lib/msw/types';
+
+const projects: Record<string, Project> = {
+  '1': {
     name: 'Atomic Pulse',
     tagNames: ['space', 'experimental', 'vaporwave'],
     isVisible: true,
@@ -9,7 +11,7 @@ const projects = {
     userId: 2,
     autosave: false
   },
-  2: {
+  '2': {
     name: 'Quantum Drive',
     tagNames: ['science', 'innovation', 'tech'],
     isVisible: false,
@@ -17,7 +19,7 @@ const projects = {
     userId: 2,
     autosave: true
   },
-  3: {
+  '3': {
     name: 'Nebula Explorer',
     tagNames: ['space', 'research'],
     isVisible: true,
@@ -31,57 +33,67 @@ export const projectHandler = [
   http.get('/projects/:id/name', ({ params }) => {
     const { id } = params;
 
-    if (!projects[id]) {
+    if (typeof id !== 'string' || !projects[id]) {
       return HttpResponse.json(
         { message: 'Project is not found' },
         { status: 404 }
       );
     }
 
-    const projectName = projects[id].name || {
-      name: 'Unknown Project'
-    };
-
-    return HttpResponse.json(projectName, { status: 200 });
+    return HttpResponse.json(
+      { name: projects[id].name ?? 'Unknown Project' },
+      { status: 200 }
+    );
   }),
 
   http.get('/projects/:id/link', ({ params }) => {
     const { id } = params;
 
-    if (!projects[id]) {
+    if (typeof id !== 'string' || !projects[id]) {
       return HttpResponse.json(
         { message: 'Project is not found' },
         { status: 404 }
       );
     }
 
-    const projectLink = projects[id].link || {
-      link: 'H4sIAAAAAAAAA1WPwW6DMBBE%2F2XPPkBUtYFbpSo%2FkNyqHAxs4lWNTex1EEL8exYoUXLbGb8dz47gPGP8DkEPUP6Oi4Qy%2F1KgmXX9d6J21oWCJgXN5B2UH5N6gsU7uPt8B88KIjKTu0YoR6i6VnZ2mQJZYbH2kwA%2Bueb4Qt29TXNYtmUvY4P13FGmmCJrkvxcQUCLOq4wB2y99YeAt4SuHl7NH%2BzY%2FOdYPaxtRV0Qm%2Br5BUX2Ye0usqK5Yi4ndcS1ORq68PJgfX8gyxjkYJGGrmbT%2BywTp9d3iYdIDmGaHtqLLbhlAQAA'
-    };
-
-    return HttpResponse.json(projectLink, { status: 200 });
+    return HttpResponse.json(
+      {
+        link:
+          projects[id].link ??
+          'H4sIAAAAAAAAA1WPwW6DMBBE%2F2XPPkBUtYFbpSo%2FkNyqHAxs4lWNTex1EEL8exYoUXLbGb8dz47gPGP8DkEPUP6Oi4Qy%2F1KgmXX9d6J21oWCJgXN5B2UH5N6gsU7uPt8B88KIjKTu0YoR6i6VnZ2mQJZYbH2kwA%2Bueb4Qt29TXNYtmUvY4P13FGmmCJrkvxcQUCLOq4wB2y99YeAt4SuHl7NH%2BzY%2FOdYPaxtRV0Qm%2Br5BUX2Ye0usqK5Yi4ndcS1ORq68PJgfX8gyxjkYJGGrmbT%2BywTp9d3iYdIDmGaHtqLLbhlAQAA'
+      },
+      { status: 200 }
+    );
   }),
 
   http.get('/projects/:id/userId', ({ params }) => {
     const { id } = params;
 
-    if (!projects[id]) {
+    if (typeof id !== 'string' || !projects[id]) {
       return HttpResponse.json(
         { message: 'Project is not found' },
         { status: 404 }
       );
     }
 
-    const projectUserId = projects[id].userId || {
-      userId: null
-    };
-
-    return HttpResponse.json(projectUserId, { status: 200 });
+    return HttpResponse.json(
+      { name: projects[id].userId ?? null },
+      { status: 200 }
+    );
   }),
 
   http.put('/projects/:id', async ({ request, params }) => {
     const { id } = params;
-    const { name = '', link = '' } = await request.json();
+
+    if (typeof id !== 'string' || !projects[id]) {
+      return HttpResponse.json(
+        { message: 'Project is not found' },
+        { status: 404 }
+      );
+    }
+
+    const { name = '', link = '' } =
+      (await request.json()) as UpdateRequestBody;
     return HttpResponse.json({
       status: 200
     });

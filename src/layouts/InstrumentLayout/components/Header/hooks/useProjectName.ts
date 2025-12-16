@@ -23,14 +23,13 @@ export const useProjectName = (initialName: string) => {
 
   useEffect(() => {
     if (id) {
-      try {
-        dispatch(fetchProjectName(id));
-        setTempName(name);
-      } catch (error) {
-        toastError('Failed to load project name');
-      }
+      dispatch(fetchProjectName(id));
     }
-  }, [id]);
+  }, [id, dispatch]);
+
+  useEffect(() => {
+    setTempName(name);
+  }, [name]);
 
   const handleNameValidation = useCallback(
     (name: string): { isValid: boolean; error?: string } => {
@@ -71,7 +70,7 @@ export const useProjectName = (initialName: string) => {
         await apiClient.put(`/projects/${id}`, {
           name: tempName.trim()
         });
-        setProjectName(tempName.trim());
+        dispatch(setProjectName(tempName.trim()));
       } catch (error) {
         toastError('Failed to update project name');
         setTempName(name);
@@ -105,7 +104,7 @@ export const useProjectName = (initialName: string) => {
             await apiClient.put(`/projects/${id}`, {
               name: tempName.trim()
             });
-            setProjectName(tempName.trim());
+            dispatch(setProjectName(tempName.trim()));
           } catch (error) {
             toastError('Failed to update project name');
             return;

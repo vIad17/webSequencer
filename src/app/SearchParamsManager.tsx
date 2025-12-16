@@ -2,6 +2,8 @@ import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useParams, useSearchParams } from 'react-router-dom';
 
+import { AxiosError } from 'axios';
+
 import { apiClient } from 'src/shared/api/apiClient';
 import { compress, decompress } from 'src/shared/functions/compress';
 import {
@@ -58,11 +60,9 @@ const SearchParamsManager = () => {
     (state: RootState) => state.notesArray.notesArray
   );
   const { id: user_id } = useSelector((state: RootState) => state.user);
-  const {
-    link: projectLink,
-    isLoading: isGetProjectLinkLoading,
-    error: isGetProjectLinkError
-  } = useSelector((state: RootState) => state.project_link);
+  const { link: projectLink } = useSelector(
+    (state: RootState) => state.project_link
+  );
 
   const { userId } = useSelector((state: RootState) => state.project_user_id);
 
@@ -147,8 +147,9 @@ const SearchParamsManager = () => {
         }
 
         updateLink(compressed);
-      } catch (e) {
-        if (e.response?.status === 403) {
+      } catch (e: unknown) {
+        const error = e as AxiosError;
+        if (error.response?.status === 403) {
           console.error('No permissions (403 Forbidden)');
           return;
         }

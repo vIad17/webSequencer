@@ -2,8 +2,7 @@ import { createSlice } from '@reduxjs/toolkit';
 
 const initialState = {
   name: '',
-  isLoading: false,
-  error: null
+  isLoading: false
 };
 
 export const projectNameSlice = createSlice({
@@ -19,16 +18,9 @@ export const projectNameSlice = createSlice({
     },
     setProjectNameLoading: (state, action) => {
       state.isLoading = action.payload;
-    },
-    setProjectNameError: (state, action) => {
-      state.error = action.payload;
     }
   }
 });
 
-export const {
-  setProjectName,
-  clearProjectName,
-  setProjectNameLoading,
-  setProjectNameError
-} = projectNameSlice.actions;
+export const { setProjectName, setProjectNameLoading } =
+  projectNameSlice.actions;
