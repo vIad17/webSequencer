@@ -36,6 +36,14 @@ interface HeaderProps {
   className?: string;
 }
 
+interface Project {
+  name: string;
+  tagNames?: string[];
+  isVisible: boolean;
+  link: string;
+  userId: number;
+  autosave: boolean;
+}
 const Header = ({ className = '' }: HeaderProps) => {
   const { id } = useParams();
   const [myBpm, setMyBpm] = useState(120);
@@ -67,9 +75,11 @@ const Header = ({ className = '' }: HeaderProps) => {
     error: isGetUserInfoError
   } = useSelector((state: RootState) => state.user);
 
+
+
   const getAutosaveStatus = async () => {
-    const { autosave } = await apiClient.get(`/projects/${id}`);
-    return autosave;
+  const { data } = await apiClient.get<Project>(`/projects/${id}`);
+  return data.autosave;
   };
 
   const updateAutosaveStatus = async (isAutosave: boolean) => {
