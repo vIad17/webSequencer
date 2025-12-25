@@ -2,6 +2,8 @@ import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useParams, useSearchParams } from 'react-router-dom';
 
+import { AxiosError } from 'axios';
+
 import { apiClient } from 'src/shared/api/apiClient';
 import { compress, decompress } from 'src/shared/functions/compress';
 import {
@@ -17,7 +19,7 @@ import {
   SoundSettingsState
 } from 'src/shared/redux/slices/soundSettingsSlice';
 import { RootState, SequencerDispatch } from 'src/shared/redux/store/store';
-import { fetchProjectData } from 'src/shared/redux/thunks/projectThunks';
+import { fetchProjectLink } from 'src/shared/redux/thunks/projectThunks';
 
 const INITIAL_SETTINGS: SoundSettingsState = {
   volume: 0,
@@ -58,9 +60,11 @@ const SearchParamsManager = () => {
     (state: RootState) => state.notesArray.notesArray
   );
   const { id: user_id } = useSelector((state: RootState) => state.user);
-  const { link: projectLink, userId } = useSelector(
-    (state: RootState) => state.project
+  const { link: projectLink } = useSelector(
+    (state: RootState) => state.project_link
   );
+
+  const { userId } = useSelector((state: RootState) => state.project_user_id);
 
   async function updateLink(link: string) {
     await apiClient.put(`/projects/${id}`, {
@@ -70,7 +74,7 @@ const SearchParamsManager = () => {
 
   useEffect(() => {
     if (id) {
-      dispatch(fetchProjectData(id));
+      dispatch(fetchProjectLink(id));
     }
   }, [dispatch, id]);
 
@@ -143,8 +147,9 @@ const SearchParamsManager = () => {
         }
 
         updateLink(compressed);
-      } catch (e) {
-        if (e.response?.status === 403) {
+      } catch (e: unknown) {
+        const error = e as AxiosError;
+        if (error.response?.status === 403) {
           console.error('No permissions (403 Forbidden)');
           return;
         }

@@ -29,25 +29,7 @@ const projects: Record<string, Project> = {
   }
 };
 
-
-
 export const projectHandler = [
-   http.get('/projects/:id', ({ params }) => {
-    const { id } = params;
-
-    if (typeof id !== 'string' || !projects[id]) {
-      return HttpResponse.json(
-        { message: 'Project is not found' },
-        { status: 404 }
-      );
-    }
-
-    return HttpResponse.json(
-      projects[id],
-      { status: 200 }
-    );
-  }),
-
   http.get('/projects/:id/name', ({ params }) => {
     const { id } = params;
 
@@ -102,7 +84,6 @@ export const projectHandler = [
 
   http.put('/projects/:id', async ({ request, params }) => {
     const { id } = params;
-    const { name = '', link = '', autosave = false } = await request.json() as Project;
 
     if (typeof id !== 'string' || !projects[id]) {
       return HttpResponse.json(
@@ -111,7 +92,7 @@ export const projectHandler = [
       );
     }
 
-    const { name: prjName = '', link: prjLink = '' } =
+    const { name = '', link = '' , autosave = ''} =
       (await request.json()) as UpdateRequestBody;
     return HttpResponse.json({
       status: 200

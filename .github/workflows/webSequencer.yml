@@ -76,10 +76,6 @@ jobs:
               git reset --hard origin/${GITHUB_REF_NAME}
             fi
 
-            # Создаем сеть если не существует
-            docker network ls | grep websequencer-net || docker network create websequencer-net
-
             # Перезапускаем
-            #cd "$PROJECT_DIR"
             docker compose down
             docker compose up -d --build

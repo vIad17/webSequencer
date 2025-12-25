@@ -1,19 +1,22 @@
+import { AxiosError } from 'axios';
+
 import { apiClient } from 'src/shared/api/apiClient';
-import {
-  setError,
-  setLoading,
-  setUserData
-} from 'src/shared/redux/slices/userSlice';
+import { setLoading, setUserData } from 'src/shared/redux/slices/userSlice';
+import { SequencerDispatch } from 'src/shared/redux/store/store';
 
 async function getUserInfo() {
   const { data } = await apiClient.get('/users/0');
   return data;
 }
 
-export const fetchUserData = () => async (dispatch) => {
+export const fetchUserData = () => async (dispatch: SequencerDispatch) => {
+  if (!localStorage.getItem('accessToken')) {
+    dispatch(setLoading(false));
+    return;
+  }
+
   try {
     dispatch(setLoading(true));
-    dispatch(setError(null));
 
     const userData = await getUserInfo();
 
@@ -22,8 +25,9 @@ export const fetchUserData = () => async (dispatch) => {
     }
 
     dispatch(setUserData(userData));
-  } catch (error) {
-    dispatch(setError(error.message));
+  } catch (e: unknown) {
+    const error = e as AxiosError;
+    console.warn('Failed to fetch user data:', error.message);
   } finally {
     dispatch(setLoading(false));
   }

@@ -1,11 +1,11 @@
 .header {
   color: #fff;
   display: flex;
-  align-items: center;
+  align-items: start;
   gap: 40px;
-  top: 0;
   width: 100%;
   z-index: 2;
+  box-sizing: border-box;
 
   &__left {
     flex: 1;
@@ -15,15 +15,74 @@
   }
 
   &__center {
-    position: absolute;
+    flex: 1;
     left: 50%;
     transform: translateX(-50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+  }
+
+  &__logo-container {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  &__logo {
+    width: 40px;
+    height: 40px;
+    object-fit: contain;
+  }
+
+  &__project-name-container {
+    cursor: pointer;
+    min-height: 32px;
+    display: flex;
+    align-items: center;
+    padding: 4px 8px;
+    border-radius: 4px;
+    transition: background-color 0.2s ease;
+
+    &:hover {
+      background-color: rgba(255, 255, 255, 0.1);
+    }
+
+    &_editable {
+      cursor: text;
+      background-color: rgba(255, 255, 255, 0.1);
+    }
+  }
+
+  &__project-name {
+    font-family: var(--lato);
+    font-size: 20px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  &__project-input {
+    background: none;
+    border: none;
+    color: white;
+    font-family: var(--lato);
+    font-size: 20px;
+    outline: none;
+    padding: 4px 8px;
+    margin: 0;
+    width: 200px;
+    text-align: center;
+    transition: all 0.2s ease;
+  }
+
+  &__controls {
     display: flex;
     gap: 36px;
   }
 
   &__right {
-    position: relative;
     display: flex;
     justify-content: flex-end;
     margin-right: 80px;
