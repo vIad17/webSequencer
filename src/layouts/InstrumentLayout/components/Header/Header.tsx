@@ -82,9 +82,9 @@ const Header = ({ className = '' }: HeaderProps) => {
   return data.autosave;
   };
 
-  const updateAutosaveStatus = async (isAutosave: boolean) => {
+  const updateAutosaveStatus = async (autosave: boolean) => {
     await apiClient.put(`/projects/${id}`, {
-      isAutosave
+      autosave
     });
   };
 

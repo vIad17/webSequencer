@@ -29,7 +29,25 @@ const projects: Record<string, Project> = {
   }
 };
 
+
+
 export const projectHandler = [
+   http.get('/projects/:id', ({ params }) => {
+    const { id } = params;
+
+    if (typeof id !== 'string' || !projects[id]) {
+      return HttpResponse.json(
+        { message: 'Project is not found' },
+        { status: 404 }
+      );
+    }
+
+    return HttpResponse.json(
+      projects[id],
+      { status: 200 }
+    );
+  }),
+
   http.get('/projects/:id/name', ({ params }) => {
     const { id } = params;
 
