@@ -10,6 +10,8 @@
   &__left {
     flex: 1;
     margin-left: 80px;
+    display: flex;
+    gap: 24px;
   }
 
   &__center {
@@ -173,6 +175,38 @@
     z-index: 50;
   }
 
+
+  &__second_left-item {
+    width: fit-content;
+    position: relative;
+  }
+
+  &__second_left-button {
+    background: none;
+    padding: 0;
+    border: none;
+    color: var(--colors-text-secondary);
+    font-size: 24px;
+
+    transition: color 0.1s ease;
+
+    &:hover:not(&_active) {
+      color: var(--colors-ui-primary);
+    }
+
+    &:active,
+    &_active {
+      color: var(--colors-ui-accent);
+    }
+  }
+
+  &__second_left-button-modal {
+    top: 40px;
+    left: 0;
+    min-width: 170px;
+    z-index: 50;
+  }
+
   &__right-button-modal {
     top: 50px;
     right: 0;
@@ -212,3 +246,10 @@
     font-size: 1rem;
   }
 }
+
+.modal__hotkey {
+  color: #888;
+  font-size: 12px;
+  margin-left: 8px;
+}
+

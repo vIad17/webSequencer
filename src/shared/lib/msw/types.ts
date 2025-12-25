@@ -6,6 +6,7 @@ export type LoginRequestBody = {
 export type UpdateRequestBody = {
   name?: string;
   link?: string;
+  autosave?: boolean;
 };
 
 export type Project = {

@@ -92,7 +92,7 @@ export const projectHandler = [
       );
     }
 
-    const { name = '', link = '' } =
+    const { name = '', link = '' , autosave = ''} =
       (await request.json()) as UpdateRequestBody;
     return HttpResponse.json({
       status: 200
