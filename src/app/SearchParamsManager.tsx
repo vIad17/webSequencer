@@ -19,7 +19,10 @@ import {
   SoundSettingsState
 } from 'src/shared/redux/slices/soundSettingsSlice';
 import { RootState, SequencerDispatch } from 'src/shared/redux/store/store';
-import { fetchProjectLink } from 'src/shared/redux/thunks/projectThunks';
+import {
+  fetchProjectLink,
+  fetchProjectUserId
+} from 'src/shared/redux/thunks/projectThunks';
 
 const INITIAL_SETTINGS: SoundSettingsState = {
   volume: 0,
@@ -75,6 +78,12 @@ const SearchParamsManager = () => {
   useEffect(() => {
     if (id) {
       dispatch(fetchProjectLink(id));
+    }
+  }, [dispatch, id]);
+
+  useEffect(() => {
+    if (id) {
+      dispatch(fetchProjectUserId(id));
     }
   }, [dispatch, id]);
 
