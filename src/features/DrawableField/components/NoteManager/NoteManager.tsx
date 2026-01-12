@@ -35,6 +35,7 @@ import DraggableNote from '../DraggableNote/DraggableNote';
 import { setCopiedObjects } from 'src/shared/redux/slices/copiedObjectsSlise';
 import { useNavigate } from 'react-router-dom';
 import { Note } from 'src/shared/interfaces';
+import { setIsDragging } from 'src/shared/redux/slices/userSlice';
 
 const moveByGreed = {
   ArrowUp: { x: 0, y: -1 },
@@ -247,9 +248,9 @@ const NoteManager = ({ className, isEditable = true }: NoteManagerProps) => {
   );
 
   const deleteNoteHandler = useCallback(
-    (e: React.MouseEvent, index1: number) => {
+    (e: React.MouseEvent, index: number) => {
       e.preventDefault();
-      dispatch(deleteNote(index1));
+      dispatch(deleteNote(index));
     },
     [dispatch]
   );
@@ -318,6 +319,8 @@ const NoteManager = ({ className, isEditable = true }: NoteManagerProps) => {
           dispatch(changeSelectedNote({ index: i, isSelected: true }));
         }
       }
+
+      dispatch(setIsDragging(true));
     },
     [dispatch, addSelectedNote, changeSelectedNote]
   );
@@ -330,6 +333,7 @@ const NoteManager = ({ className, isEditable = true }: NoteManagerProps) => {
         dispatch(changeSelectedNote({ index: index1, isSelected: true }));
       }
       setIsDragg(false);
+      dispatch(setIsDragging(false));
       setIsBlockedCreation(false);
     },
     [isDragg, isResizing, dispatch]

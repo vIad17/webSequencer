@@ -59,13 +59,14 @@ const SearchParamsManager = () => {
   const notesArray = useSelector(
     (state: RootState) => state.notesArray.notesArray
   );
-  const { id: user_id } = useSelector((state: RootState) => state.user);
+  const userId = useSelector((state: RootState) => state.user.id);
   const { link: projectLink } = useSelector(
-    (state: RootState) => state.project_link
+    (state: RootState) => state.projectLink
   );
 
-  const { userId } = useSelector((state: RootState) => state.project_user_id);
-
+  const projectUserId = useSelector((state: RootState) => state.projectUserId.userId);
+  const isDragging = useSelector((state: RootState) => state.user.isDragging);
+  
   async function updateLink(link: string) {
     await apiClient.put(`/projects/${id}`, {
       link
@@ -127,6 +128,7 @@ const SearchParamsManager = () => {
 
   useEffect(() => {
     if (pageIsStarted) return;
+    if (isDragging) return;
 
     const storedNotesArray = Array.isArray(notesArray)
       ? notesArray.map((note) => ({
@@ -141,7 +143,7 @@ const SearchParamsManager = () => {
 
     if (id) {
       try {
-        if (user_id !== userId) {
+        if (userId !== projectUserId) {
           console.error("You haven't permissions to modify the project");
           return;
         }
@@ -159,7 +161,7 @@ const SearchParamsManager = () => {
     } else {
       setSearchParams('params=' + compressed);
     }
-  }, [notesArray, settings, soundSettings]);
+  }, [isDragging, notesArray, settings, soundSettings]);
 
   return <></>;
 };
