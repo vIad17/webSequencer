@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import { useParams } from 'react-router-dom';
 
 import { useMIDIInputs } from '@react-midi/hooks';
 import clsx from 'clsx';
@@ -43,6 +44,7 @@ const Header = ({ className = '' }: HeaderProps) => {
   const [fileOpen, setFileOpen] = useState(false);
   const [inputModalOpen, setInputModalOpen] = useState(false);
   const [profileDropdown, setProfileDropdown] = useState(false);
+  const { id } = useParams();
 
   const nameInputRef = useRef<HTMLInputElement>(null);
 
@@ -213,7 +215,7 @@ const Header = ({ className = '' }: HeaderProps) => {
         </div>
 
         <div className="header__center">
-          {localStorage.getItem('accessToken') && (
+          {id ? (
             <div className="header__logo-container">
               <img src={logo} alt="Project Logo" className="header__logo" />
               <div
@@ -241,7 +243,7 @@ const Header = ({ className = '' }: HeaderProps) => {
                 )}
               </div>
             </div>
-          )}
+          ) : null}
 
           <div className="header__controls">
             {!!settings.bpm || !!settings.tacts ? (
