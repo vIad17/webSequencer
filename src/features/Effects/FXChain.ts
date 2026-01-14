@@ -160,8 +160,6 @@ export class FXChain {
     const lowFilter = new Tone.Filter(8000, 'highpass');
     // const gain = new Tone.Gain(6);
 
-    console.log(ss)
-
     if (ss.tremoloFrequency) tremolo.frequency.value = ss.tremoloFrequency;
     if (ss.tremoloDepth) tremolo.depth.value = ss.tremoloDepth;
     if (ss.delayTime) delay.delayTime.value = ss.delayTime;

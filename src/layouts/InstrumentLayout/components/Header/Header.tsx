@@ -62,7 +62,7 @@ const Header = ({ className = '' }: HeaderProps) => {
 
   const { username } = useSelector((state: RootState) => state.user);
 
-  const { isLoading } = useSelector((state: RootState) => state.project_name);
+  const { isLoading } = useSelector((state: RootState) => state.projectName);
 
   const {
     name,
