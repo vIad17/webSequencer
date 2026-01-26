@@ -13,10 +13,11 @@ import KnobInput from '../../KnobInput/KnobInput';
 
 interface FXBitcrushProps {
   className?: string;
-  name: string;
+  name?: string;
+  id: string;
 }
 
-const FXBitcrush = ({ name = '', className }: FXBitcrushProps) => {
+const FXBitcrush = ({ name = '', className, id }: FXBitcrushProps) => {
   const svgRef = useRef<SVGSVGElement>(null);
   const dispatch = useDispatch();
   const soundSettings = useSelector((state: RootState) => state.soundSettings);
@@ -94,7 +95,7 @@ const FXBitcrush = ({ name = '', className }: FXBitcrushProps) => {
   }, [soundSettings.bits]);
 
   return (
-    <EffectCard name={'Bitcrush'} width={230} children={
+    <EffectCard name={'Bitcrush'} width={230} id={id} children={
       <div className="effect__content_inner">
         <svg ref={svgRef} className="synth__graph" />
         <div className='Effect_knobs_horizontal'>

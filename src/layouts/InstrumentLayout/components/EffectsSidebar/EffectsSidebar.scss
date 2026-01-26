@@ -3,7 +3,12 @@
   flex-direction: column;
   gap: 20px;
   overflow: hidden;
+  // padding: 20px;
 
   transition: width 0.3s ease;
-  width: var(--sidebar-width, 0px);
+  width: var(--sidebar-width);
+
+  &__container {
+    padding: 24px 8px 0 24px;
+  }
 }

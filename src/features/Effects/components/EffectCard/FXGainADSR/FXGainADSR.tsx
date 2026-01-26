@@ -13,10 +13,11 @@ import KnobInput from '../../KnobInput/KnobInput';
 
 interface FXGainADSRProps {
   className?: string;
-  name: string;
+  name?: string;
+  id: string;
 }
 
-const FXGainADSR = ({ name = '', className }: FXGainADSRProps) => {
+const FXGainADSR = ({ name = '', className, id }: FXGainADSRProps) => {
   const svgRef = useRef<SVGSVGElement>(null);
   const dispatch = useDispatch();
   const soundSettings = useSelector((state: RootState) => state.soundSettings);
@@ -195,7 +196,7 @@ const FXGainADSR = ({ name = '', className }: FXGainADSRProps) => {
   }, [soundSettings.attack, soundSettings.decay, soundSettings.sustain, soundSettings.release]);
 
   return (
-    <EffectCard name={'Gain ADSR'} width={280} children={
+    <EffectCard name={'Gain ADSR'} width={280} id={id} children={
       <div className="effect__content_inner">
         <svg ref={svgRef} className="synth__graph" />
         <div className="Effect_knobs_horizontal">

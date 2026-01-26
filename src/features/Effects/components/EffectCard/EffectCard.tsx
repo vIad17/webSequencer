@@ -3,16 +3,20 @@ import './EffectCard.scss';
 import clsx from 'clsx';
 import { Icon } from 'src/shared/icons/Icon';
 import { IconType } from 'src/shared/icons/IconMap';
+import { useDispatch } from 'react-redux';
+import { removeEffect } from 'src/shared/redux/slices/effectsSlice';
 
 interface EffectCardProps {
   className?: string;
   name: string;
   width: number;
   canRemove?: boolean;
+  id: string;
   children: ReactNode;
 }
 
-const EffectCard = ({ className = "", name, width, canRemove = true, children }: EffectCardProps) => {
+const EffectCard = ({ className = "", name, width, canRemove = true, id, children }: EffectCardProps) => {
+  const dispatch = useDispatch();
 
   const [collapsed, setCollapsed] = useState(false);
   const [muted, setMuted] = useState(false);
@@ -29,7 +33,7 @@ const EffectCard = ({ className = "", name, width, canRemove = true, children }:
             event.stopPropagation();
           }}
             onPointerDown={(e) => {
-              e.stopPropagation(); // 👈 Prevents drag from starting
+              e.stopPropagation();
             }}>
             <Icon icon={IconType.Eye} interactable />
           </button>
@@ -42,11 +46,17 @@ const EffectCard = ({ className = "", name, width, canRemove = true, children }:
               setMuted((prev) => !prev);
             }}
             onPointerDown={(e) => {
-              e.stopPropagation(); // 👈 Prevents drag from starting
+              e.stopPropagation();
             }}>
             <Icon icon={IconType.Power} interactable />
           </button>
-          <button className='effect__header_button'>
+          <button className='effect__header_button'
+            onClick={(event) => {
+              dispatch(removeEffect(id))
+            }}
+            onPointerDown={(e) => {
+              e.stopPropagation();
+            }}>
             <Icon icon={IconType.X} interactable />
           </button>
         </div>
