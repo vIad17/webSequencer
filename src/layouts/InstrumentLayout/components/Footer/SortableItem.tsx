@@ -13,7 +13,7 @@ const EffectComponentByType: Partial<Record<EffectType, React.ComponentType<{ id
   [EffectType.BITS]: FXBitcrush,
 };
 
-export const SortableItem = ({id, key, effect}: {id: string, key: string, effect: Effect}) => {
+export const SortableItem = ({id, effect}: {id: string, effect: Effect}) => {
   const {
     attributes,
     listeners,

@@ -10,7 +10,7 @@ export interface IndexedNote extends Note {
   index: number;
 }
 
-export interface Coordinates {
+export interface Vector2 {
   x: number;
   y: number;
 }

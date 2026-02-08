@@ -5,6 +5,8 @@ import clsx from 'clsx';
 import { Icon } from 'src/shared/icons/Icon';
 import { IconType } from 'src/shared/icons/IconMap';
 import { addEffect, EffectType } from 'src/shared/redux/slices/effectsSlice';
+import { useDraggable } from '@dnd-kit/core';
+import { useEffect, useState } from 'react';
 
 export interface EffectPreviewData {
   icon: IconType;
@@ -42,24 +44,44 @@ export const effectPreviewByType: Record<EffectType, EffectPreviewData> = {
   },
 };
 
+const makeId = () => `id_${Date.now()}_${Math.random()}`;
+
 interface EffectPreviewProps {
   className?: string;
   type: EffectType;
 }
 
-const EffectPreview = ({className, type }: EffectPreviewProps) => {
-  
+const EffectPreview = ({ className, type }: EffectPreviewProps) => {
+
   const dispatch = useDispatch();
+
+  const [dragId, setDragId] = useState(() => `fx_${type}_${makeId()}`);
 
   const effectPreviewData = effectPreviewByType[type];
 
   const onClick = () => {
-    dispatch(addEffect({type, id: crypto.randomUUID()}))
+    dispatch(addEffect({ type, id: crypto.randomUUID() }))
   }
 
+  const { setNodeRef, listeners, attributes, isDragging } = useDraggable({
+    id: dragId,
+    data: { from: 'sidebar', effectType: type },
+  });
+
+  useEffect(() => {
+    if (!isDragging) setDragId(`fx_${type}_${makeId()}`);
+  }, [isDragging, type]);
+
   return (
-    <div className={clsx('effect-preview', className)} onClick={onClick}>
-      <Icon className='effect-preview__icon' icon={effectPreviewData.icon} size={20}/>
+    <div
+      {...listeners}
+      {...attributes}
+      data-dnd-origin="sidebar"
+      ref={setNodeRef}
+      className={clsx('effect-preview', className)}
+      onDoubleClick={onClick}
+    >
+      <Icon className='effect-preview__icon' icon={effectPreviewData.icon} size={20} />
       <h2 className='effect-preview__name'>{effectPreviewData.name}</h2>
     </div>
   );

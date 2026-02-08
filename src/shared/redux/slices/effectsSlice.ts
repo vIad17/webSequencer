@@ -27,6 +27,10 @@ export const effectsSlice = createSlice({
   name: 'effects',
   initialState,
   reducers: {
+    setEffects: (state, action: PayloadAction<Effect[]>) => ({
+      ...state,
+      effects: action.payload
+    }),
     addEffect: (state, action: PayloadAction<Effect>) => ({
       ...state,
       effects: [...state.effects, action.payload]
@@ -37,4 +41,4 @@ export const effectsSlice = createSlice({
     }),
   }
 });
-export const { addEffect, removeEffect } = effectsSlice.actions;
+export const { setEffects,  addEffect, removeEffect } = effectsSlice.actions;
