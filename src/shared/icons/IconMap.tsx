@@ -15,6 +15,13 @@ import Repeat from './svg/repeat.svg?react';
 import X from './svg/x.svg?react';
 import Knob from './svg/knob.svg?react';
 import Sound from './svg/sound.svg?react';
+import EffectAdsr from './svg/effect-adsr.svg?react';
+import EffectBits from './svg/effect-bits.svg?react';
+import EffectDelay from './svg/effect-delay.svg?react';
+import EffectDistortion from './svg/effect-distortion.svg?react';
+import EffectFilter from './svg/effect-filter.svg?react';
+import EffectPitchShift from './svg/effect-pitch-shift.svg?react';
+import EffectTremolo from './svg/effect-tremolo.svg?react';
 
 export enum IconType {
   ArrowDown,
@@ -31,7 +38,14 @@ export enum IconType {
   Repeat,
   X,
   Knob,
-  Sound
+  Sound,
+  EffectAdsr,
+  EffectBits,
+  EffectDelay,
+  EffectDistortion,
+  EffectFilter,
+  EffectPitchShift,
+  EffectTremolo
 }
 
 export type IconProps = React.SVGProps<SVGSVGElement> & {
@@ -57,4 +71,11 @@ export const IconMap: Record<IconType, (props: IconProps) => ReactElement> = {
   [IconType.X]: (props) => <X {...props} />,
   [IconType.Knob]: (props) => <Knob {...props} />,
   [IconType.Sound]: (props) => <Sound {...props} />,
+  [IconType.EffectAdsr]: (props) => <EffectAdsr {...props} />,
+  [IconType.EffectBits]: (props) => <EffectBits {...props} />,
+  [IconType.EffectDelay]: (props) => <EffectDelay {...props} />,
+  [IconType.EffectDistortion]: (props) => <EffectDistortion {...props} />,
+  [IconType.EffectFilter]: (props) => <EffectFilter {...props} />,
+  [IconType.EffectPitchShift]: (props) => <EffectPitchShift {...props} />,
+  [IconType.EffectTremolo]: (props) => <EffectTremolo {...props} />,
 };

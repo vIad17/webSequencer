@@ -67,7 +67,7 @@ const MySketch = ({ className = '' }: MySketchProps) => {
 
   useEffect(() => {
     const width = 350;
-    const height = 260;
+    const height = 282;
 
     const svg = d3
       .select(svgRef.current)

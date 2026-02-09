@@ -59,15 +59,6 @@ const PreviewPage = ({ className = '' }: InstrumentPageProps) => {
     // }
   });
 
-  // useEffect(() => {
-  //   console.log("  FDSGDHF")
-  //   document.querySelector('.preview')?.scrollTo({
-  //     top: 200
-  //   })
-  // });
-
-  console.log(notesArray);
-
   return (
     <main className={clsx('preview', className)}>
       <DrawableField className="preview__drawable-field" isPreview={true} />

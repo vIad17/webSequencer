@@ -13,10 +13,11 @@ import KnobInput from '../../KnobInput/KnobInput';
 
 interface FXTremoloProps {
   className?: string;
-  name: string;
+  name?: string;
+  id: string;
 }
 
-const FXTremolo = ({ name = '', className }: FXTremoloProps) => {
+const FXTremolo = ({ name = '', className, id }: FXTremoloProps) => {
   const svgRef = useRef<SVGSVGElement>(null);
   const dispatch = useDispatch();
   const soundSettings = useSelector((state: RootState) => state.soundSettings);
@@ -90,7 +91,7 @@ const FXTremolo = ({ name = '', className }: FXTremoloProps) => {
   }, [soundSettings.tremoloDepth, soundSettings.tremoloFrequency]);
 
   return (
-    <EffectCard name={'Tremolo'} width={230} children={
+    <EffectCard name={'Tremolo'} width={230} id={id} children={
       <div className="effect__content_inner">
         <svg ref={svgRef} className="synth__graph" />
         <div className='Effect_knobs_horizontal'>

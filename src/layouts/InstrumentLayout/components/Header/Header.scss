@@ -10,7 +10,7 @@
 
   &__left {
     flex: 1;
-    margin-left: 80px;
+    margin-left: 20px;
   }
 
   &__center {
@@ -46,10 +46,11 @@
   &__icon {
     width: 32px;
     height: 32px;
-    & *{
+
+    & * {
       color: aqua;
     }
-      
+
   }
 
   &__icon-pause {
@@ -84,6 +85,8 @@
   &__left-item {
     width: fit-content;
     position: relative;
+    display: flex;
+    gap: 32px;
   }
 
   &__left-button {
@@ -99,8 +102,32 @@
       color: var(--colors-ui-primary);
     }
 
-    &:active, &_active {
+    &:active,
+    &_active {
       color: var(--colors-ui-accent);
+    }
+  }
+
+  &__effects-button {
+    background: linear-gradient(90deg, #FF16A2 0%, #DF59EE 20%, #4F54F1 40%, var(--colors-text-secondary) 50%);
+    background-size: 300% 100%;
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-position: 100% 0;
+    transition: background-position 0.3s ease;
+
+    &:hover:not(&_active) {
+      background: linear-gradient(90deg, #FF16A2 0%, #DF59EE 20%, #4F54F1 40%, var(--colors-ui-primary) 50%);
+      background-size: 300% 100%;
+      -webkit-background-clip: text;
+      background-clip: text;
+      background-position: 100% 0;
+    }
+
+    &:active,
+    &_active {
+      background-position: 0 100%;
     }
   }
 

@@ -14,10 +14,11 @@ import { clamp } from 'src/shared/functions/math';
 
 interface FXDistortionProps {
   className?: string;
-  name: string;
+  name?: string;
+  id: string
 }
 
-const FXDistortion = ({ name = '', className }: FXDistortionProps) => {
+const FXDistortion = ({ name = '', className, id }: FXDistortionProps) => {
   const svgRef = useRef<SVGSVGElement>(null);
   const dispatch = useDispatch();
   const soundSettings = useSelector((state: RootState) => state.soundSettings);
@@ -91,7 +92,7 @@ const FXDistortion = ({ name = '', className }: FXDistortionProps) => {
   }, [soundSettings.distortion]);
 
   return (
-    <EffectCard name={'Distortion'} width={230} children={
+    <EffectCard id={id} name={'Distortion'} width={230} children={
       <div className="effect__content_inner">
         <svg ref={svgRef} className="synth__graph" />
         <div className='Effect_knobs_horizontal'>

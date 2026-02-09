@@ -14,10 +14,11 @@ import { clamp } from 'src/shared/functions/math';
 
 interface FXPitchShiftProps {
   className?: string;
-  name: string;
+  name?: string;
+  id: string
 }
 
-const FXPitchShift = ({ name = '', className }: FXPitchShiftProps) => {
+const FXPitchShift = ({ name = '', className, id }: FXPitchShiftProps) => {
   const svgRef = useRef<SVGSVGElement>(null);
   const dispatch = useDispatch();
   const soundSettings = useSelector((state: RootState) => state.soundSettings);
@@ -112,7 +113,7 @@ const FXPitchShift = ({ name = '', className }: FXPitchShiftProps) => {
   }, [soundSettings.pitchShift]);
 
   return (
-    <EffectCard name={'Pitch Shift'} width={230} children={
+    <EffectCard id={id} name={'Pitch Shift'} width={230} children={
       <div className="effect__content_inner">
         <svg ref={svgRef} className="synth__graph" />
         <div className='Effect_knobs_horizontal'>

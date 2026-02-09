@@ -1,36 +1,52 @@
 import MySketch from 'src/components/Scetch/Sketch';
-import SoundSettings from 'src/components/SoundSettings/SoundSettings';
+import SynthCard from 'src/features/Effects/components/SynthCard/SynthCard';
 
 import './Footer.scss';
 import clsx from 'clsx';
-import SynthCard from 'src/features/Effects/components/SynthCard/SynthCard';
 
-//temp
-import FXBitcrush from 'src/features/Effects/components/EffectCard/FXBitcruch/FXBitcrush';
-import FXTremolo from 'src/features/Effects/components/EffectCard/FXTremolo/FXTremolo';
-import FXGainADSR from 'src/features/Effects/components/EffectCard/FXGainADSR/FXGainADSR';
-import FXDelay from 'src/features/Effects/components/EffectCard/FXDelay/FXDelay';
-import FXDistortion from 'src/features/Effects/components/EffectCard/FXDistortion/FXDistortion';
-import FXPitchShift from 'src/features/Effects/components/EffectCard/FXPitchShift/FXPitchShift';
-//--
+import { useDroppable } from '@dnd-kit/core';
+import { horizontalListSortingStrategy, SortableContext } from '@dnd-kit/sortable';
+
+import { useMemo } from 'react';
+import { SortableItem } from './SortableItem';
+
+import { useDispatch, useSelector } from 'react-redux';
+import type { RootState } from 'src/shared/redux/store/store';
+
+export const FOOTER_DROP_ID = 'footer-dropzone';
 
 interface FooterProps {
   className?: string;
 }
 
-const Footer = ({ className = '' }: FooterProps) => (
-  <div className={clsx('footer', className)}>
-    <SynthCard className="footer__synth" name="Synth" />
-    <div className="footer__effects">
-      <FXBitcrush className='footer__effects_card' name={'Bitcrush'}></FXBitcrush>
-      <FXTremolo name={''}></FXTremolo>
-      <FXGainADSR name={''}></FXGainADSR>
-      <FXDelay name={''}></FXDelay>
-      <FXPitchShift name={''}></FXPitchShift>
-      <FXDistortion name={''}></FXDistortion>
+const Footer = ({ className = '' }: FooterProps) => {
+  const effects = useSelector((state: RootState) => state.effects.effects);
+
+  const dispatch = useDispatch();
+  const effectsById = useMemo(() => {
+    const map: Record<string, (typeof effects)[number]> = {};
+    for (const e of effects) map[e.id] = e;
+    return map;
+  }, [effects]);
+
+  const { setNodeRef: setFooterDropRef } = useDroppable({ id: FOOTER_DROP_ID });
+
+  return (
+    <div className={clsx('footer', className)}>
+      <SynthCard className="footer__synth" name="Synth" />
+
+      <div ref={setFooterDropRef} className="footer__effects">
+        <SortableContext items={effects} strategy={horizontalListSortingStrategy}>
+          {effects.map((effect) => {
+            if (!effect) return null;
+            return <SortableItem key={effect.id} id={effect.id} effect={effect} />;
+          })}
+        </SortableContext>
+      </div>
+
+      <MySketch className="footer__sketch" />
     </div>
-    <MySketch className="footer__sketch" />
-  </div>
-);
+  );
+};
 
 export default Footer;

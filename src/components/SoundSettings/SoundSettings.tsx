@@ -38,8 +38,8 @@ const SoundSettings = ({ className = '' }: SoundSettingsProps) => {
   return (
     <div className={`sound-settings ${className}`}>
       <ul className="sound-settings__list">
-        <FXTremolo name={''}></FXTremolo>
-        <FXBitcrush name={''}></FXBitcrush>
+        <FXTremolo id='1'></FXTremolo>
+        <FXBitcrush id='2'></FXBitcrush>
         <SynthCard
           name="Synth"
         />

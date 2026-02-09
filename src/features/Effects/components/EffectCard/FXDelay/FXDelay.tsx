@@ -13,10 +13,11 @@ import KnobInput from '../../KnobInput/KnobInput';
 
 interface FXDelayProps {
   className?: string;
-  name: string;
+  name?: string;
+  id: string
 }
 
-const FXDelay = ({ name = '', className }: FXDelayProps) => {
+const FXDelay = ({ name = '', className, id }: FXDelayProps) => {
   const svgRef = useRef<SVGSVGElement>(null);
   const dispatch = useDispatch();
   const soundSettings = useSelector((state: RootState) => state.soundSettings);
@@ -87,7 +88,7 @@ const FXDelay = ({ name = '', className }: FXDelayProps) => {
   }, [soundSettings.delayTime, soundSettings.feedback]);
 
   return (
-    <EffectCard name={'Delay'} width={230} children={
+    <EffectCard id={id} name={'Delay'} width={230} children={
       <div className="effect__content_inner">
         <svg ref={svgRef} className="synth__graph" />
         <div className='Effect_knobs_horizontal'>

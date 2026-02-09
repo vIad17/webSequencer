@@ -1,0 +1,26 @@
+<svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g clip-path="url(#clip0_641_1994)">
+<rect x="-0.803223" y="3.69325" width="0.828582" height="5.80007" fill="white"/>
+<rect x="0.439697" y="3.69307" width="0.828582" height="5.80007" fill="white"/>
+<rect x="4.58276" y="4.1077" width="0.828582" height="5.38578" fill="white"/>
+<rect x="5.82568" y="4.10771" width="0.828582" height="5.38578" fill="white"/>
+<rect x="9.96826" y="4.52193" width="0.828582" height="4.97149" fill="white"/>
+<rect x="11.2112" y="4.52187" width="0.828582" height="4.97149" fill="white"/>
+<rect x="15.3542" y="4.93629" width="0.828582" height="4.5572" fill="white"/>
+<rect x="16.5972" y="4.93643" width="0.828582" height="4.5572" fill="white"/>
+<rect width="0.828582" height="5.80007" transform="matrix(1 0 0 -1 2.09692 16.1224)" fill="white"/>
+<rect width="0.828582" height="5.80007" transform="matrix(1 0 0 -1 3.34009 16.1223)" fill="white"/>
+<rect width="0.828582" height="5.38578" transform="matrix(1 0 0 -1 7.48291 15.7078)" fill="white"/>
+<rect width="0.828582" height="5.38578" transform="matrix(1 0 0 -1 8.72583 15.7078)" fill="white"/>
+<rect width="0.828582" height="4.97149" transform="matrix(1 0 0 -1 12.8691 15.2939)" fill="white"/>
+<rect width="0.828582" height="4.97149" transform="matrix(1 0 0 -1 14.1116 15.2939)" fill="white"/>
+<rect width="0.828582" height="4.5572" transform="matrix(1 0 0 -1 18.2544 14.8792)" fill="white"/>
+<rect width="0.828582" height="4.5572" transform="matrix(1 0 0 -1 19.4973 14.8794)" fill="white"/>
+</g>
+<rect x="0.5" y="0.5" width="18.7647" height="18.7647" rx="1.14706" stroke="white"/>
+<defs>
+<clipPath id="clip0_641_1994">
+<rect width="19.7647" height="19.7647" rx="1.64706" fill="white"/>
+</clipPath>
+</defs>
+</svg>

@@ -1,0 +1,28 @@
+.effect-preview {
+  display: flex;
+  flex-direction: row;
+  gap: 10px;
+  vertical-align: middle;
+  min-width: 155px;
+  width: 100%;
+  cursor: grab;
+  user-select: none;
+
+  &__name {
+    color: var(--colors-text-secondary);
+  }
+
+  * {
+    transition: stroke 0.1s ease;
+  }
+
+  &:hover * {
+    color: var(--colors-text-primary);
+    stroke: var(--colors-ui-primary);
+  }
+
+  &:active * {
+    color: var(--colors-ui-accent);
+    stroke: var(--colors-ui-accent);
+  }
+}
