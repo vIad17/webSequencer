@@ -1,25 +1,38 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import { useParams } from 'react-router-dom';
 
+import { useMIDIInputs } from '@react-midi/hooks';
+import clsx from 'clsx';
+import FileModal, {
+  ModalItem
+} from 'src/components/Modals/FileModal/FileModal';
+import ProfileModal from 'src/components/Modals/ProfileModal/ProfileModal';
+import ProgressModal from 'src/components/Modals/ProgressModal/ProgressModal';
 import * as Tone from 'tone';
 
+import {
+  exportMp3,
+  openMIDI,
+  pauseMusic,
+  stopMusic
+} from 'src/app/SoundManager';
+import $api from 'src/shared/api/axiosConfig';
+import { useHandleClickOutside } from 'src/shared/hooks/useHandleClickOutside';
+import { Icon } from 'src/shared/icons/Icon';
+import { IconType } from 'src/shared/icons/IconMap';
+import logo from 'src/shared/icons/png/logo.png';
+import avatar from 'src/shared/icons/svg/avatar.svg';
 import { setIsPlaying } from 'src/shared/redux/slices/currentMusicSlice';
 import { setColumnsCount } from 'src/shared/redux/slices/drawableFieldSlice';
 import { setBpm, setTacts } from 'src/shared/redux/slices/settingsSlice';
-import { RootState } from 'src/shared/redux/store/store';
+import { RootState, SequencerDispatch } from 'src/shared/redux/store/store';
+import { fetchUserData } from 'src/shared/redux/thunks/userThunks';
+import Button from 'src/shared/ui/Button/Button';
 
-import arrowRightIcon from './images/arrowRightIcon.svg';
-import checkIcon from './images/checkIcon.svg';
+import { useProjectName } from './hooks/useProjectName';
 
 import './Header.scss';
-import { pauseMusic, stopMusic, openMIDI } from 'src/app/SoundManager';
-import Modal, { ModalItem } from 'src/components/Modal/Modal';
-import { useHandleClickOutside } from 'src/shared/hooks/useHandleClickOutside';
-import clsx from 'clsx';
-
-import { useMIDIInputs } from '@react-midi/hooks';
-import { Icon } from 'src/shared/icons/Icon';
-import { IconType } from 'src/shared/icons/IconMap';
 import { setIsSidebarOpen } from 'src/shared/redux/slices/effectsSidebarSlice';
 
 interface HeaderProps {
@@ -31,14 +44,37 @@ const Header = ({ className = '' }: HeaderProps) => {
   const [myTacts, setMyTacts] = useState(8);
   const [fileOpen, setFileOpen] = useState(false);
   const [inputModalOpen, setInputModalOpen] = useState(false);
+  const [profileDropdown, setProfileDropdown] = useState(false);
+  const { id } = useParams();
 
-  const { modalRef } = useHandleClickOutside(() => {
+  const nameInputRef = useRef<HTMLInputElement>(null);
+
+  const { modalRef: fileModalRef } = useHandleClickOutside(() => {
     setFileOpen(false);
     setInputModalOpen(false);
   });
 
+  const { modalRef: profileModalRef } = useHandleClickOutside(() => {
+    setProfileDropdown(false);
+  });
+
+  const dispatch = useDispatch<SequencerDispatch>();
   const settings = useSelector((state: RootState) => state.settings);
   const isSidebarOpen = useSelector((state: RootState) => state.effectsSidebar.isOpen);
+
+  const { username } = useSelector((state: RootState) => state.user);
+
+  const { isLoading } = useSelector((state: RootState) => state.projectName);
+
+  const {
+    name,
+    isEditing,
+    tempName,
+    setTempName,
+    handleNameClick,
+    handleNameBlur,
+    handleNameKeyDown
+  } = useProjectName('Untitled Project');
 
   const handleButtonClick = () => {
     document.getElementById('import-midi-file-input')?.click();
@@ -69,25 +105,38 @@ const Header = ({ className = '' }: HeaderProps) => {
   const { input, inputs, selectInput, selectedInputId } = useMIDIInputs();
 
   useEffect(() => {
-    const midiInput = localStorage.getItem("midi-input")
-    midiInput && selectInput(midiInput)
-  }, [selectInput])
+    dispatch(fetchUserData());
+  }, [dispatch]);
+
+  useEffect(() => {
+    const midiInput = localStorage.getItem('midi-input');
+    midiInput && selectInput(midiInput);
+  }, [selectInput]);
+
+  useEffect(() => {
+    if (isEditing && nameInputRef.current) {
+      nameInputRef.current.focus();
+    }
+  }, [isEditing]);
 
   const midiDeviceModalData: ModalItem[] = inputs.map((el) => ({
     text: el.name,
     callback: (event) => {
       event.stopPropagation();
-      localStorage.setItem("midi-input", el.id)
+      localStorage.setItem('midi-input', el.id);
       selectInput(el.id);
     },
     sideContent: (
-      <Icon icon={IconType.Check}
+      <Icon
+        icon={IconType.Check}
         className={clsx('modal__side-icon', 'modal__check-icon', {
           'modal__side-icon_hidden': selectedInputId !== el.id
-        })} />
+        })}
+      />
     )
   }));
   const FileData: ModalItem[] = [
+    { text: 'Export to mp3', callback: exportMp3 },
     {
       text: 'Import MIDI File',
       callback: handleButtonClick,
@@ -112,7 +161,7 @@ const Header = ({ className = '' }: HeaderProps) => {
       sideContent: (
         <>
           <Icon icon={IconType.ChevronRight} className="modal__side-icon" />
-          <Modal
+          <FileModal
             className={clsx(
               'header__inputs-left-button-sub-modal',
               'header__left-button-sub-modal'
@@ -125,12 +174,28 @@ const Header = ({ className = '' }: HeaderProps) => {
     }
   ];
 
-  const dispatch = useDispatch();
+  const ProfileData: ModalItem[] = [
+    {
+      text: 'Profile',
+      callback: () => {
+        window.location.href = '/main/myprojects';
+      }
+    },
+    {
+      text: 'Log out',
+      callback: () => {
+        $api.post('/logout');
+        localStorage.clear();
+      }
+    }
+  ];
 
   return (
-    <header className={`header ${className}`}>
+    <>
+      <ProgressModal />
+      <header className={`header ${className}`}>
       <div className="header__left">
-        <div ref={modalRef} className="header__left-item">
+        <div ref={fileModalRef} className="header__left-item">
           <button
             className={clsx('header__left-button header__effects-button', {
               'header__effects-button_active': isSidebarOpen
@@ -152,7 +217,7 @@ const Header = ({ className = '' }: HeaderProps) => {
           >
             File
           </button>
-          <Modal
+          <FileModal
             className={clsx('header__left-button-modal')}
             modalActions={FileData}
             isOpen={fileOpen}
@@ -169,7 +234,7 @@ const Header = ({ className = '' }: HeaderProps) => {
             >
               Edit
             </button>
-            <Modal
+            <FileModal
               className={clsx('header__left-button-modal')}
               modalActions={FileData}
               isOpen={fileOpen}
@@ -264,6 +329,7 @@ const Header = ({ className = '' }: HeaderProps) => {
 
       <div className="header__right"></div>
     </header>
+    </>
   );
 };
 

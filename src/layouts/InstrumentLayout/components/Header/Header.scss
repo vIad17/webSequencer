@@ -1,12 +1,13 @@
 .header {
   color: #fff;
   display: flex;
-  align-items: center;
+  align-items: start;
   gap: 40px;
   padding: 20px 0;
   top: 0;
   width: 100%;
   z-index: 2;
+  box-sizing: border-box;
 
   &__left {
     flex: 1;
@@ -14,15 +15,78 @@
   }
 
   &__center {
-    position: absolute;
+    flex: 1;
     left: 50%;
     transform: translateX(-50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+  }
+
+  &__logo-container {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  &__logo {
+    width: 40px;
+    height: 40px;
+    object-fit: contain;
+  }
+
+  &__project-name-container {
+    cursor: pointer;
+    min-height: 32px;
+    display: flex;
+    align-items: center;
+    padding: 4px 8px;
+    border-radius: 4px;
+    transition: background-color 0.2s ease;
+
+    &:hover {
+      background-color: rgba(255, 255, 255, 0.1);
+    }
+
+    &_editable {
+      cursor: text;
+      background-color: rgba(255, 255, 255, 0.1);
+    }
+  }
+
+  &__project-name {
+    font-family: var(--lato);
+    font-size: 20px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  &__project-input {
+    background: none;
+    border: none;
+    color: white;
+    font-family: var(--lato);
+    font-size: 20px;
+    outline: none;
+    padding: 4px 8px;
+    margin: 0;
+    width: 200px;
+    text-align: center;
+    transition: all 0.2s ease;
+  }
+
+  &__controls {
     display: flex;
     gap: 36px;
   }
 
   &__right {
-    flex: 1;
+    display: flex;
+    justify-content: flex-end;
+    margin-right: 80px;
+    gap: 12px;
   }
 
   &__settings {
@@ -46,11 +110,6 @@
   &__icon {
     width: 32px;
     height: 32px;
-
-    & * {
-      color: aqua;
-    }
-
   }
 
   &__icon-pause {
@@ -138,6 +197,13 @@
     z-index: 50;
   }
 
+  &__right-button-modal {
+    top: 50px;
+    right: 0;
+    min-width: 170px;
+    z-index: 50;
+  }
+
   &__inputs-left-button-sub-modal {
     width: 280px;
   }
@@ -147,5 +213,26 @@
     left: 100%;
     margin-left: 20px;
     min-width: 170px;
+  }
+
+  &__right_profile {
+    background: transparent;
+    display: flex;
+    border: none;
+    color: white;
+    gap: 16px;
+    cursor: pointer;
+  }
+
+  &__right_avatar {
+    outline: 2px solid #041d32;
+    width: 1.6rem;
+    height: 1.6rem;
+    border-radius: 0.5rem;
+  }
+
+  &__right_username {
+    font-family: var(--lato-medium);
+    font-size: 1rem;
   }
 }

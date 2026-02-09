@@ -3,9 +3,12 @@
   height: 100dvh;
   display: flex;
   flex-direction: column;
+  position: relative;
 
   &__header {
+    position: relative;
     z-index: 2;
+    padding: 20px;
   }
 
   &__main {
@@ -19,8 +22,22 @@
   &__content {
     z-index: 1;
     display: flex;
+    justify-content: flex-end;
     width: 100%;
-    overflow: auto;
     flex: 1 1 auto;
+    position: relative;
+    z-index: 1;
+    overflow: hidden;
+  }
+
+  &__outlet {
+    width: 80%;
+    position: relative;
+  }
+
+  &__sidebar {
+    width: 20%;
+    position: relative;
+    z-index: 5;
   }
 }

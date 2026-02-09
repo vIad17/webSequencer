@@ -1,7 +1,6 @@
 body {
   margin: 0;
   width: 100vw;
-  // height: 100vh;
   overflow: hidden;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -10,19 +9,26 @@ body {
 
 @font-face {
   font-family: roboto-regular;
-  src: url("/fonts/roboto/roboto-regular.woff2");
+  src: url('/fonts/roboto/roboto-regular.woff2');
   font-display: fallback;
 }
 
 @font-face {
   font-family: roboto-medium;
-  src: url("/fonts/roboto/roboto-medium.woff2");
+  src: url('/fonts/roboto/roboto-medium.woff2');
+  font-display: fallback;
+}
+
+@font-face {
+  font-family: lato-medium;
+  src: url('/fonts/lato/lato-medium.woff2');
   font-display: fallback;
 }
 
 :root {
   --roboto-regular: roboto-regular, sans-serif;
   --roboto-medium: roboto-medium, sans-serif;
+  --lato-medium: lato-medium, sans-serif;
 
   --colors-bg-primary: #030918;
   --colors-bg-secondary: #001629;

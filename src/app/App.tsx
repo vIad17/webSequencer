@@ -1,7 +1,11 @@
+import { Toaster } from 'react-hot-toast';
+
+import { MIDIProvider } from '@react-midi/hooks';
+
+import LiveMIDIInput from 'src/features/InputOutput/LiveMIDIInput';
+
 import Router from './Router/Router';
 import SoundManager from './SoundManager';
-import { MIDIProvider } from '@react-midi/hooks';
-import LiveMIDIInput from 'src/features/InputOutput/LiveMIDIInput'
 
 const App = () => (
   <div className="App">
@@ -9,6 +13,7 @@ const App = () => (
       <Router />
       <SoundManager />
       <LiveMIDIInput />
+      <Toaster />
     </MIDIProvider>
   </div>
 );

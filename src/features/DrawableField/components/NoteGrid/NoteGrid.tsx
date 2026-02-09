@@ -22,8 +22,6 @@ const NoteGrid = ({ className = '' }: NoteGridProps) => {
     (state: RootState) => state.notesArray.playingNotes
   );
 
-  console.log(plaingNotes);
-
   const elemWidth = drawableField.elementWidth;
   const elemHeight = drawableField.elementHeight;
   const columnCount = drawableField.columnsCount;
