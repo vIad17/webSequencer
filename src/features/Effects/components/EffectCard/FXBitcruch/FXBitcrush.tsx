@@ -74,11 +74,8 @@ const FXBitcrush = ({ name = '', className, id }: FXBitcrushProps) => {
     svg
       .append('path')
       .datum(sineData)
-      .attr('class', 'sine-wave')
+      .attr('class', 'sine-wave FXgraph-line')
       .attr('d', lineGenerator)
-      .attr('fill', 'none')
-      .attr('stroke', '#FFFFFF')
-      .attr('stroke-width', 3);
   };
   
 

@@ -1,8 +1,8 @@
 import { ReactNode, useRef, useEffect } from 'react';
 import * as d3 from 'd3';
-import './FXTremolo.scss';
+import './FXDelay.scss';
 
-import { setTremoloFrequency, setTremoloDepth } from 'src/shared/redux/slices/soundSettingsSlice';
+import { setTremoloFrequency, setTremoloDepth, setDelayTime, setFeedback } from 'src/shared/redux/slices/soundSettingsSlice';
 
 import { RootState } from 'src/shared/redux/store/store';
 import { useSelector, useDispatch } from 'react-redux';
@@ -11,13 +11,13 @@ import { graphSAW, graphSIN, graphSQR, graphTRI } from 'src/shared/functions/wav
 import EffectCard from '../EffectCard';
 import KnobInput from '../../KnobInput/KnobInput';
 
-interface FXTremoloProps {
+interface FXDelayProps {
   className?: string;
   name?: string;
-  id: string;
+  id: string
 }
 
-const FXTremolo = ({ name = '', className, id }: FXTremoloProps) => {
+const FXDelay = ({ name = '', className, id }: FXDelayProps) => {
   const svgRef = useRef<SVGSVGElement>(null);
   const dispatch = useDispatch();
   const soundSettings = useSelector((state: RootState) => state.soundSettings);
@@ -58,23 +58,20 @@ const FXTremolo = ({ name = '', className, id }: FXTremoloProps) => {
       .attr('x2', width)
       .attr('y2', (d) => yScale(d));
 
-
-    const sineData = d3.range(0.001, cols, 0.005).map((x) => ({
-      x,
-      y: (graphSIN((x-2)* (soundSettings.tremoloFrequency??1))*1.5*(soundSettings.tremoloDepth??1)+2)
-    }));
-
-    const lineGenerator = d3
-      .line<{ x: number; y: number }>()
-      .x((d) => xScale(d.x))
-      .y((d) => yScale(d.y))
-      .curve(d3.curveLinear);
+    const xScaleDelay = d3.scaleLinear().domain([0, cols*20]).range([2, (width*20*Math.max((soundSettings.delayTime ?? 0), 0.05))-1]);
+    
+    const delayLineHeight = 50;
 
     svg
-      .append('path')
-      .datum(sineData)
-      .attr('class', 'sine-wave FXgraph-line')
-      .attr('d', lineGenerator)
+      .selectAll('line.delay')
+      .data(d3.range(cols*20 + 1))
+      .enter()
+      .append('line')
+      .attr('class', 'delay-line FXgraph-line')
+      .attr('x1', (d) => xScaleDelay(d))
+      .attr('y1', (d) => 50-(delayLineHeight*Math.pow((soundSettings.feedback ?? 0),d)))
+      .attr('x2', (d) => xScaleDelay(d))
+      .attr('y2', (d) => 50+(delayLineHeight*Math.pow((soundSettings.feedback ?? 0),d)));
   };
   
 
@@ -88,30 +85,30 @@ const FXTremolo = ({ name = '', className, id }: FXTremoloProps) => {
       .attr('height', height);
 
     drawSketch(svg, width, height);
-  }, [soundSettings.tremoloDepth, soundSettings.tremoloFrequency]);
+  }, [soundSettings.delayTime, soundSettings.feedback]);
 
   return (
-    <EffectCard name={'Tremolo'} width={230} id={id} children={
+    <EffectCard id={id} name={'Delay'} width={230} children={
       <div className="effect__content_inner">
         <svg ref={svgRef} className="synth__graph" />
         <div className='Effect_knobs_horizontal'>
           <KnobInput 
-            value={soundSettings.tremoloFrequency}
-            setValue={setTremoloFrequency}
+            value={soundSettings.delayTime}
+            setValue={setDelayTime}
             min={0}
-            max={10}
+            max={1}
             step={0.01}
-            label="frequency"
+            label="Time"
             showValue={false}
             lockMouse={true}
           />
           <KnobInput 
-            value={soundSettings.tremoloDepth}
-            setValue={setTremoloDepth}
+            value={soundSettings.feedback}
+            setValue={setFeedback}
             min={0}
             max={1}
             step={0.01}
-            label="depth"
+            label="Feedback"
             showValue={false}
             lockMouse={true}
           />
@@ -122,4 +119,4 @@ const FXTremolo = ({ name = '', className, id }: FXTremoloProps) => {
   );
 };
 
-export default FXTremolo;
+export default FXDelay;

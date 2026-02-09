@@ -1,8 +1,8 @@
 import { ReactNode, useRef, useEffect } from 'react';
 import * as d3 from 'd3';
-import './FXTremolo.scss';
+import './FXDistortion.scss';
 
-import { setTremoloFrequency, setTremoloDepth } from 'src/shared/redux/slices/soundSettingsSlice';
+import { setDistortion } from 'src/shared/redux/slices/soundSettingsSlice';
 
 import { RootState } from 'src/shared/redux/store/store';
 import { useSelector, useDispatch } from 'react-redux';
@@ -10,14 +10,15 @@ import { useSelector, useDispatch } from 'react-redux';
 import { graphSAW, graphSIN, graphSQR, graphTRI } from 'src/shared/functions/waveforms';
 import EffectCard from '../EffectCard';
 import KnobInput from '../../KnobInput/KnobInput';
+import { clamp } from 'src/shared/functions/math';
 
-interface FXTremoloProps {
+interface FXDistortionProps {
   className?: string;
   name?: string;
-  id: string;
+  id: string
 }
 
-const FXTremolo = ({ name = '', className, id }: FXTremoloProps) => {
+const FXDistortion = ({ name = '', className, id }: FXDistortionProps) => {
   const svgRef = useRef<SVGSVGElement>(null);
   const dispatch = useDispatch();
   const soundSettings = useSelector((state: RootState) => state.soundSettings);
@@ -61,7 +62,7 @@ const FXTremolo = ({ name = '', className, id }: FXTremoloProps) => {
 
     const sineData = d3.range(0.001, cols, 0.005).map((x) => ({
       x,
-      y: (graphSIN((x-2)* (soundSettings.tremoloFrequency??1))*1.5*(soundSettings.tremoloDepth??1)+2)
+      y: clamp((x-2)*(1+(soundSettings.distortion ?? 0)*10)+2, 0.05, 3.95)
     }));
 
     const lineGenerator = d3
@@ -88,33 +89,24 @@ const FXTremolo = ({ name = '', className, id }: FXTremoloProps) => {
       .attr('height', height);
 
     drawSketch(svg, width, height);
-  }, [soundSettings.tremoloDepth, soundSettings.tremoloFrequency]);
+  }, [soundSettings.distortion]);
 
   return (
-    <EffectCard name={'Tremolo'} width={230} id={id} children={
+    <EffectCard id={id} name={'Distortion'} width={230} children={
       <div className="effect__content_inner">
         <svg ref={svgRef} className="synth__graph" />
         <div className='Effect_knobs_horizontal'>
           <KnobInput 
-            value={soundSettings.tremoloFrequency}
-            setValue={setTremoloFrequency}
-            min={0}
-            max={10}
-            step={0.01}
-            label="frequency"
-            showValue={false}
-            lockMouse={true}
-          />
-          <KnobInput 
-            value={soundSettings.tremoloDepth}
-            setValue={setTremoloDepth}
+            value={soundSettings.distortion}
+            setValue={setDistortion}
             min={0}
             max={1}
             step={0.01}
-            label="depth"
+            label="distortion"
             showValue={false}
             lockMouse={true}
           />
+          
         </div>
       </div>
       }>
@@ -122,4 +114,4 @@ const FXTremolo = ({ name = '', className, id }: FXTremoloProps) => {
   );
 };
 
-export default FXTremolo;
+export default FXDistortion;

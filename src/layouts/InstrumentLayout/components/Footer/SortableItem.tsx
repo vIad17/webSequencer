@@ -6,11 +6,17 @@ import FXGainADSR from 'src/features/Effects/components/EffectCard/FXGainADSR/FX
 import FXTremolo from 'src/features/Effects/components/EffectCard/FXTremolo/FXTremolo';
 import { index } from 'd3';
 import { Effect, EffectType } from 'src/shared/redux/slices/effectsSlice';
+import FXDelay from 'src/features/Effects/components/EffectCard/FXDelay/FXDelay';
+import FXDistortion from 'src/features/Effects/components/EffectCard/FXDistortion/FXDistortion';
+import FXPitchShift from 'src/features/Effects/components/EffectCard/FXPitchShift/FXPitchShift';
 
-const EffectComponentByType: Partial<Record<EffectType, React.ComponentType<{ id: string }>>> = {
+export const EffectComponentByType: Partial<Record<EffectType, React.ComponentType<{ id: string }>>> = {
   [EffectType.ADSR]: FXGainADSR,
   [EffectType.TREMOLO]: FXTremolo,
   [EffectType.BITS]: FXBitcrush,
+  [EffectType.DELAY]: FXDelay,
+  [EffectType.DISTORTION]: FXDistortion,
+  [EffectType.PITCH_SHIFT]: FXPitchShift,
 };
 
 export const SortableItem = ({id, effect}: {id: string, effect: Effect}) => {

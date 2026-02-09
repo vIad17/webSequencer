@@ -10,7 +10,7 @@ import { RootState } from 'src/shared/redux/store/store';
 import { useMemo, useState } from 'react';
 import { closestCenter, CollisionDetection, DndContext, DragEndEvent, DragOverEvent, DragOverlay, DragStartEvent, KeyboardSensor, PointerSensor, pointerWithin, useDroppable, useSensor, useSensors } from '@dnd-kit/core';
 import { arrayMove, sortableKeyboardCoordinates } from '@dnd-kit/sortable';
-import { SortableItem } from './components/Footer/SortableItem';
+import { EffectComponentByType, SortableItem } from './components/Footer/SortableItem';
 import { snapCenterToCursor } from '@dnd-kit/modifiers';
 import { addEffect, Effect, EffectType, removeEffect, setEffects } from 'src/shared/redux/slices/effectsSlice';
 import FXGainADSR from 'src/features/Effects/components/EffectCard/FXGainADSR/FXGainADSR';
@@ -121,6 +121,7 @@ const sensors = useSensors(
 
   const { setNodeRef: setMainRef } = useDroppable({ id: "main" });
   const { setNodeRef: setSidebarRef } = useDroppable({ id: "sidebar" });
+  const EffectCard = activeEffect ? EffectComponentByType[activeEffect.type] : undefined;
 
   return <div className="instrument-layout">
     <Header className="instrument-layout__header" />
@@ -147,7 +148,7 @@ const sensors = useSensors(
       <DragOverlay style={{ opacity: isOverFooter ? 1 : 0.35 }}>
         {activeEffect ?
           isNewEffect ?
-            <EffectGhost effect={activeEffect} /> :
+            !!EffectCard && <EffectCard id={activeEffect.id} /> :
             activeEffectComp ?
               <div dangerouslySetInnerHTML={{ __html: activeEffectComp.outerHTML }} /> :
               null :

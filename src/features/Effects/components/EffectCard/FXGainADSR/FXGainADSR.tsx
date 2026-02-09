@@ -96,27 +96,24 @@ const FXGainADSR = ({ name = '', className, id }: FXGainADSRProps) => {
       .y((d) => yScale(d.y))
       .curve(d3.curveLinear);
 
-    // Draw waveform
-    svg
-      .append('path')
-      .datum(sineData)
-      .attr('class', 'sine-wave')
-      .attr('d', lineGenerator)
-      .attr('fill', 'none')
-      .attr('stroke', '#FFFFFF')
-      .attr('stroke-width', 3);
-
+  // Draw waveform
+  svg
+    .append('path')
+    .datum(sineData)
+    .attr('class', 'FXgraph-line')
+    .attr('d', lineGenerator)
 
     const svgNode = svg.node();
 
-    // Drag behavior
-    const drag = d3
-      .drag<SVGCircleElement, { id: string; x: number; y: number }>()
-      .on('start', function (event) {
-        d3.select(this).raise().attr('stroke', 'orange').attr('r', 6);
-      })
-      .on('drag', function (event, d) {
-        const [mouseX, mouseY] = d3.pointer(event, svgNode);
+  // Drag behavior
+  const drag = d3
+    .drag<SVGCircleElement, { id: string; x: number; y: number }>()
+    .on('start', function () {
+      // d3.select(this).raise().attr('fill', 'orange').attr('r', 6);
+      d3.select(this).raise().attr('class', 'draggable-point active');
+    })
+    .on('drag', function (event, d) {
+      const [mouseX, mouseY] = d3.pointer(event, svgNode);
 
         const xData = xScale.invert(mouseX);
         const yData = yScale.invert(mouseY);
@@ -130,58 +127,39 @@ const FXGainADSR = ({ name = '', className, id }: FXGainADSRProps) => {
         let newSustain = soundSettings.sustain ?? 1;
         let newRelease = soundSettings.release ?? 0;
 
-        if (d.id === 'attack') {
-          newAttack = Math.min(Math.max(0, constrainedX * 2), 2); // reverse your scaling: /2 → *2
-          d.x = constrainedX;
-          d.y = 1;
-        } else if (d.id === 'decay') {
-          newSustain = Math.min(Math.max(0, Math.min(1, constrainedY / 4)), 1);
-          newDecay = Math.min(Math.max(0, (constrainedX - attack) * 2), 2); // reverse /2 scaling
-          d.x = constrainedX;
-          d.y = newSustain;
-        } else if (d.id === 'sustain') {
-          newSustain = Math.max(0, Math.min(1, constrainedY / 4));
-          d.y = newSustain;
-        } else if (d.id === 'release') {
-          newRelease = Math.min(Math.max(0, (constrainedX - (attack + decay + 1)) * 5), 5);
-          d.x = constrainedX;
-          d.y = 0;
-        }
+      if (d.id === 'attack') {
+        newAttack = Math.min(Math.max(0, constrainedX * 2),2);
+        d.x = constrainedX;
+        d.y = 1;
+        dispatch(setAttack(newAttack));
+      } else if (d.id === 'decay') {
+        newSustain = Math.min(Math.max(0, Math.min(1, constrainedY/4)),1);
+        newDecay = Math.min(Math.max(0, (constrainedX - attack) * 2),2);
+        d.x = constrainedX;
+        d.y = newSustain;
+        dispatch(setDecay(newDecay));
+        dispatch(setSustain(newSustain));
+      } else if (d.id === 'sustain') {
+        newSustain = Math.max(0, Math.min(1, constrainedY/4));
+        d.y = newSustain;
+        dispatch(setSustain(newSustain));
+      } else if (d.id === 'release') {
+        newRelease = Math.min(Math.max(0, (constrainedX-(attack + decay + 1)) * 5),5); 
+        d.x = constrainedX;
+        d.y = 0;
+        dispatch(setRelease(newRelease));
+      }
 
-        // Dispatch updates
-        if (d.id === 'attack') dispatch(setAttack(newAttack));
-        if (d.id === 'decay') {
-          dispatch(setDecay(newDecay));
-          dispatch(setSustain(newSustain));
-        }
-        if (d.id === 'sustain') dispatch(setSustain(newSustain));
-        if (d.id === 'release') dispatch(setRelease(newRelease));
-
-        // Update visual position
-        d3.select(this)
-          .attr('cx', xScale(d.x))
-          .attr('cy', yScale(d.y));
-      })
-      .on('end', function () {
-        d3.select(this).attr('stroke', 'white').attr('r', 5);
-      });
-
-    // Draw draggable points
-    svg
-      .selectAll('.draggable-point')
-      .data(points)
-      .enter()
-      .append('circle')
-      .attr('class', 'draggable-point')
-      .attr('cx', (d) => xScale(d.x))
-      .attr('cy', (d) => yScale(d.y))
-      .attr('r', 7)
-      .on('pointerdown', function (event) {
-        event.stopPropagation();
-      })
-      .call(drag);
-  };
-
+      // Update visual position
+      d3.select(this)
+        .attr('cx', xScale(d.x))
+        .attr('cy', yScale(d.y));
+    })
+    .on('end', function () {
+      // d3.select(this).attr('fill', 'white');
+      d3.select(this).attr('class', 'draggable-point');
+    });
+  }
 
   useEffect(() => {
     const width = 270;
