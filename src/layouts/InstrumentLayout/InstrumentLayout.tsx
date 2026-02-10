@@ -12,23 +12,11 @@ import { closestCenter, CollisionDetection, DndContext, DragEndEvent, DragOverEv
 import { arrayMove, sortableKeyboardCoordinates } from '@dnd-kit/sortable';
 import { EffectComponentByType, SortableItem } from './components/Footer/SortableItem';
 import { snapCenterToCursor } from '@dnd-kit/modifiers';
-import { addEffect, Effect, EffectType, removeEffect, setEffects } from 'src/shared/redux/slices/effectsSlice';
+import { addEffect, Effect, EffectType, removeEffect, setEffects, moveEffect } from 'src/shared/redux/slices/effectsSlice';
 import FXGainADSR from 'src/features/Effects/components/EffectCard/FXGainADSR/FXGainADSR';
 import FXTremolo from 'src/features/Effects/components/EffectCard/FXTremolo/FXTremolo';
 import FXBitcrush from 'src/features/Effects/components/EffectCard/FXBitcruch/FXBitcrush';
 
-const EffectGhost = ({ effect }: { effect: Effect }) => {
-  switch (effect.type) {
-    case EffectType.ADSR:
-      return <FXGainADSR id={effect.id} />;
-    case EffectType.TREMOLO:
-      return <FXTremolo id={effect.id} />;
-    case EffectType.BITS:
-      return <FXBitcrush id={effect.id} />;
-    default:
-      return null;
-  }
-};
 
 const collisionDetection: CollisionDetection = (args) => {
   if (args.pointerCoordinates) return pointerWithin(args);
@@ -110,6 +98,8 @@ const sensors = useSensors(
       if (oldIndex === -1 || newIndex === -1) return effects;
       return arrayMove(effects, oldIndex, newIndex);
     });
+
+    // dispatch(moveEffect()) //TODO WIP
 
     dispatch(setEffects(setOrderedEffectIds()))
 

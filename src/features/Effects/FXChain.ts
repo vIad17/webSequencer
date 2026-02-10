@@ -137,7 +137,6 @@ export class FXChain {
     this.addFX(removedFX, newPosition);
 
     this.effectsChain.splice(position, 1);
-
   }
 
   public appendFX(newFX: Tone.ToneAudioNode) {
