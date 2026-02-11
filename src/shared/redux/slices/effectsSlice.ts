@@ -64,4 +64,4 @@ export const effectsSlice = createSlice({
     }),
   }
 });
-export const { setEffects, addEffect, removeEffect } = effectsSlice.actions;
+export const { setEffects, addEffect, removeEffect, moveEffect } = effectsSlice.actions;
