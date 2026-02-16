@@ -1,3 +1,4 @@
+
 /**
  * Mock Service Worker.
  * @see https://github.com/mswjs/msw
@@ -216,7 +217,9 @@ async function getResponse(
 
 function sendToClient(
   client: Client,
+
   message: string,
+
   transferrables: Transferable[] = []
 ): Promise<any> {
   return new Promise((resolve, reject) => {
