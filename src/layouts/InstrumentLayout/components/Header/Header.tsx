@@ -48,7 +48,6 @@ interface Project {
   autosave: boolean;
 }
 const Header = ({ className = '' }: HeaderProps) => {
-  const { id } = useParams();
   const [myBpm, setMyBpm] = useState(120);
   const [myTacts, setMyTacts] = useState(8);
   const [fileOpen, setFileOpen] = useState(false);
@@ -56,6 +55,7 @@ const Header = ({ className = '' }: HeaderProps) => {
   const [inputModalOpen, setInputModalOpen] = useState(false);
   const [profileDropdown, setProfileDropdown] = useState(false);
   const [isAutosaveEnabled, setIsAutosaveEnabled] = useState(false);
+  const { id } = useParams();
 
   const nameInputRef = useRef<HTMLInputElement>(null);
 
@@ -77,7 +77,7 @@ const Header = ({ className = '' }: HeaderProps) => {
 
   const { username } = useSelector((state: RootState) => state.user);
 
-  const { isLoading } = useSelector((state: RootState) => state.project_name);
+  const { isLoading } = useSelector((state: RootState) => state.projectName);
 
   const {
     name,
@@ -308,7 +308,7 @@ const Header = ({ className = '' }: HeaderProps) => {
         </div>
 
         <div className="header__center">
-          {localStorage.getItem('accessToken') && (
+          {id ? (
             <div className="header__logo-container">
               <img src={logo} alt="Project Logo" className="header__logo" />
               <div
@@ -336,7 +336,7 @@ const Header = ({ className = '' }: HeaderProps) => {
                 )}
               </div>
             </div>
-          )}
+          ) : null}
 
           <div className="header__controls">
             {!!settings.bpm || !!settings.tacts ? (

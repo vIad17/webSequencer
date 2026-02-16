@@ -1,18 +1,28 @@
-import { createSlice } from '@reduxjs/toolkit';
+import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
-const initialState = {
+export interface UserState {
+  id: string | null,
+  username: string,
+  avatar_id: string | null,
+  bio: string,
+  isLoading: boolean,
+  isDragging: boolean
+}
+
+const initialState: UserState = {
   id: null,
   username: '',
   avatar_id: null,
   bio: '',
-  isLoading: false
+  isLoading: false,
+  isDragging: false
 };
 
 export const userSlice = createSlice({
   name: 'user',
   initialState,
   reducers: {
-    setUserData: (state, action) => {
+    setUserData: (state, action: PayloadAction<UserState>) => {
       const { id, username, avatar_id, bio } = action.payload;
       state.id = id;
       state.username = username;
@@ -25,10 +35,13 @@ export const userSlice = createSlice({
       state.avatar_id = null;
       state.bio = '';
     },
-    setLoading: (state, action) => {
+    setLoading: (state, action: PayloadAction<boolean>) => {
       state.isLoading = action.payload;
+    },
+    setIsDragging: (state, action: PayloadAction<boolean>) => {
+      state.isDragging = action.payload
     }
   }
 });
 
-export const { setUserData, setLoading } = userSlice.actions;
+export const { setUserData, setLoading, setIsDragging } = userSlice.actions;

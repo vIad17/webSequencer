@@ -17,7 +17,7 @@ export const useProjectName = (initialName: string) => {
   const [tempName, setTempName] = useState(initialName);
   const dispatch = useDispatch<SequencerDispatch>();
 
-  const { name } = useSelector((state: RootState) => state.project_name);
+  const { name } = useSelector((state: RootState) => state.projectName);
 
   const { toastError } = useToast();
 

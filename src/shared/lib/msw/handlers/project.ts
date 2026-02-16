@@ -77,7 +77,7 @@ export const projectHandler = [
     }
 
     return HttpResponse.json(
-      { name: projects[id].userId ?? null },
+      { userId: projects[id].userId ?? null },
       { status: 200 }
     );
   }),

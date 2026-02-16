@@ -1,26 +1,30 @@
-import { createSlice } from '@reduxjs/toolkit';
+import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
-const initialState = {
+export interface ProjectUserIdState {
+  userId: string | null;
+  isLoading: boolean;
+}
+
+const initialState: ProjectUserIdState = {
   userId: null,
   isLoading: false
 };
 
 export const projectUserIdSlice = createSlice({
-  name: 'project_user_id',
+  name: 'projectUserId',
   initialState,
   reducers: {
-    setProjectUserId: (state, action) => {
-      const userId = action.payload;
-      state.userId = userId;
+    setProjectUserId: (state, action: PayloadAction<string | null>) => {
+      state.userId = action.payload;
     },
     clearProjectUserId: (state) => {
       state.userId = null;
     },
-    setProjectUserIdLoading: (state, action) => {
+    setProjectUserIdLoading: (state, action: PayloadAction<boolean>) => {
       state.isLoading = action.payload;
     }
   }
 });
 
-export const { setProjectUserId, setProjectUserIdLoading } =
+export const { setProjectUserId, clearProjectUserId, setProjectUserIdLoading } =
   projectUserIdSlice.actions;
