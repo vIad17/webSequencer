@@ -45,8 +45,8 @@
     border-radius: 4px;
     transition: background-color 0.2s ease;
 
-    &:hover {
-      background-color: rgba(255, 255, 255, 0.1);
+    &_hover-enabled:hover {
+        background-color: rgba(255, 255, 255, 0.1);
     }
 
     &_editable {
@@ -175,7 +175,6 @@
     z-index: 50;
   }
 
-
   &__second_left-item {
     width: fit-content;
     position: relative;
@@ -252,4 +251,3 @@
   font-size: 12px;
   margin-left: 8px;
 }
-
