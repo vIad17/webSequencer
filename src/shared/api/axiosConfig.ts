@@ -22,8 +22,8 @@ interface RetryConfig extends AxiosRequestConfig {
 let isRefreshing = false;
 
 let failedQueue: Array<{
-  resolve: (value: unknown) => void;
-  reject: (reason?: any) => void;
+  resolve: (value: string | PromiseLike<string>) => void;
+  reject: (reason?: Error) => void;
 }> = [];
 
 const processQueue = (error: Error | null, token: string | null = null) => {
@@ -31,7 +31,7 @@ const processQueue = (error: Error | null, token: string | null = null) => {
     if (error) {
       prom.reject(error);
     } else {
-      prom.resolve(token);
+      prom.resolve(token as string);
     }
   });
 
@@ -60,7 +60,7 @@ $api.interceptors.response.use(
       !originalRequest._retry
     ) {
       if (isRefreshing) {
-        return new Promise((resolve, reject) => {
+        return new Promise<string>((resolve, reject) => {
           failedQueue.push({ resolve, reject });
         })
           .then((token) => {
