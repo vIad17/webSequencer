@@ -10,9 +10,33 @@ const $api = axios.create({
   }
 });
 
+const $refreshApi = axios.create({
+  baseURL: API_URL,
+  withCredentials: true
+});
+
 interface RetryConfig extends AxiosRequestConfig {
   _retry?: boolean;
 }
+
+let isRefreshing = false;
+
+let failedQueue: Array<{
+  resolve: (value: string | PromiseLike<string>) => void;
+  reject: (reason?: Error) => void;
+}> = [];
+
+const processQueue = (error: Error | null, token: string | null = null) => {
+  failedQueue.forEach((prom) => {
+    if (error) {
+      prom.reject(error);
+    } else {
+      prom.resolve(token as string);
+    }
+  });
+
+  failedQueue = [];
+};
 
 $api.interceptors.request.use(
   (config) => {
@@ -31,24 +55,59 @@ $api.interceptors.response.use(
   async (error: AxiosError) => {
     const originalRequest = error.config as RetryConfig;
 
-    if (error.response?.status === 401 && !originalRequest._retry) {
+    if (
+      (error.response?.status === 401) &&
+      !originalRequest._retry
+    ) {
+      if (isRefreshing) {
+        return new Promise<string>((resolve, reject) => {
+          failedQueue.push({ resolve, reject });
+        })
+          .then((token) => {
+            if (originalRequest.headers) {
+              originalRequest.headers.Authorization = `Bearer ${token}`;
+            }
+            return $api(originalRequest);
+          })
+          .catch((err) => Promise.reject(err));
+      }
+
       originalRequest._retry = true;
+      isRefreshing = true;
 
       try {
-        const { data } = await $api.post('/refresh');
+        const response = await $refreshApi.post('/refresh');
 
-        localStorage.setItem('accessToken', data.accessToken);
+        if (!response.data || !response.data.accessToken) {
+          throw new Error('Invalid refresh response');
+        }
+
+        const { accessToken } = response.data;
+
+        localStorage.setItem('accessToken', accessToken);
 
         if (originalRequest.headers) {
-          originalRequest.headers.Authorization = `Bearer ${data.accessToken}`;
+          originalRequest.headers.Authorization = `Bearer ${accessToken}`;
         }
+
+        processQueue(null, accessToken);
 
         return $api(originalRequest);
       } catch (refreshError) {
-        await $api.post('/logout');
-        console.error('Token refresh failed:', refreshError);
+        processQueue(refreshError as Error, null);
+
         localStorage.clear();
+
+        try {
+          await $refreshApi.post('/logout');
+        } catch (logoutError) {
+          console.error('Logout failed:', logoutError);
+        }
+
+        console.error('Token refresh failed:', refreshError);
         return Promise.reject(refreshError);
+      } finally {
+        isRefreshing = false;
       }
     }
 
