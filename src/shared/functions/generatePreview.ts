@@ -8,10 +8,6 @@ export const generatePreview = (
   width: number = 344,
   height: number = 228
 ): string => {
-  if (!notesArray || notesArray.length === 0) {
-    return '';
-  }
-
   const minVelocityIndex = notesArray.reduce(
     (minIndex, current, currentIndex, array) => {
       return current.note < array[minIndex].note ? currentIndex : minIndex;
@@ -90,8 +86,8 @@ export const generatePreview = (
     .attr('x2', x => x * elemWidth)
     .attr('y2', rowsCount * elemHeight)
     .attr('stroke', '#FFFFFF')
-    .attr('opacity', 0.2)
-    .attr('stroke-width', x => (x + (minDeltaPositionNote?.attackTime ?? 0)) % 16 === 0 ? 3 : 1);
+    .attr('opacity', 0.1)
+    .attr('stroke-width', x => (x + (minDeltaPositionNote?.attackTime ?? 0)) % 16 === 0 ? 2 : 1);
 
   svg
     .selectAll('line.horizontal')
@@ -104,21 +100,37 @@ export const generatePreview = (
     .attr('x2', elemWidth * columnCount)
     .attr('y2', y => y * elemHeight)
     .attr('stroke', '#FFFFFF')
-    .attr('opacity', 0.4)
+    .attr('opacity', 0.1)
     .attr('stroke-width', 1);
 
-  svg
-    .selectAll('rect.note')
+  const notes = svg
+    .selectAll('g.note-group')
     .data(notesArray, (_, note) => note)
     .enter()
+    .append('g')
+    .attr('class', 'note-group')
+    .attr('transform', note =>
+      `translate(${(note.attackTime - minDeltaPositionNote.attackTime) * elemWidth}, 
+                ${(note.note - minVelocityNote.note) * elemHeight})`);
+
+  notes
     .append('rect')
-    .attr('class', 'note')
-    .attr('x', note => (note.attackTime - minDeltaPositionNote.attackTime) * elemWidth)
-    .attr('y', note => (note.note - minVelocityNote.note) * elemHeight)
+    .attr('class', 'note-outer')
     .attr('width', note => note.duration * elemWidth)
     .attr('height', elemHeight)
     .attr('fill', '#030918')
-    .attr('stroke', '#FFFFFF');
+    .attr('stroke', '#FFFFFF')
+    .attr('rx', 1)
+    .attr('ry', 1);
+
+  notes
+    .append('rect')
+    .attr('class', 'note-inner')
+    .attr('x', note => (note.duration * elemWidth - elemWidth * 0.6))
+    .attr('y', elemHeight * 0.1)
+    .attr('width', elemWidth * 0.5)
+    .attr('height', elemHeight * 0.8)
+    .attr('fill', '#FFFFFF')
 
   return svg.node()?.outerHTML || '';
 };
