@@ -103,10 +103,10 @@ export const generatePreview = (
     .attr('opacity', 0.1)
     .attr('stroke-width', 1);
 
-  var filtredNotesArray = notesArray.filter(note => note.note <= minVelocityNote.note + deltaVelocity && note.attackTime  <= minDeltaPositionNote.attackTime + deltaPosition);
+  var filteredNotesArray  = notesArray.filter(note => note.note <= minVelocityNote.note + deltaVelocity && note.attackTime  <= minDeltaPositionNote.attackTime + deltaPosition);
   const notes = svg
     .selectAll('g.note-group')
-    .data(filtredNotesArray, (_, note) => note)
+    .data(filteredNotesArray , (_, note) => note)
     .enter()
     .append('g')
     .attr('class', 'note-group')
