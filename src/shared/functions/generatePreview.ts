@@ -41,14 +41,14 @@ export const generatePreview = (
   const defaultDeltaVelocity = maxVelocityNote && minVelocityNote
     ? maxVelocityNote.note - minVelocityNote.note
     : 0;
-  const deltaVelocity = Math.max(defaultDeltaVelocity, 12) + 1;
+  const deltaVelocity = clamp(defaultDeltaVelocity, 12, 48) + 1;
 
   const minDeltaPositionNote = notesArray[minNotePositionIndex];
   const maxDeltaPositionNote = notesArray[maxNotePositionIndex];
   const defaultDeltaPosition = maxDeltaPositionNote && minDeltaPositionNote
     ? maxDeltaPositionNote.attackTime + maxDeltaPositionNote.duration - minDeltaPositionNote.attackTime
     : 0;
-  const deltaPosition = clamp(defaultDeltaPosition, 32, 256);
+  const deltaPosition = clamp(defaultDeltaPosition, 32, 128);
 
   const elemWidth = width / deltaPosition;
   const elemHeight = height / deltaVelocity;
@@ -103,9 +103,10 @@ export const generatePreview = (
     .attr('opacity', 0.1)
     .attr('stroke-width', 1);
 
+  var filtredNotesArray = notesArray.filter(note => note.note <= minVelocityNote.note + deltaVelocity && note.attackTime  <= minDeltaPositionNote.attackTime + deltaPosition);
   const notes = svg
     .selectAll('g.note-group')
-    .data(notesArray, (_, note) => note)
+    .data(filtredNotesArray, (_, note) => note)
     .enter()
     .append('g')
     .attr('class', 'note-group')
