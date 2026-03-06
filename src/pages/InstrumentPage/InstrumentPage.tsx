@@ -1,7 +1,6 @@
 import { useEffect } from 'react';
 
 import TactsNumbers from 'src/components/TactsNumbers/TactsNumbers';
-import TimeStripe from 'src/components/TimeStripe/TimeStripe';
 import VerticalPiano from 'src/components/VerticalPiano/VerticalPiano';
 
 import DrawableField from 'src/features/DrawableField/DrawableField';
@@ -9,6 +8,7 @@ import DrawableField from 'src/features/DrawableField/DrawableField';
 import './InstrumentPage.scss';
 import { useSelector } from 'react-redux';
 import { RootState } from 'src/shared/redux/store/store';
+import { generatePreview } from 'src/shared/functions/generatePreview';
 
 interface InstrumentPageProps {
   className?: string;
@@ -26,6 +26,12 @@ const InstrumentPage = ({ className = '' }: InstrumentPageProps) => {
     (state: RootState) => state.drawableField.elementWidth
   );
 
+  const notesArray = useSelector(
+    (state: RootState) => state.notesArray.notesArray
+  );
+
+  console.log(generatePreview(notesArray));
+
   return (
     <main
       className={`instrument-page ${className}`}
@@ -34,7 +40,6 @@ const InstrumentPage = ({ className = '' }: InstrumentPageProps) => {
         '--element-width': `${elementWidth*16}px`
       }}
     >
-
       
       <TactsNumbers className="top-field__tacts-number" />
       <VerticalPiano className="instrument-page__vertical-piano" />
