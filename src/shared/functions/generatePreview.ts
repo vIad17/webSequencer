@@ -135,3 +135,4 @@ export const generatePreview = (
 
   return svg.node()?.outerHTML || '';
 };
+
