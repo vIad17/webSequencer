@@ -7,6 +7,7 @@ export type UpdateRequestBody = {
   name?: string;
   link?: string;
   autosave?: boolean;
+  image?: string;
 };
 
 export type Project = {
@@ -16,4 +17,5 @@ export type Project = {
   link: string;
   userId: number;
   autosave: boolean;
+  image?: string;
 };

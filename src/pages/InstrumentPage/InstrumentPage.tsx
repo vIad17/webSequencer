@@ -29,8 +29,7 @@ const InstrumentPage = ({ className = '' }: InstrumentPageProps) => {
   const notesArray = useSelector(
     (state: RootState) => state.notesArray.notesArray
   );
-
-  console.log(generatePreview(notesArray));
+  
 
   return (
     <main

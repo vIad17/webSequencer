@@ -92,10 +92,23 @@ export const projectHandler = [
       );
     }
 
-    const { name = '', link = '' , autosave = ''} =
-      (await request.json()) as UpdateRequestBody;
-    return HttpResponse.json({
-      status: 200
-    });
+    const body = await request.json() as UpdateRequestBody;
+
+    projects[id] = {
+      ...projects[id],
+      ...(body.name !== undefined && { name: body.name }),
+      ...(body.link !== undefined && { link: body.link }),
+      ...(body.autosave !== undefined && { autosave: body.autosave }),
+      ...(body.image !== undefined && { image: body.image })
+    };
+
+    return HttpResponse.json(
+      { 
+        status: 200,
+        message: 'Project updated',
+        data: projects[id]
+      },
+      { status: 200 }
+    );
   })
 ];
