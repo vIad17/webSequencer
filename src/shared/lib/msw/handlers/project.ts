@@ -95,11 +95,10 @@ export const projectHandler = [
     const body = await request.json() as UpdateRequestBody;
 
     projects[id] = {
-      ...projects[id],
-      ...(body.name !== undefined && { name: body.name }),
-      ...(body.link !== undefined && { link: body.link }),
-      ...(body.autosave !== undefined && { autosave: body.autosave }),
-      ...(body.image !== undefined && { image: body.image })
+      ...(!!body.name && { name: body.name }),
+      ...(!!body.link && { link: body.link }),
+      ...(!!body.autosave && { autosave: body.autosave }),
+      ...(!!body.image && { image: body.image })
     };
 
     return HttpResponse.json(
