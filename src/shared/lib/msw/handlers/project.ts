@@ -95,6 +95,7 @@ export const projectHandler = [
     const body = await request.json() as UpdateRequestBody;
 
     projects[id] = {
+      ...projects[id],
       ...(!!body.name && { name: body.name }),
       ...(!!body.link && { link: body.link }),
       ...(!!body.autosave && { autosave: body.autosave }),
