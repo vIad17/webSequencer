@@ -152,7 +152,7 @@ const SearchParamsManager = () => {
       : [];
 
     const obj = { notesArray: storedNotesArray, settings, soundSettings };
-    const compressed = compress(obj);
+    const compressed = compress(JSON.stringify(obj));
     
     let compressedImage: string | undefined;
     try {
