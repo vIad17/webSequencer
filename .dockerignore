@@ -1,4 +1,13 @@
 node_modules
 .git
-.env
+.gitignore
+Dockerfile
+compose.yaml
+dist
+build
+coverage
+.vscode
+.idea
 *.log
+.env
+*.md
