@@ -254,7 +254,7 @@ const Header = ({ className = '' }: HeaderProps) => {
     {
       text: 'Profile',
       callback: () => {
-        window.location.href = '/main/myprojects';
+        window.location.href = '/me';
       }
     },
     {
