@@ -23,7 +23,7 @@ export interface ChangeActiveType {
   isActive?: boolean;
 }
 
-interface NotesArrayState {
+export interface NotesArrayState {
   notesArray: Note[];
   playingNotes: string[];
   currentNote: string;
@@ -97,9 +97,7 @@ export const notesArraySlice = createSlice({
     }),
     deleteSelectedNotes: (state) => ({
       ...state,
-      notesArray: state.notesArray.filter(
-        (note) => !note.isSelected
-      )
+      notesArray: state.notesArray.filter((note) => !note.isSelected)
     }),
     changeSelectedNote: (state, action: PayloadAction<ChangeSelectedType>) => ({
       ...state,

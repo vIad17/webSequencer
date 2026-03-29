@@ -1,0 +1,60 @@
+.profile-modal {
+  position: absolute;
+  padding: 14px 12px 16px;
+  background-color: #0a2c58;
+  border: var(--colors-bg-primary) 1px solid;
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  align-content: space-between;
+  justify-content: start;
+
+  &__item {
+    background: none;
+    border: none;
+    margin: 0;
+    padding: 0;
+    color: var(--colors-text-secondary);
+    font-size: 18px;
+    display: flex;
+    justify-content: space-between;
+    position: relative;
+
+    transition: color 0.1s ease;
+
+    &:hover {
+      color: var(--colors-ui-primary);
+    }
+
+    &:active,
+    &:_active {
+      color: var(--colors-ui-accent);
+    }
+  }
+
+  &__text {
+    white-space: nowrap;
+    margin: 6px 0;
+  }
+
+  &__side-content {
+    margin: auto 0 auto 16px;
+    display: flex;
+    justify-content: center;
+  }
+
+  &__side-content > &__check-icon > * {
+    stroke: var(--colors-ui-accent);
+  }
+
+  &__side-icon {
+    width: 24px;
+    height: 24px;
+    scale: 1;
+    transition: scale 0.2s ease;
+
+    &_hidden {
+      scale: 0;
+    }
+  }
+}

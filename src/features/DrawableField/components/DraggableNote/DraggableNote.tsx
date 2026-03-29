@@ -14,6 +14,7 @@ interface DraggableNoteProps {
   index: number;
   isSelected?: boolean;
   isActive?: boolean;
+  isEditable?: boolean
   onDrag?: (e: DraggableEvent, position: DraggableData) => void;
   onMouseDown?: (e: React.MouseEvent, index: number) => void;
   onMouseUp?: (e: React.MouseEvent, index: number) => void;
@@ -26,6 +27,7 @@ const DraggableNote = ({
   y,
   size = 4,
   index,
+  isEditable = true,
   isSelected = false,
   isActive = false,
   onDrag = () => {},
@@ -56,6 +58,7 @@ const DraggableNote = ({
         x: x * elementWidth,
         y: y * elementHeight
       }}
+      disabled={!isEditable}
       cancel=".draggable-note__resizible-button"
       onDrag={onDrag}
       bounds="parent"

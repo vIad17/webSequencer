@@ -1,44 +1,128 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import { useParams } from 'react-router-dom';
 
+import { useMIDIInputs } from '@react-midi/hooks';
+import clsx from 'clsx';
+import FileModal, {
+  ModalItem
+} from 'src/components/Modals/FileModal/FileModal';
+import ProfileModal from 'src/components/Modals/ProfileModal/ProfileModal';
+import ProgressModal from 'src/components/Modals/ProgressModal/ProgressModal';
 import * as Tone from 'tone';
 
+import {
+  exportMp3,
+  openMIDI,
+  pauseMusic,
+  stopMusic
+} from 'src/app/SoundManager';
+import { apiClient } from 'src/shared/api/apiClient';
+import $api from 'src/shared/api/axiosConfig';
+import { useHandleClickOutside } from 'src/shared/hooks/useHandleClickOutside';
+import { Icon } from 'src/shared/icons/Icon';
+import { IconType } from 'src/shared/icons/IconMap';
+import logo from 'src/shared/icons/png/logo.png';
+import avatar from 'src/shared/icons/svg/avatar.svg';
 import { setIsPlaying } from 'src/shared/redux/slices/currentMusicSlice';
 import { setColumnsCount } from 'src/shared/redux/slices/drawableFieldSlice';
 import { setBpm, setTacts } from 'src/shared/redux/slices/settingsSlice';
-import { RootState } from 'src/shared/redux/store/store';
+import { RootState, SequencerDispatch } from 'src/shared/redux/store/store';
+import { fetchUserData } from 'src/shared/redux/thunks/userThunks';
+import Button from 'src/shared/ui/Button/Button';
 
-import arrowRightIcon from './images/arrowRightIcon.svg';
-import checkIcon from './images/checkIcon.svg';
+import { useProjectName } from './hooks/useProjectName';
 
 import './Header.scss';
-import { pauseMusic, stopMusic, openMIDI } from 'src/app/SoundManager';
-import Modal, { ModalItem } from 'src/components/Modal/Modal';
-import { useHandleClickOutside } from 'src/shared/hooks/useHandleClickOutside';
-import clsx from 'clsx';
-
-import { useMIDIInputs } from '@react-midi/hooks';
-import { Icon } from 'src/shared/icons/Icon';
-import { IconType } from 'src/shared/icons/IconMap';
 import { setIsSidebarOpen } from 'src/shared/redux/slices/effectsSidebarSlice';
 
 interface HeaderProps {
   className?: string;
 }
 
+interface Project {
+  name: string;
+  tagNames?: string[];
+  isVisible: boolean;
+  link: string;
+  userId: number;
+  autosave: boolean;
+}
 const Header = ({ className = '' }: HeaderProps) => {
   const [myBpm, setMyBpm] = useState(120);
   const [myTacts, setMyTacts] = useState(8);
   const [fileOpen, setFileOpen] = useState(false);
+  const [editOpen, setEditOpen] = useState(false);
   const [inputModalOpen, setInputModalOpen] = useState(false);
+  const [profileDropdown, setProfileDropdown] = useState(false);
+  const [isAutosaveEnabled, setIsAutosaveEnabled] = useState(false);
+  const { id } = useParams();
 
-  const { modalRef } = useHandleClickOutside(() => {
+  const nameInputRef = useRef<HTMLInputElement>(null);
+
+  const { modalRef: fileModalRef } = useHandleClickOutside(() => {
     setFileOpen(false);
     setInputModalOpen(false);
   });
 
+  const { modalRef: editModalRef } = useHandleClickOutside(() => {
+    setEditOpen(false);
+  });
+
+  const { modalRef: profileModalRef } = useHandleClickOutside(() => {
+    setProfileDropdown(false);
+  });
+
+  const dispatch = useDispatch<SequencerDispatch>();
   const settings = useSelector((state: RootState) => state.settings);
   const isSidebarOpen = useSelector((state: RootState) => state.effectsSidebar.isOpen);
+
+  const { username } = useSelector((state: RootState) => state.user);
+
+  const { isLoading } = useSelector((state: RootState) => state.projectName);
+
+  const userId = useSelector((state: RootState) => state.user.id);
+  const projectUserId = useSelector(
+    (state: RootState) => state.projectUserId.userId
+  );
+
+  const {
+    name,
+    isEditing,
+    tempName,
+    setTempName,
+    handleNameClick,
+    handleNameBlur,
+    handleNameKeyDown
+  } = useProjectName('Untitled Project');
+
+  const isMyProject = isEditing && userId === projectUserId;
+
+  const getAutosaveStatus = async () => {
+    const { data } = await apiClient.get<Project>(`/projects/${id}`);
+    return data.autosave;
+  };
+
+  const updateAutosaveStatus = async (autosave: boolean) => {
+    await apiClient.put(`/projects/${id}`, {
+      autosave
+    });
+  };
+
+  const loadAutosaveStatus = async () => {
+    try {
+      const autosaveStatus = await getAutosaveStatus();
+      setIsAutosaveEnabled(autosaveStatus);
+    } catch (error) {
+      console.error('Failed to load autosave status:', error);
+    }
+  };
+
+  useEffect(() => {
+    if (id) {
+      loadAutosaveStatus();
+    }
+  }, []);
 
   const handleButtonClick = () => {
     document.getElementById('import-midi-file-input')?.click();
@@ -69,25 +153,38 @@ const Header = ({ className = '' }: HeaderProps) => {
   const { input, inputs, selectInput, selectedInputId } = useMIDIInputs();
 
   useEffect(() => {
-    const midiInput = localStorage.getItem("midi-input")
-    midiInput && selectInput(midiInput)
-  }, [selectInput])
+    dispatch(fetchUserData());
+  }, [dispatch]);
+
+  useEffect(() => {
+    const midiInput = localStorage.getItem('midi-input');
+    midiInput && selectInput(midiInput);
+  }, [selectInput]);
+
+  useEffect(() => {
+    if (isEditing && nameInputRef.current) {
+      nameInputRef.current.focus();
+    }
+  }, [isEditing]);
 
   const midiDeviceModalData: ModalItem[] = inputs.map((el) => ({
     text: el.name,
     callback: (event) => {
       event.stopPropagation();
-      localStorage.setItem("midi-input", el.id)
+      localStorage.setItem('midi-input', el.id);
       selectInput(el.id);
     },
     sideContent: (
-      <Icon icon={IconType.Check}
+      <Icon
+        icon={IconType.Check}
         className={clsx('modal__side-icon', 'modal__check-icon', {
           'modal__side-icon_hidden': selectedInputId !== el.id
-        })} />
+        })}
+      />
     )
   }));
   const FileData: ModalItem[] = [
+    { text: 'Export to mp3', callback: exportMp3 },
     {
       text: 'Import MIDI File',
       callback: handleButtonClick,
@@ -100,10 +197,6 @@ const Header = ({ className = '' }: HeaderProps) => {
         />
       )
     },
-    // {
-    //   text: 'Autosave',
-    //   callback: () => { }
-    // },
     {
       text: 'MIDI input',
       callback: () => {
@@ -112,7 +205,7 @@ const Header = ({ className = '' }: HeaderProps) => {
       sideContent: (
         <>
           <Icon icon={IconType.ChevronRight} className="modal__side-icon" />
-          <Modal
+          <FileModal
             className={clsx(
               'header__inputs-left-button-sub-modal',
               'header__left-button-sub-modal'
@@ -122,16 +215,65 @@ const Header = ({ className = '' }: HeaderProps) => {
           />
         </>
       )
+    },
+
+    {
+      text: 'Autosave',
+      callback: async () => {
+        const newAutosaveStatus = !isAutosaveEnabled;
+
+        try {
+          await updateAutosaveStatus(newAutosaveStatus);
+          setIsAutosaveEnabled(newAutosaveStatus);
+        } catch (error) {
+          console.error('Failed to update autosave status:', error);
+        }
+
+        setFileOpen(false);
+      },
+      sideContent: isAutosaveEnabled ? (
+        <Icon
+          icon={IconType.Check}
+          className={clsx('modal__side-icon', 'modal__check-icon')}
+        />
+      ) : null
     }
   ];
 
-  const dispatch = useDispatch();
+  const EditData: ModalItem[] = [
+    {
+      text: 'Save',
+      callback: () => {
+        console.log('Save clicked');
+        setEditOpen(false);
+      },
+      sideContent: <span className="modal__hotkey">Ctrl+S</span>
+    }
+  ];
+
+  const ProfileData: ModalItem[] = [
+    {
+      text: 'Profile',
+      callback: () => {
+        window.location.href = '/main/myprojects';
+      }
+    },
+    {
+      text: 'Log out',
+      callback: () => {
+        $api.post('/logout');
+        localStorage.clear();
+      }
+    }
+  ];
 
   return (
-    <header className={`header ${className}`}>
-      <div className="header__left">
-        <div ref={modalRef} className="header__left-item">
-          <button
+    <>
+      <ProgressModal />
+      <header className={`header ${className}`}>
+        <div className="header__left">
+          <div ref={fileModalRef} className="header__left-item">
+            <button
             className={clsx('header__left-button header__effects-button', {
               'header__effects-button_active': isSidebarOpen
             })}
@@ -141,23 +283,6 @@ const Header = ({ className = '' }: HeaderProps) => {
           >
             Effect library
           </button>
-          <button
-            className={clsx('header__left-button', {
-              'header__left-button_active': fileOpen
-            })}
-            onClick={() => {
-              setFileOpen((prev) => !prev);
-              setInputModalOpen(false);
-            }}
-          >
-            File
-          </button>
-          <Modal
-            className={clsx('header__left-button-modal')}
-            modalActions={FileData}
-            isOpen={fileOpen}
-          />
-          <div>
             <button
               className={clsx('header__left-button', {
                 'header__left-button_active': fileOpen
@@ -165,105 +290,190 @@ const Header = ({ className = '' }: HeaderProps) => {
               onClick={() => {
                 setFileOpen((prev) => !prev);
                 setInputModalOpen(false);
+                setEditOpen(false);
               }}
             >
-              Edit
+              File
             </button>
-            <Modal
+            <FileModal
               className={clsx('header__left-button-modal')}
               modalActions={FileData}
               isOpen={fileOpen}
             />
           </div>
-        </div>
-      </div>
 
-      <div className="header__center">
-        {(!!settings.bpm || !!settings.tacts) && (
-          <div className="header__buttons">
+          <div ref={editModalRef} className="header__second_left-item">
             <button
-              className="header__button"
+              className={clsx('header__second_left-button', {
+                'header__second_left-button_active': editOpen
+              })}
               onClick={() => {
-                if (Tone.context.state === 'suspended') {
-                  Tone.context.resume();
-                }
-                Tone.Transport.start();
-                dispatch(setIsPlaying(true));
+                setEditOpen((prev) => !prev);
+                setFileOpen(false);
+                setInputModalOpen(false);
               }}
             >
-              <Icon
-                icon={IconType.Play}
-                interactable
-                className="header__icon header__icon-start"
-              />
+              Edit
             </button>
-            <button className="header__button" onClick={pauseMusic}>
-              <Icon
-                icon={IconType.Pause}
-                interactable
-                className="header__icon header__icon-pause"
-              />
-            </button>
-            <button className="header__button" onClick={stopMusic}>
-              <Icon
-                icon={IconType.Repeat}
-                interactable
-                className="header__icon header__icon_stop"
-              />
-            </button>
+            <FileModal
+              className={clsx('header__second_left-button-modal')}
+              modalActions={EditData}
+              isOpen={editOpen}
+            />
           </div>
-        )}
+        </div>
 
-        <div className="header__inputs">
-          {!!settings.bpm && (
-            <form
-              className="header__input-form"
-              onSubmit={(event) => {
-                event.preventDefault();
-                dispatch(setBpm(myBpm));
-              }}
-            >
-              bpm
-              <input
-                className="header__input"
-                type="text"
-                defaultValue={settings.bpm}
-                onChange={(event) => {
-                  if (Number(event.target.value)) {
-                    setMyBpm(Number(event.target.value));
-                  }
-                }}
-              />
-            </form>
-          )}
+        <div className="header__center">
+          {id ? (
+            <div className="header__logo-container">
+              <img src={logo} alt="Project Logo" className="header__logo" />
+              <div
+                className={clsx('header__project-name-container', {
+                  'header__project-name-container_editable': isMyProject,
+                  'header__project-name-container_loading': isLoading,
+                  'header__project-name-container_hover-enabled':
+                    userId === projectUserId
+                })}
+                onClick={handleNameClick}
+              >
+                {isMyProject ? (
+                  <input
+                    ref={nameInputRef}
+                    type="text"
+                    value={tempName}
+                    onChange={(e) => setTempName(e.target.value)}
+                    onBlur={handleNameBlur}
+                    onKeyDown={handleNameKeyDown}
+                    className="header__project-input"
+                    placeholder="Enter project name"
+                    maxLength={50}
+                    disabled={isLoading}
+                  />
+                ) : (
+                  <h2 className="header__project-name">{name || tempName}</h2>
+                )}
+              </div>
+            </div>
+          ) : null}
 
-          {!!settings.tacts && (
-            <form
-              className="header__input-form"
-              onSubmit={(event) => {
-                event.preventDefault();
-                dispatch(setTacts(myTacts));
-                dispatch(setColumnsCount(myTacts * 16));
-              }}
-            >
-              tacts
-              <input
-                className="header__input"
-                type="text"
-                defaultValue={settings.tacts}
-                onChange={(event) => {
-                  if (Number(event.target.value)) {
-                    setMyTacts(Number(event.target.value));
-                  }
-                }}
+          <div className="header__controls">
+            {!!settings.bpm || !!settings.tacts ? (
+              <div className="header__buttons">
+                <button
+                  className="header__button"
+                  onClick={() => {
+                    if (Tone.context.state === 'suspended') {
+                      Tone.context.resume();
+                    }
+                    Tone.Transport.start();
+                    dispatch(setIsPlaying(true));
+                  }}
+                >
+                  <Icon
+                    icon={IconType.Play}
+                    interactable
+                    className="header__icon header__icon-start"
+                  />
+                </button>
+                <button className="header__button" onClick={pauseMusic}>
+                  <Icon
+                    icon={IconType.Pause}
+                    interactable
+                    className="header__icon header__icon-pause"
+                  />
+                </button>
+                <button className="header__button" onClick={stopMusic}>
+                  <Icon
+                    icon={IconType.Repeat}
+                    interactable
+                    className="header__icon header__icon_stop"
+                  />
+                </button>
+              </div>
+            ) : null}
+
+            <div className="header__inputs">
+              {!!settings.bpm && (
+                <form
+                  className="header__input-form"
+                  onSubmit={(event) => {
+                    event.preventDefault();
+                    dispatch(setBpm(myBpm));
+                  }}
+                >
+                  bpm
+                  <input
+                    className="header__input"
+                    type="text"
+                    defaultValue={settings.bpm}
+                    onChange={(event) => {
+                      if (Number(event.target.value)) {
+                        setMyBpm(Number(event.target.value));
+                      }
+                    }}
+                  />
+                </form>
+              )}
+
+              {!!settings.tacts && (
+                <form
+                  className="header__input-form"
+                  onSubmit={(event) => {
+                    event.preventDefault();
+                    dispatch(setTacts(myTacts));
+                    dispatch(setColumnsCount(myTacts * 16));
+                  }}
+                >
+                  tacts
+                  <input
+                    className="header__input"
+                    type="text"
+                    defaultValue={settings.tacts}
+                    onChange={(event) => {
+                      if (Number(event.target.value)) {
+                        setMyTacts(Number(event.target.value));
+                      }
+                    }}
+                  />
+                </form>
+              )}
+            </div>
+          </div>
+        </div>
+
+        <div className="header__right" ref={profileModalRef}>
+          {localStorage.getItem('accessToken') && username ? (
+            <>
+              <button
+                className="header__right_profile"
+                onClick={() => setProfileDropdown(!profileDropdown)}
+              >
+                <img
+                  className="header__right_avatar"
+                  src={avatar}
+                  alt="avatar"
+                />
+                <h2 className="header__right_username">{username}</h2>
+              </button>
+              <ProfileModal
+                className={clsx('header__right-button-modal')}
+                modalActions={ProfileData}
+                isOpen={profileDropdown}
               />
-            </form>
+            </>
+          ) : (
+            <>
+              <Button type="header__right_login">
+                <a href="/login">Log in</a>
+              </Button>
+              <Button type="header__right_signup">
+                <a href="/register">Sign up</a>
+              </Button>
+            </>
           )}
         </div>
-      </div>
-
-      <div className="header__right"></div>
-    </header>
+      </header>
+    </>
   );
 };
 

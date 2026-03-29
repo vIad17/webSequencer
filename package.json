@@ -3,15 +3,19 @@
   "version": "0.3.0",
   "private": true,
   "scripts": {
-    "start": "vite",
+    "start": "vite dev",
+    "start:mock": "vite dev --mode=mock",
     "build": "tsc && vite build",
+    "msw:build": "tsc src/shared/lib/msw/mockServiceWorker.ts --target es2020 --outDir public",
     "eslint": "eslint --fix --ext .ts,.tsx .",
     "stylelint": "stylelint --config .stylelintrc.json src/**/*.scss",
     "test": "vitest",
     "prepare": "husky"
   },
   "dependencies": {
+    "@breezystack/lamejs": "^1.2.7",
     "@dnd-kit/core": "^6.3.1",
+    "@dnd-kit/modifiers": "^9.0.0",
     "@dnd-kit/sortable": "^10.0.0",
     "@react-midi/hooks": "^2.0.1",
     "@reduxjs/toolkit": "1.9.5",
@@ -19,16 +23,20 @@
     "@vitejs/plugin-react": "4.2.1",
     "@vitejs/plugin-react-swc": "3.6.0",
     "audiokeys": "0.1.1",
+    "axios": "^1.13.2",
     "clsx": "^2.1.1",
     "d3": "^7.9.0",
     "dnd-kit": "^0.0.2",
     "install": "^0.13.0",
+    "lamejs": "^1.2.1",
     "midi-json-parser": "^8.1.66",
+    "node-lame": "^1.4.0",
     "p5.js-svg": "1.5.1",
     "pako": "2.1.0",
     "react": "18.2.0",
     "react-dom": "18.2.0",
     "react-draggable": "4.4.6",
+    "react-hot-toast": "^2.6.0",
     "react-icons": "^5.5.0",
     "react-p5": "1.3.35",
     "react-redux": "8.0.5",
@@ -40,7 +48,8 @@
     "typescript": "^5.8.2",
     "vite": "5.1.1",
     "vite-plugin-svgr": "4.2.0",
-    "vite-tsconfig-paths": "4.3.1"
+    "vite-tsconfig-paths": "4.3.1",
+    "zod": "^4.3.5"
   },
   "devDependencies": {
     "@types/d3": "^7.4.3",
@@ -65,6 +74,7 @@
     "husky": "9.0.11",
     "husky-init": "8.0.0",
     "lint-staged": "15.2.2",
+    "msw": "^2.12.1",
     "prettier": "3.2.5",
     "schematics-scss-migrate": "2.3.17"
   },
@@ -96,6 +106,11 @@
       "last 1 chrome version",
       "last 1 firefox version",
       "last 1 safari version"
+    ]
+  },
+  "msw": {
+    "workerDirectory": [
+      "public"
     ]
   }
 }

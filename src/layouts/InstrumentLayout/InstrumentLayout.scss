@@ -5,7 +5,9 @@
   flex-direction: column;
 
   &__header {
-    z-index: 2;
+    position: relative;
+    z-index: 10;
+    padding: 20px;
   }
 
   &__main {
@@ -19,6 +21,7 @@
   &__content {
     z-index: 1;
     display: flex;
+    justify-content: flex-end;
     width: 100%;
     overflow: auto;
     flex: 1 1 auto;
