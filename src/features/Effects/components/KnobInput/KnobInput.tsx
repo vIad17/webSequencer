@@ -3,10 +3,11 @@ import { AnyAction } from '@reduxjs/toolkit';
 import { Icon } from 'src/shared/icons/Icon';
 import { IconType } from 'src/shared/icons/IconMap';
 import './KnobInput.scss';
+import { setIsDragging } from 'src/shared/redux/slices/userSlice';
 
 interface KnobInputProps {
   value: number | null;
-  setValue: (arg1: number) => AnyAction;
+  setValue: (arg1: number) => void;
   min: number;
   max: number;
   step: number;
@@ -49,6 +50,7 @@ const KnobInput = ({
     if (isDragging) return;
     isDragging = true;
     e.preventDefault();
+    dispatch(setIsDragging(true));
     const knobElement = e.currentTarget as HTMLElement;
     let startValue = value ?? min;
     
@@ -78,7 +80,7 @@ const KnobInput = ({
       const roundedValue = Math.round(newValue / step) * step;
       const formattedValue = Number(roundedValue.toFixed(stepDecimalPlaces));
       
-      dispatch(setValue(formattedValue));
+      setValue(formattedValue);
       startValue = formattedValue;
     };
 
@@ -86,6 +88,8 @@ const KnobInput = ({
       if (document.exitPointerLock && lockMouse) {
         document.exitPointerLock();
       }
+
+      dispatch(setIsDragging(false));
 
       document.removeEventListener('mousemove', handleMouseMove);
       document.removeEventListener('mouseup', handleMouseUp);

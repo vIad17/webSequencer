@@ -2,8 +2,6 @@ import { ReactNode, useRef, useEffect } from 'react';
 import * as d3 from 'd3';
 import './FXDistortion.scss';
 
-import { setDistortion } from 'src/shared/redux/slices/soundSettingsSlice';
-
 import { RootState } from 'src/shared/redux/store/store';
 import { useSelector, useDispatch } from 'react-redux';
 
@@ -11,6 +9,7 @@ import { graphSAW, graphSIN, graphSQR, graphTRI } from 'src/shared/functions/wav
 import EffectCard from '../EffectCard';
 import KnobInput from '../../KnobInput/KnobInput';
 import { clamp } from 'src/shared/functions/math';
+import { EffectParamsDistortion, setEffectParams } from 'src/shared/redux/slices/effectsSlice';
 
 interface FXDistortionProps {
   className?: string;
@@ -21,7 +20,13 @@ interface FXDistortionProps {
 const FXDistortion = ({ name = '', className, id }: FXDistortionProps) => {
   const svgRef = useRef<SVGSVGElement>(null);
   const dispatch = useDispatch();
-  const soundSettings = useSelector((state: RootState) => state.soundSettings);
+
+  const effect = useSelector((state: RootState) => state.effects.effects).find(el => el.id === id);
+  const effectParams = effect?.params as EffectParamsDistortion;
+
+  const setDistortion = (value: number) => {
+    dispatch(setEffectParams({ id, params: { ...effectParams, distortion: value } }));
+  }
 
   const drawSketch = (
     svg: d3.Selection<SVGSVGElement | null, unknown, null, undefined>,
@@ -62,7 +67,7 @@ const FXDistortion = ({ name = '', className, id }: FXDistortionProps) => {
 
     const sineData = d3.range(0.001, cols, 0.005).map((x) => ({
       x,
-      y: clamp((x-2)*(1+(soundSettings.distortion ?? 0)*10)+2, 0.05, 3.95)
+      y: clamp((x - 2) * (1 + (effectParams.distortion ?? 0) * 10) + 2, 0.05, 3.95)
     }));
 
     const lineGenerator = d3
@@ -77,7 +82,7 @@ const FXDistortion = ({ name = '', className, id }: FXDistortionProps) => {
       .attr('class', 'sine-wave FXgraph-line')
       .attr('d', lineGenerator)
   };
-  
+
 
   useEffect(() => {
     const width = 230;
@@ -89,15 +94,15 @@ const FXDistortion = ({ name = '', className, id }: FXDistortionProps) => {
       .attr('height', height);
 
     drawSketch(svg, width, height);
-  }, [soundSettings.distortion]);
+  }, [effectParams.distortion]);
 
   return (
     <EffectCard id={id} name={'Distortion'} width={230} children={
       <div className="effect__content_inner">
         <svg ref={svgRef} className="synth__graph" />
         <div className='Effect_knobs_horizontal'>
-          <KnobInput 
-            value={soundSettings.distortion}
+          <KnobInput
+            value={effectParams.distortion}
             setValue={setDistortion}
             min={0}
             max={1}
@@ -106,10 +111,10 @@ const FXDistortion = ({ name = '', className, id }: FXDistortionProps) => {
             showValue={false}
             lockMouse={true}
           />
-          
+
         </div>
       </div>
-      }>
+    }>
     </EffectCard>
   );
 };

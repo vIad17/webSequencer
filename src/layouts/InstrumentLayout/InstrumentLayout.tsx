@@ -10,25 +10,10 @@ import { RootState } from 'src/shared/redux/store/store';
 import { useMemo, useState } from 'react';
 import { closestCenter, CollisionDetection, DndContext, DragEndEvent, DragOverEvent, DragOverlay, DragStartEvent, KeyboardSensor, PointerSensor, pointerWithin, useDroppable, useSensor, useSensors } from '@dnd-kit/core';
 import { arrayMove, sortableKeyboardCoordinates } from '@dnd-kit/sortable';
-import { EffectComponentByType, SortableItem } from './components/Footer/SortableItem';
+import { EffectComponentByType } from './components/Footer/SortableItem';
 import { snapCenterToCursor } from '@dnd-kit/modifiers';
-import { addEffect, Effect, EffectType, removeEffect, setEffects } from 'src/shared/redux/slices/effectsSlice';
-import FXGainADSR from 'src/features/Effects/components/EffectCard/FXGainADSR/FXGainADSR';
-import FXTremolo from 'src/features/Effects/components/EffectCard/FXTremolo/FXTremolo';
-import FXBitcrush from 'src/features/Effects/components/EffectCard/FXBitcruch/FXBitcrush';
-
-const EffectGhost = ({ effect }: { effect: Effect }) => {
-  switch (effect.type) {
-    case EffectType.ADSR:
-      return <FXGainADSR id={effect.id} />;
-    case EffectType.TREMOLO:
-      return <FXTremolo id={effect.id} />;
-    case EffectType.BITS:
-      return <FXBitcrush id={effect.id} />;
-    default:
-      return null;
-  }
-};
+import { addEffect, EffectType, removeEffect, setEffects } from 'src/shared/redux/slices/effectsSlice';
+import { effectPreviewByType } from 'src/features/Effects/components/EffectPreview/EffectPreview';
 
 const collisionDetection: CollisionDetection = (args) => {
   if (args.pointerCoordinates) return pointerWithin(args);
@@ -65,17 +50,24 @@ const sensors = useSensors(
 );
 
   function onDragStart(event: DragStartEvent) {
-    const data = event.active.data.current
+    const data = event.active.data.current;
+    
+    if (!data) {
+      return
+    }
+    
+    const effectType = data.effectType as EffectType
+    console.log(event);
 
     const id = String(event.active.id);
-    const isFromSidebar = data?.from === 'sidebar'
+    const isFromSidebar = data?.from === 'sidebar';
 
     setActiveId(id);
 
     setIsNewEffect(isFromSidebar);
 
     if (isFromSidebar) {
-      dispatch(addEffect({ id, type: data.effectType }));
+      dispatch(addEffect({ id, type: effectType, params: effectPreviewByType[effectType].defaultParams }));
     }
   }
 
@@ -87,10 +79,6 @@ const sensors = useSensors(
     const { active, over } = event;
 
     setActiveId(null);
-
-
-
-    // if (!over) return;
 
     const activeEffect = effects.find(effect => effect.id === active.id);
     const overEffect = over ? effects.find(effect => effect.id === over.id) : undefined;
@@ -104,14 +92,14 @@ const sensors = useSensors(
 
     if (activeEffect?.id === overEffect?.id) return;
 
-    const setOrderedEffectIds = (() => {
+    const setOrderedEffects = (() => {
       const oldIndex = effects.indexOf(activeEffect);
       const newIndex = effects.indexOf(overEffect);
       if (oldIndex === -1 || newIndex === -1) return effects;
       return arrayMove(effects, oldIndex, newIndex);
     });
 
-    dispatch(setEffects(setOrderedEffectIds()))
+    dispatch(setEffects(setOrderedEffects()))
 
     setIsOverFooter(false);
   }

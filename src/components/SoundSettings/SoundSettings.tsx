@@ -5,7 +5,6 @@ import {
   setBits,
   setDecay,
   setDelayTime,
-  setDistortion,
   setFeedback,
   setHighFilter,
   setLowFilter,
@@ -22,7 +21,6 @@ import { RootState } from 'src/shared/redux/store/store';
 import './SoundSettings.scss';
 import RangeSetting from './RangeSetting';
 import KnobInput from 'src/features/Effects/components/KnobInput/KnobInput';
-import EffectCard from 'src/features/Effects/components/EffectCard/EffectCard';
 import SynthCard from 'src/features/Effects/components/SynthCard/SynthCard';
 import FXBitcrush from 'src/features/Effects/components/EffectCard/FXBitcruch/FXBitcrush';
 import FXTremolo from 'src/features/Effects/components/EffectCard/FXTremolo/FXTremolo';
@@ -53,14 +51,6 @@ const SoundSettings = ({ className = '' }: SoundSettingsProps) => {
           showValue={false}
           lockMouse={false}
         />
-        {/* <RangeSetting
-          value={soundSettings.volume}
-          setValue={setVolume}
-          min={-50}
-          max={10}
-          step={0.1}
-          label="volume"
-        /> */}
         <KnobInput 
           value={soundSettings.attack}
           setValue={setAttack}
@@ -71,14 +61,6 @@ const SoundSettings = ({ className = '' }: SoundSettingsProps) => {
           showValue={true}
           lockMouse={true}
         />
-        {/* <RangeSetting
-          value={soundSettings.attack}
-          setValue={setAttack}
-          min={0}
-          max={1}
-          step={0.01}
-          label="attack"
-        /> */}
         <RangeSetting
           value={soundSettings.decay}
           setValue={setDecay}
@@ -232,9 +214,6 @@ const SoundSettings = ({ className = '' }: SoundSettingsProps) => {
           <></>
         )}
       </ul>
-      {/* <EffectCard name="Oscillator" >
-        asdfghj
-      </EffectCard> */}
     </div>
   );
 };

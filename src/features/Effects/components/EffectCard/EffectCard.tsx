@@ -3,8 +3,9 @@ import './EffectCard.scss';
 import clsx from 'clsx';
 import { Icon } from 'src/shared/icons/Icon';
 import { IconType } from 'src/shared/icons/IconMap';
-import { useDispatch } from 'react-redux';
-import { removeEffect } from 'src/shared/redux/slices/effectsSlice';
+import { useDispatch, useSelector } from 'react-redux';
+import { removeEffect, toggleIsEffectMuted } from 'src/shared/redux/slices/effectsSlice';
+import { RootState } from 'src/shared/redux/store/store';
 
 interface EffectCardProps {
   className?: string;
@@ -18,11 +19,12 @@ interface EffectCardProps {
 const EffectCard = ({ className = "", name, width, canRemove = true, id, children }: EffectCardProps) => {
   const dispatch = useDispatch();
 
+  const effect = useSelector((state: RootState) => state.effects.effects).find(el => el.id === id);
+
   const [collapsed, setCollapsed] = useState(false);
-  const [muted, setMuted] = useState(false);
 
   return (
-    <div id={id} className={clsx('effect', className, { 'collapsed': collapsed }, { 'muted': muted })} style={{ width: `${collapsed ? 35 : width}px` }}>
+    <div id={id} className={clsx('effect', className, { 'collapsed': collapsed }, { 'muted': effect?.isMuted })} style={{ width: `${collapsed ? 35 : width}px` }}>
       <header className="effect__header">
         <h5 className="effect__header-title">{name}</h5>
         <div className="effect__header_controls">
@@ -43,7 +45,7 @@ const EffectCard = ({ className = "", name, width, canRemove = true, id, childre
             }}
             onClick={(event) => {
               event.stopPropagation();
-              setMuted((prev) => !prev);
+              dispatch(toggleIsEffectMuted({id}))
             }}
             onPointerDown={(e) => {
               e.stopPropagation();

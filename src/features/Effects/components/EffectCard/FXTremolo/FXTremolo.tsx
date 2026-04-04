@@ -2,14 +2,13 @@ import { ReactNode, useRef, useEffect } from 'react';
 import * as d3 from 'd3';
 import './FXTremolo.scss';
 
-import { setTremoloFrequency, setTremoloDepth } from 'src/shared/redux/slices/soundSettingsSlice';
-
 import { RootState } from 'src/shared/redux/store/store';
 import { useSelector, useDispatch } from 'react-redux';
 
 import { graphSAW, graphSIN, graphSQR, graphTRI } from 'src/shared/functions/waveforms';
 import EffectCard from '../EffectCard';
 import KnobInput from '../../KnobInput/KnobInput';
+import { EffectParamsTremollo, setEffectParams } from 'src/shared/redux/slices/effectsSlice';
 
 interface FXTremoloProps {
   className?: string;
@@ -20,7 +19,17 @@ interface FXTremoloProps {
 const FXTremolo = ({ name = '', className, id }: FXTremoloProps) => {
   const svgRef = useRef<SVGSVGElement>(null);
   const dispatch = useDispatch();
-  const soundSettings = useSelector((state: RootState) => state.soundSettings);
+
+  const effect = useSelector((state: RootState) => state.effects.effects).find(el => el.id === id);
+  const effectParams = effect?.params as EffectParamsTremollo;
+
+  const setTremoloFrequency = (value: number) => {
+    dispatch(setEffectParams({ id, params: {...effectParams, tremoloFrequency: value} }));
+  }
+
+  const setTremoloDepth = (value: number) => {
+    dispatch(setEffectParams({ id, params: {...effectParams, tremoloDepth: value} }));
+  }
 
   const drawSketch = (
     svg: d3.Selection<SVGSVGElement | null, unknown, null, undefined>,
@@ -61,7 +70,7 @@ const FXTremolo = ({ name = '', className, id }: FXTremoloProps) => {
 
     const sineData = d3.range(0.001, cols, 0.005).map((x) => ({
       x,
-      y: (graphSIN((x-2)* (soundSettings.tremoloFrequency??1))*1.5*(soundSettings.tremoloDepth??1)+2)
+      y: (graphSIN((x - 2) * (effectParams?.tremoloFrequency ?? 1)) * 1.5 * (effectParams?.tremoloDepth ?? 1) + 2)
     }));
 
     const lineGenerator = d3
@@ -76,7 +85,7 @@ const FXTremolo = ({ name = '', className, id }: FXTremoloProps) => {
       .attr('class', 'sine-wave FXgraph-line')
       .attr('d', lineGenerator)
   };
-  
+
 
   useEffect(() => {
     const width = 230;
@@ -88,15 +97,15 @@ const FXTremolo = ({ name = '', className, id }: FXTremoloProps) => {
       .attr('height', height);
 
     drawSketch(svg, width, height);
-  }, [soundSettings.tremoloDepth, soundSettings.tremoloFrequency]);
+  }, [effectParams?.tremoloDepth, effectParams?.tremoloFrequency]);
 
   return (
     <EffectCard name={'Tremolo'} width={230} id={id} children={
       <div className="effect__content_inner">
         <svg ref={svgRef} className="synth__graph" />
         <div className='Effect_knobs_horizontal'>
-          <KnobInput 
-            value={soundSettings.tremoloFrequency}
+          <KnobInput
+            value={effectParams?.tremoloFrequency ?? 0}
             setValue={setTremoloFrequency}
             min={0}
             max={10}
@@ -105,8 +114,8 @@ const FXTremolo = ({ name = '', className, id }: FXTremoloProps) => {
             showValue={false}
             lockMouse={true}
           />
-          <KnobInput 
-            value={soundSettings.tremoloDepth}
+          <KnobInput
+            value={effectParams?.tremoloDepth ?? 0}
             setValue={setTremoloDepth}
             min={0}
             max={1}
@@ -117,7 +126,7 @@ const FXTremolo = ({ name = '', className, id }: FXTremoloProps) => {
           />
         </div>
       </div>
-      }>
+    }>
     </EffectCard>
   );
 };

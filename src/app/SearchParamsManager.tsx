@@ -24,6 +24,7 @@ import {
   fetchProjectLink,
   fetchProjectUserId
 } from 'src/shared/redux/thunks/projectThunks';
+import { Effect, setEffects } from 'src/shared/redux/slices/effectsSlice';
 
 const INITIAL_SETTINGS: SoundSettingsState = {
   volume: 0,
@@ -49,6 +50,7 @@ interface LoadableData {
   notesArray?: NotesArrayState;
   soundSettings?: SoundSettingsState;
   settings?: SettingsState;
+  effects?: Effect[];
 }
 
 const SearchParamsManager = () => {
@@ -60,6 +62,7 @@ const SearchParamsManager = () => {
 
   const soundSettings = useSelector((state: RootState) => state.soundSettings);
   const settings = useSelector((state: RootState) => state.settings);
+  const effects = useSelector((state: RootState) => state.effects.effects);
   const notesArray = useSelector(
     (state: RootState) => state.notesArray.notesArray
   );
@@ -96,10 +99,12 @@ const SearchParamsManager = () => {
     const safeNotes = Array.isArray(obj?.notesArray) ? obj.notesArray : [];
     const safeSound = obj?.soundSettings ?? INITIAL_SETTINGS;
     const safeSettings = obj?.settings ?? DEFAULT_MAIN_SETTINGS;
+    const safeEffects = obj?.effects ?? [];
 
     dispatch(setNotes(safeNotes));
     dispatch(setSoundSettings(safeSound));
     dispatch(setSettings(safeSettings));
+    dispatch(setEffects(safeEffects));
   };
 
   const initializePage = async () => {
@@ -151,7 +156,7 @@ const SearchParamsManager = () => {
         }))
       : [];
 
-    const obj = { notesArray: storedNotesArray, settings, soundSettings };
+    const obj = { notesArray: storedNotesArray, settings, soundSettings, effects };
     const compressed = compress(obj);
     
     let compressedImage: string | undefined;
@@ -182,7 +187,7 @@ const SearchParamsManager = () => {
     } else {
       setSearchParams('params=' + compressed);
     }
-  }, [isDragging, notesArray, settings, soundSettings]);
+  }, [isDragging, notesArray, settings, soundSettings, effects]);
 
   return <></>;
 };

@@ -2,15 +2,13 @@ import { ReactNode, useRef, useEffect } from 'react';
 import * as d3 from 'd3';
 import './FXPitchShift.scss';
 
-import { setDistortion, setPitchShift } from 'src/shared/redux/slices/soundSettingsSlice';
-
 import { RootState } from 'src/shared/redux/store/store';
 import { useSelector, useDispatch } from 'react-redux';
 
-import { graphSAW, graphSIN, graphSQR, graphTRI } from 'src/shared/functions/waveforms';
+import { graphSIN } from 'src/shared/functions/waveforms';
 import EffectCard from '../EffectCard';
 import KnobInput from '../../KnobInput/KnobInput';
-import { clamp } from 'src/shared/functions/math';
+import { EffectParamsPitchShift, setEffectParams } from 'src/shared/redux/slices/effectsSlice';
 
 interface FXPitchShiftProps {
   className?: string;
@@ -21,7 +19,13 @@ interface FXPitchShiftProps {
 const FXPitchShift = ({ name = '', className, id }: FXPitchShiftProps) => {
   const svgRef = useRef<SVGSVGElement>(null);
   const dispatch = useDispatch();
-  const soundSettings = useSelector((state: RootState) => state.soundSettings);
+
+  const effect = useSelector((state: RootState) => state.effects.effects).find(el => el.id === id);
+  const effectParams = effect?.params as EffectParamsPitchShift;
+
+  const setPitchShift = (value: number) => {
+    dispatch(setEffectParams({ id, params: { ...effectParams, pitchShift: value } }));
+  }
 
   const drawSketch = (
     svg: d3.Selection<SVGSVGElement | null, unknown, null, undefined>,
@@ -63,7 +67,7 @@ const FXPitchShift = ({ name = '', className, id }: FXPitchShiftProps) => {
     //Base line
     const sineData2 = d3.range(0.001, cols, 0.005).map((x) => ({
       x,
-      y: (graphSIN((x-2)*(1 ) )*1.5+2)
+      y: (graphSIN((x - 2) * (1)) * 1.5 + 2)
     }));
 
     const lineGenerator2 = d3
@@ -81,7 +85,7 @@ const FXPitchShift = ({ name = '', className, id }: FXPitchShiftProps) => {
     //Offset line
     const sineData = d3.range(0.001, cols, 0.005).map((x) => ({
       x,
-      y: (graphSIN((x-2)*(Math.pow(2, (soundSettings.pitchShift??1)/6) ) )*1.5+2)
+      y: (graphSIN((x - 2) * (Math.pow(2, (effectParams.pitchShift ?? 1) / 6))) * 1.5 + 2)
     }));
 
     const lineGenerator = d3
@@ -95,10 +99,8 @@ const FXPitchShift = ({ name = '', className, id }: FXPitchShiftProps) => {
       .datum(sineData)
       .attr('class', 'sine-wave FXgraph-line')
       .attr('d', lineGenerator)
-
-    
   };
-  
+
 
   useEffect(() => {
     const width = 230;
@@ -110,15 +112,15 @@ const FXPitchShift = ({ name = '', className, id }: FXPitchShiftProps) => {
       .attr('height', height);
 
     drawSketch(svg, width, height);
-  }, [soundSettings.pitchShift]);
+  }, [effectParams.pitchShift]);
 
   return (
     <EffectCard id={id} name={'Pitch Shift'} width={230} children={
       <div className="effect__content_inner">
         <svg ref={svgRef} className="synth__graph" />
         <div className='Effect_knobs_horizontal'>
-          <KnobInput 
-            value={soundSettings.pitchShift}
+          <KnobInput
+            value={effectParams.pitchShift}
             setValue={setPitchShift}
             min={-24}
             max={24}
@@ -127,10 +129,10 @@ const FXPitchShift = ({ name = '', className, id }: FXPitchShiftProps) => {
             showValue={true}
             lockMouse={true}
           />
-          
+
         </div>
       </div>
-      }>
+    }>
     </EffectCard>
   );
 };

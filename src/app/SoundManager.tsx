@@ -30,7 +30,7 @@ import {
   setProgress
 } from 'src/shared/redux/slices/progressSlice';
 
-const chain = new FXChain();
+export const chain = new FXChain();
 const synth = chain.getSynth();
 /* creating effects */
 
@@ -57,13 +57,13 @@ const lowFilter = new Tone.Filter(8000, 'highpass');
 
 const gain = new Tone.Gain(6);
 
-chain.appendFX(tremolo);
-chain.appendFX(delay);
+// chain.appendFX(tremolo);
+// chain.appendFX(delay);
 // chain.appendFX(dist);
-chain.appendFX(crusher);
-chain.appendFX(shifter);
-chain.appendFX(highFilter);
-chain.appendFX(lowFilter);
+// chain.appendFX(crusher);
+// chain.appendFX(shifter);
+// chain.appendFX(highFilter);
+// chain.appendFX(lowFilter);
 // chain.appendFX(gain);
 
 /* creating a loop music */
@@ -376,6 +376,10 @@ export async function exportMp3() {
     store.dispatch(setProgress(100));
     store.dispatch(setCurrentStep(null));
   }
+}
+
+export function GetChain() {
+  return chain;
 }
 
 /* creating a component */

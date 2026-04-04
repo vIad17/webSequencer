@@ -2,14 +2,12 @@ import { ReactNode, useRef, useEffect } from 'react';
 import * as d3 from 'd3';
 import './FXDelay.scss';
 
-import { setTremoloFrequency, setTremoloDepth, setDelayTime, setFeedback } from 'src/shared/redux/slices/soundSettingsSlice';
-
 import { RootState } from 'src/shared/redux/store/store';
 import { useSelector, useDispatch } from 'react-redux';
 
-import { graphSAW, graphSIN, graphSQR, graphTRI } from 'src/shared/functions/waveforms';
 import EffectCard from '../EffectCard';
 import KnobInput from '../../KnobInput/KnobInput';
+import { EffectParamsDelay, setEffectParams } from 'src/shared/redux/slices/effectsSlice';
 
 interface FXDelayProps {
   className?: string;
@@ -20,7 +18,17 @@ interface FXDelayProps {
 const FXDelay = ({ name = '', className, id }: FXDelayProps) => {
   const svgRef = useRef<SVGSVGElement>(null);
   const dispatch = useDispatch();
-  const soundSettings = useSelector((state: RootState) => state.soundSettings);
+
+  const effect = useSelector((state: RootState) => state.effects.effects).find(el => el.id === id);
+  const effectParams = effect?.params as EffectParamsDelay;
+
+  const setDelayTime = (value: number) => {
+    dispatch(setEffectParams({ id, params: { ...effectParams, delayTime: value } }));
+  }
+
+  const setFeedback = (value: number) => {
+    dispatch(setEffectParams({ id, params: { ...effectParams, feedback: value } }));
+  }
 
   const drawSketch = (
     svg: d3.Selection<SVGSVGElement | null, unknown, null, undefined>,
@@ -58,22 +66,23 @@ const FXDelay = ({ name = '', className, id }: FXDelayProps) => {
       .attr('x2', width)
       .attr('y2', (d) => yScale(d));
 
-    const xScaleDelay = d3.scaleLinear().domain([0, cols*20]).range([2, (width*20*Math.max((soundSettings.delayTime ?? 0), 0.05))-1]);
-    
+    const xScaleDelay = d3.scaleLinear().domain([0, cols * 20]).range([2, (width * 20 * Math.max((effectParams.delayTime ?? 0), 0.05)) - 1]);
+
     const delayLineHeight = 50;
 
     svg
       .selectAll('line.delay')
-      .data(d3.range(cols*20 + 1))
+      .data(d3.range(cols * 20 + 1))
       .enter()
       .append('line')
       .attr('class', 'delay-line FXgraph-line')
       .attr('x1', (d) => xScaleDelay(d))
-      .attr('y1', (d) => 50-(delayLineHeight*Math.pow((soundSettings.feedback ?? 0),d)))
+      .attr('y1', (d) => 50 - (delayLineHeight * Math.pow((effectParams.feedback ?? 0), d)))
       .attr('x2', (d) => xScaleDelay(d))
-      .attr('y2', (d) => 50+(delayLineHeight*Math.pow((soundSettings.feedback ?? 0),d)));
+      .attr('y2', (d) => 50 + (delayLineHeight * Math.pow((effectParams.feedback ?? 0), d)));
   };
-  
+
+  console.log(effectParams);
 
   useEffect(() => {
     const width = 230;
@@ -85,15 +94,15 @@ const FXDelay = ({ name = '', className, id }: FXDelayProps) => {
       .attr('height', height);
 
     drawSketch(svg, width, height);
-  }, [soundSettings.delayTime, soundSettings.feedback]);
+  }, [effectParams.delayTime, effectParams.feedback]);
 
   return (
     <EffectCard id={id} name={'Delay'} width={230} children={
       <div className="effect__content_inner">
         <svg ref={svgRef} className="synth__graph" />
         <div className='Effect_knobs_horizontal'>
-          <KnobInput 
-            value={soundSettings.delayTime}
+          <KnobInput
+            value={effectParams.delayTime}
             setValue={setDelayTime}
             min={0}
             max={1}
@@ -102,8 +111,8 @@ const FXDelay = ({ name = '', className, id }: FXDelayProps) => {
             showValue={false}
             lockMouse={true}
           />
-          <KnobInput 
-            value={soundSettings.feedback}
+          <KnobInput
+            value={effectParams.feedback}
             setValue={setFeedback}
             min={0}
             max={1}
@@ -114,7 +123,7 @@ const FXDelay = ({ name = '', className, id }: FXDelayProps) => {
           />
         </div>
       </div>
-      }>
+    }>
     </EffectCard>
   );
 };

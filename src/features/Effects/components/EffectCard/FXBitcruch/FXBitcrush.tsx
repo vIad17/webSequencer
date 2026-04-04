@@ -1,15 +1,14 @@
-import { ReactNode, useRef, useEffect } from 'react';
+import { useRef, useEffect } from 'react';
 import * as d3 from 'd3';
 import './FXBitcrush.scss';
-
-import { setBits } from 'src/shared/redux/slices/soundSettingsSlice';
 
 import { RootState } from 'src/shared/redux/store/store';
 import { useSelector, useDispatch } from 'react-redux';
 
-import { graphSAW, graphSIN, graphSQR, graphTRI } from 'src/shared/functions/waveforms';
+import { graphSIN } from 'src/shared/functions/waveforms';
 import EffectCard from '../EffectCard';
 import KnobInput from '../../KnobInput/KnobInput';
+import { EffectParamsBits, setEffectParams } from 'src/shared/redux/slices/effectsSlice';
 
 interface FXBitcrushProps {
   className?: string;
@@ -20,7 +19,13 @@ interface FXBitcrushProps {
 const FXBitcrush = ({ name = '', className, id }: FXBitcrushProps) => {
   const svgRef = useRef<SVGSVGElement>(null);
   const dispatch = useDispatch();
-  const soundSettings = useSelector((state: RootState) => state.soundSettings);
+
+  const effect = useSelector((state: RootState) => state.effects.effects).find(el => el.id === id);
+  const effectParams = effect?.params as EffectParamsBits;
+
+  const setBits = (value: number) => {
+    dispatch(setEffectParams({ id, params: { ...effectParams, bits: value } }));
+  }
 
   const drawSketch = (
     svg: d3.Selection<SVGSVGElement | null, unknown, null, undefined>,
@@ -58,11 +63,11 @@ const FXBitcrush = ({ name = '', className, id }: FXBitcrushProps) => {
       .attr('x2', width)
       .attr('y2', (d) => yScale(d));
 
-    const bits = soundSettings.bits??16;
+    const bits = effectParams.bits ?? 16;
 
     const sineData = d3.range(0.001, cols, 0.005).map((x) => ({
       x,
-      y: Math.round((graphSIN(x)*1.5+2) * bits)/bits
+      y: Math.round((graphSIN(x) * 1.5 + 2) * bits) / bits
     }));
 
     const lineGenerator = d3
@@ -77,7 +82,7 @@ const FXBitcrush = ({ name = '', className, id }: FXBitcrushProps) => {
       .attr('class', 'sine-wave FXgraph-line')
       .attr('d', lineGenerator)
   };
-  
+
 
   useEffect(() => {
     const width = 230;
@@ -89,15 +94,15 @@ const FXBitcrush = ({ name = '', className, id }: FXBitcrushProps) => {
       .attr('height', height);
 
     drawSketch(svg, width, height);
-  }, [soundSettings.bits]);
+  }, [effectParams.bits]);
 
   return (
     <EffectCard name={'Bitcrush'} width={230} id={id} children={
       <div className="effect__content_inner">
         <svg ref={svgRef} className="synth__graph" />
         <div className='Effect_knobs_horizontal'>
-          <KnobInput 
-            value={soundSettings.bits ?? 16}
+          <KnobInput
+            value={effectParams.bits ?? 16}
             setValue={setBits}
             min={1}
             max={16}
@@ -108,7 +113,7 @@ const FXBitcrush = ({ name = '', className, id }: FXBitcrushProps) => {
           />
         </div>
       </div>
-      }>
+    }>
     </EffectCard>
   );
 };

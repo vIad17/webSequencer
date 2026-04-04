@@ -94,30 +94,6 @@ export class FXChain {
     return newFX;
   }
 
-  private removeFXconnections(position: number): Tone.ToneAudioNode {
-    const removedFX = this.effectsChain[position];
-
-    if (this.effectsChain.length === 1) {
-      this.synth.disconnect();
-      removedFX.disconnect();
-      this.synth.toDestination();
-    } else if (position === 0) {
-      this.synth.disconnect();
-      removedFX.disconnect();
-      this.synth.connect(this.effectsChain[1]);
-    } else if (position === this.effectsChain.length - 1) {
-      this.effectsChain[position - 1].disconnect();
-      removedFX.disconnect();
-      this.effectsChain[position - 1].toDestination();
-    } else {
-      this.effectsChain[position - 1].disconnect();
-      removedFX.disconnect();
-      this.effectsChain[position - 1].connect(this.effectsChain[position + 1]);
-    }
-
-    return removedFX;
-  }
-
   public removeFX(position: number): void {
     if (position < 0 || position >= this.effectsChain.length) return;
 
@@ -195,5 +171,29 @@ export class FXChain {
     this.synth.dispose();
     this.effectsChain.forEach(fx => fx.dispose());
     this.effectsChain = [];
+  }
+
+  private removeFXconnections(position: number): Tone.ToneAudioNode {
+    const removedFX = this.effectsChain[position];
+
+    if (this.effectsChain.length === 1) {
+      this.synth.disconnect();
+      removedFX.disconnect();
+      this.synth.toDestination();
+    } else if (position === 0) {
+      this.synth.disconnect();
+      removedFX.disconnect();
+      this.synth.connect(this.effectsChain[1]);
+    } else if (position === this.effectsChain.length - 1) {
+      this.effectsChain[position - 1].disconnect();
+      removedFX.disconnect();
+      this.effectsChain[position - 1].toDestination();
+    } else {
+      this.effectsChain[position - 1].disconnect();
+      removedFX.disconnect();
+      this.effectsChain[position - 1].connect(this.effectsChain[position + 1]);
+    }
+
+    return removedFX;
   }
 }

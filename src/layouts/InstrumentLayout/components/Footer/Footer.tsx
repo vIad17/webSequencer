@@ -7,7 +7,7 @@ import clsx from 'clsx';
 import { useDroppable } from '@dnd-kit/core';
 import { horizontalListSortingStrategy, SortableContext } from '@dnd-kit/sortable';
 
-import { useMemo } from 'react';
+import { useEffect, useMemo } from 'react';
 import { SortableItem } from './SortableItem';
 
 import { useDispatch, useSelector } from 'react-redux';
@@ -29,7 +29,7 @@ const Footer = ({ className = '' }: FooterProps) => {
     return map;
   }, [effects]);
 
-  const { setNodeRef: setFooterDropRef } = useDroppable({ id: FOOTER_DROP_ID });
+  const { setNodeRef: setFooterDropRef, active } = useDroppable({ id: FOOTER_DROP_ID });
 
   return (
     <div className={clsx('footer', className)}>

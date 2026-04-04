@@ -1,13 +1,9 @@
-import MySketch from 'src/components/Scetch/Sketch';
-import SoundSettings from 'src/components/SoundSettings/SoundSettings';
-
 import './EffectsSidebar.scss';
 import { RootState } from 'src/shared/redux/store/store';
 import { useSelector } from 'react-redux';
 import clsx from 'clsx';
 import { useEffect, useRef, useState } from 'react';
 import EffectPreview from 'src/features/Effects/components/EffectPreview/EffectPreview';
-import { IconType } from 'src/shared/icons/IconMap';
 import { EffectType } from 'src/shared/redux/slices/effectsSlice';
 
 const allEffectTypes = (Object.values(EffectType).filter(
