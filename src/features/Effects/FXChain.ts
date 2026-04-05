@@ -1,10 +1,14 @@
 import { useSelector } from "react-redux";
 import store, { RootState } from "src/shared/redux/store/store";
 import * as Tone from 'tone';
+import { number, string } from "zod";
+
+export type FXChainNode = {node: Tone.ToneAudioNode, uID: string};
 
 export class FXChain {
   private synth: Tone.PolySynth;
-  private effectsChain: Tone.ToneAudioNode[] = [];
+  private effectsChain: FXChainNode[] = [];
+  // private effectsIdMap: Map<string, Tone.ToneAudioNode>;
 
   constructor(synthOptions?: Tone.SynthOptions) {
     this.synth = new Tone.PolySynth(Tone.Synth, synthOptions ?? {
@@ -24,82 +28,101 @@ export class FXChain {
   // Creates FX with default values and adds it to chain. position 0 = right after synth
   public CreateFX<T extends Tone.ToneAudioNode>(
     FXClass: new (...args: any[]) => T,
-    position: number
-  ): T {
+    position: number,
+    uID?: string
+  ):  FXChainNode {
     position = Math.max(position, 0);
     const newFX = new FXClass();
 
+    if(!uID){
+      uID = crypto.randomUUID();
+    }
+
+    let NewNode:FXChainNode = {node: newFX, uID};
+    // this.effectsIdMap.set(uID, newFX);
+
     if (position >= this.effectsChain.length) {
       if (this.effectsChain.length > 0) {
-        this.effectsChain[this.effectsChain.length - 1].disconnect();
-        this.effectsChain[this.effectsChain.length - 1].connect(newFX);
+        this.effectsChain[this.effectsChain.length - 1].node.disconnect();
+        this.effectsChain[this.effectsChain.length - 1].node.connect(newFX);
       } else {
         this.synth.disconnect();
         this.synth.connect(newFX);
       }
       newFX.toDestination();
-      this.effectsChain.push(newFX);
+      this.effectsChain.push(NewNode);
     } else {
       if (position === 0) {
         this.synth.disconnect();
         this.synth.connect(newFX);
-        newFX.connect(this.effectsChain[0]);
+        newFX.connect(this.effectsChain[0].node);
       } else {
         // Insert in the middle
-        this.effectsChain[position - 1].disconnect();
-        this.effectsChain[position - 1].connect(newFX);
-        newFX.connect(this.effectsChain[position]);
+        this.effectsChain[position - 1].node.disconnect();
+        this.effectsChain[position - 1].node.connect(newFX);
+        newFX.connect(this.effectsChain[position].node);
       }
-      this.effectsChain.splice(position, 0, newFX);
+      this.effectsChain.splice(position, 0, NewNode);
     }
 
     if (typeof (newFX as any).start === 'function') {
       (newFX as any).start();
     }
 
-    return newFX;
+    return NewNode;
   }
 
   //Adds existing FX to chain
-  public addFX(newFX: Tone.ToneAudioNode, position: number): Tone.ToneAudioNode {
+  public addFX(newFX: Tone.ToneAudioNode, position: number, uID?: string): FXChainNode {
+    if(!uID){
+      uID = crypto.randomUUID();
+    }
+    // this.effectsIdMap.set(uID, newFX);
+
     position = Math.max(position, 0);
+
+    let NewNode:FXChainNode = {node: newFX, uID};
 
     if (position >= this.effectsChain.length) {
       if (this.effectsChain.length > 0) {
-        this.effectsChain[this.effectsChain.length - 1].disconnect();
-        this.effectsChain[this.effectsChain.length - 1].connect(newFX);
+        this.effectsChain[this.effectsChain.length - 1].node.disconnect();
+        this.effectsChain[this.effectsChain.length - 1].node.connect(newFX);
       } else {
         this.synth.disconnect();
         this.synth.connect(newFX);
       }
       newFX.toDestination();
-      this.effectsChain.push(newFX);
+      this.effectsChain.push(NewNode);
     } else {
       if (position === 0) {
         this.synth.disconnect();
         this.synth.connect(newFX);
-        newFX.connect(this.effectsChain[0]);
+        newFX.connect(this.effectsChain[0].node);
       } else {
-        this.effectsChain[position - 1].disconnect();
-        this.effectsChain[position - 1].connect(newFX);
-        newFX.connect(this.effectsChain[position]);
+        this.effectsChain[position - 1].node.disconnect();
+        this.effectsChain[position - 1].node.connect(newFX);
+        newFX.connect(this.effectsChain[position].node);
       }
-      this.effectsChain.splice(position, 0, newFX);
+      this.effectsChain.splice(position, 0, NewNode);
     }
 
     if (typeof (newFX as any).start === 'function') {
       (newFX as any).start();
     }
 
-    return newFX;
+    return NewNode;
   }
 
-  public removeFX(position: number): void {
-    if (position < 0 || position >= this.effectsChain.length) return;
+  addFXnode(newFX: FXChainNode, position: number): FXChainNode{
+    return this.addFX(newFX.node, position, newFX.uID);
+  }
 
-    this.removeFXconnections(position);
-    this.effectsChain[position].dispose();
-    this.effectsChain.splice(position, 1);
+  public appendFX(newFX: Tone.ToneAudioNode, uID?: string): FXChainNode{
+    return this.addFX(newFX, this.effectsChain.length, uID);
+  }
+
+  public appendFXnode(newFX: FXChainNode): FXChainNode{
+    return this.appendFX(newFX.node, newFX.uID);
   }
 
   public moveFX(position: number, newPosition: number) {
@@ -116,10 +139,23 @@ export class FXChain {
 
   }
 
-  public appendFX(newFX: Tone.ToneAudioNode) {
-    this.addFX(newFX, this.effectsChain.length);
+  public removeFX(index?: string | number): void {
+    let ind: number =-1;
+
+    if(typeof index === 'string') {
+      ind = this.effectsChain.findIndex(e => e.uID === index);
+    }else if (typeof index === 'number'){
+      ind = index;
+    };
+
+    if (ind < 0 || ind >= this.effectsChain.length) return;
+
+    this.removeFXconnections(ind);
+    this.effectsChain[ind].node.dispose();
+    this.effectsChain.splice(ind, 1);
   }
 
+  //TODO: Boilerplate. Rewrite
   public clone(): FXChain {
     // Clone synth first
     const synthOptions = this.synth.get();
@@ -163,18 +199,27 @@ export class FXChain {
     return this.synth;
   }
 
-  public getEffectsChain(): Tone.ToneAudioNode[] {
+  public getFX(index?: string | number): FXChainNode | undefined{
+    if(typeof index === 'string') {
+      return this.effectsChain.find(e => e.uID === index );
+    } 
+    if(typeof index === 'number') return this.effectsChain[index];
+    return undefined;
+  }
+
+  public getEffectsChain(): FXChainNode[] {
     return [...this.effectsChain];
   }
 
   public dispose(): void {
+    this.getFX()
     this.synth.dispose();
-    this.effectsChain.forEach(fx => fx.dispose());
+    this.effectsChain.forEach(fx => fx.node.dispose());
     this.effectsChain = [];
   }
 
   private removeFXconnections(position: number): Tone.ToneAudioNode {
-    const removedFX = this.effectsChain[position];
+    const removedFX = this.effectsChain[position].node;
 
     if (this.effectsChain.length === 1) {
       this.synth.disconnect();
@@ -183,15 +228,15 @@ export class FXChain {
     } else if (position === 0) {
       this.synth.disconnect();
       removedFX.disconnect();
-      this.synth.connect(this.effectsChain[1]);
+      this.synth.connect(this.effectsChain[1].node);
     } else if (position === this.effectsChain.length - 1) {
-      this.effectsChain[position - 1].disconnect();
+      this.effectsChain[position - 1].node.disconnect();
       removedFX.disconnect();
-      this.effectsChain[position - 1].toDestination();
+      this.effectsChain[position - 1].node.toDestination();
     } else {
-      this.effectsChain[position - 1].disconnect();
+      this.effectsChain[position - 1].node.disconnect();
       removedFX.disconnect();
-      this.effectsChain[position - 1].connect(this.effectsChain[position + 1]);
+      this.effectsChain[position - 1].node.connect(this.effectsChain[position + 1].node);
     }
 
     return removedFX;
