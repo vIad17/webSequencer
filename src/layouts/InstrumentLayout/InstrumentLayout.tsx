@@ -14,6 +14,8 @@ import { EffectComponentByType } from './components/Footer/SortableItem';
 import { snapCenterToCursor } from '@dnd-kit/modifiers';
 import { addEffect, EffectType, removeEffect, setEffects } from 'src/shared/redux/slices/effectsSlice';
 import { effectPreviewByType } from 'src/features/Effects/components/EffectPreview/EffectPreview';
+import { removeEffectParam, setEffectParams } from 'src/shared/redux/slices/effectsParamsSlice';
+import { GetChain } from 'src/app/SoundManager';
 
 const collisionDetection: CollisionDetection = (args) => {
   if (args.pointerCoordinates) return pointerWithin(args);
@@ -44,18 +46,18 @@ const InstrumentLayout = () => {
     return map;
   }, [effects]);
 
-const sensors = useSensors(
-  useSensor(PointerSensor, { activationConstraint: { distance: 1 } }),
-  useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates })
-);
+  const sensors = useSensors(
+    useSensor(PointerSensor, { activationConstraint: { distance: 1 } }),
+    useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates })
+  );
 
   function onDragStart(event: DragStartEvent) {
     const data = event.active.data.current;
-    
+
     if (!data) {
       return
     }
-    
+
     const effectType = data.effectType as EffectType
     console.log(event);
 
@@ -67,7 +69,8 @@ const sensors = useSensors(
     setIsNewEffect(isFromSidebar);
 
     if (isFromSidebar) {
-      dispatch(addEffect({ id, type: effectType, params: effectPreviewByType[effectType].defaultParams }));
+      dispatch(setEffectParams({ id, params: effectPreviewByType[effectType].defaultParams }));
+      dispatch(addEffect({ id, type: effectType }));
     }
   }
 
@@ -85,6 +88,8 @@ const sensors = useSensors(
 
     if (!isOverFooter && !!activeEffect) {
       dispatch(removeEffect(activeEffect.id));
+      dispatch(removeEffectParam(activeEffect.id));
+      GetChain().removeFX(activeEffect.id);
       return
     }
 

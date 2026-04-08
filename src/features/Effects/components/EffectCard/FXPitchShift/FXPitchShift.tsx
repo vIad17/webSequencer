@@ -8,7 +8,10 @@ import { useSelector, useDispatch } from 'react-redux';
 import { graphSIN } from 'src/shared/functions/waveforms';
 import EffectCard from '../EffectCard';
 import KnobInput from '../../KnobInput/KnobInput';
-import { EffectParamsPitchShift, setEffectParams } from 'src/shared/redux/slices/effectsSlice';
+import { selectEffectById, selectEffectParamsById } from 'src/shared/hooks/selectors';
+import { EffectParamsPitchShift, setEffectParams } from 'src/shared/redux/slices/effectsParamsSlice';
+import { GetChain } from 'src/app/SoundManager';
+import { PitchShift } from 'tone';
 
 interface FXPitchShiftProps {
   className?: string;
@@ -20,11 +23,18 @@ const FXPitchShift = ({ name = '', className, id }: FXPitchShiftProps) => {
   const svgRef = useRef<SVGSVGElement>(null);
   const dispatch = useDispatch();
 
-  const effect = useSelector((state: RootState) => state.effects.effects).find(el => el.id === id);
+  const effect = useSelector((state: RootState) => selectEffectParamsById(state, id));
   const effectParams = effect?.params as EffectParamsPitchShift;
 
   const setPitchShift = (value: number) => {
     dispatch(setEffectParams({ id, params: { ...effectParams, pitchShift: value } }));
+    const setDistortion = (value: number) => {
+      dispatch(setEffectParams({ id, params: { ...effectParams, distortion: value } }));
+      const fxNode = GetChain().getFX(id)?.node;
+      if (fxNode instanceof PitchShift) {
+        fxNode.pitch = value;
+      }
+    }
   }
 
   const drawSketch = (

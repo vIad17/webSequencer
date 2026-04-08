@@ -4,11 +4,12 @@ import './EffectPreview.scss';
 import clsx from 'clsx';
 import { Icon } from 'src/shared/icons/Icon';
 import { IconType } from 'src/shared/icons/IconMap';
-import { addEffect, EffectParams, EffectType } from 'src/shared/redux/slices/effectsSlice';
+import { addEffect, EffectType } from 'src/shared/redux/slices/effectsSlice';
 import { useDraggable } from '@dnd-kit/core';
 import { useEffect, useState } from 'react';
 import * as Tone from 'tone';
 import { chain, GetChain } from 'src/app/SoundManager';
+import { EffectParams, setEffectParams } from 'src/shared/redux/slices/effectsParamsSlice';
 
 export interface EffectPreviewData {
   icon: IconType;
@@ -23,7 +24,7 @@ export const effectPreviewByType: Record<EffectType, EffectPreviewData> = {
   [EffectType.ADSR]: {
     icon: IconType.EffectAdsr,
     name: 'ADSR',
-    createEffectObject: () => new Tone.Tremolo(0, 0),
+    createEffectObject: () => new Tone.Gain(1),
     defaultParams: { attack: 0, decay: 0, sustain: 1, release: 0 }
   },
   [EffectType.BITS]: {
@@ -80,8 +81,10 @@ const EffectPreview = ({ className, type }: EffectPreviewProps) => {
   const effectPreviewData = effectPreviewByType[type];
 
   const onClick = () => {
-    dispatch(addEffect({ type, id: crypto.randomUUID(), params: effectPreviewData.defaultParams }));
-    chain.appendFX(effectPreviewByType[type].createEffectObject());
+    const id = crypto.randomUUID();
+    dispatch(setEffectParams({ id, params: effectPreviewData.defaultParams  }));
+    dispatch(addEffect({ type, id}));
+    chain.appendFX(effectPreviewByType[type].createEffectObject(), id);
   }
 
   const { setNodeRef, listeners, attributes, isDragging } = useDraggable({

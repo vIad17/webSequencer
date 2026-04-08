@@ -19,7 +19,7 @@ export const EffectComponentByType: Partial<Record<EffectType, React.ComponentTy
   [EffectType.PITCH_SHIFT]: FXPitchShift,
 };
 
-export const SortableItem = ({id, effect}: {id: string, effect: Effect}) => {
+export const SortableItem = ({id, effect}: {id: string, effect: { id: string, type: EffectType }}) => {
   const {
     attributes,
     listeners,

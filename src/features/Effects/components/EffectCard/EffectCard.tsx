@@ -6,6 +6,9 @@ import { IconType } from 'src/shared/icons/IconMap';
 import { useDispatch, useSelector } from 'react-redux';
 import { removeEffect, toggleIsEffectMuted } from 'src/shared/redux/slices/effectsSlice';
 import { RootState } from 'src/shared/redux/store/store';
+import { selectEffectById } from 'src/shared/hooks/selectors';
+import { removeEffectParam } from 'src/shared/redux/slices/effectsParamsSlice';
+import { GetChain } from 'src/app/SoundManager';
 
 interface EffectCardProps {
   className?: string;
@@ -19,19 +22,33 @@ interface EffectCardProps {
 const EffectCard = ({ className = "", name, width, canRemove = true, id, children }: EffectCardProps) => {
   const dispatch = useDispatch();
 
-  const effect = useSelector((state: RootState) => state.effects.effects).find(el => el.id === id);
+  const effect = useSelector((state: RootState) => selectEffectById(state, id));
 
   const [collapsed, setCollapsed] = useState(false);
+
+  const onToggleCollapsed = (event: React.MouseEvent<HTMLButtonElement>) => {
+    event.stopPropagation();
+    setCollapsed((prev) => !prev);
+  }
+
+  const onToggleMute = (event: React.MouseEvent<HTMLButtonElement>) => {
+    event.stopPropagation();
+    dispatch(toggleIsEffectMuted({ id }))
+  }
+
+  const onRemove = (event: React.MouseEvent<HTMLButtonElement>) => {
+    event.stopPropagation();
+    dispatch(removeEffect(id));
+    dispatch(removeEffectParam(id));
+    GetChain().removeFX(id);
+  }
 
   return (
     <div id={id} className={clsx('effect', className, { 'collapsed': collapsed }, { 'muted': effect?.isMuted })} style={{ width: `${collapsed ? 35 : width}px` }}>
       <header className="effect__header">
         <h5 className="effect__header-title">{name}</h5>
         <div className="effect__header_controls">
-          <button className='effect__header_button' onClick={(event) => {
-            event.stopPropagation();
-            setCollapsed((prev) => !prev);
-          }} onMouseDown={(event) => {
+          <button className='effect__header_button' onClick={onToggleCollapsed} onMouseDown={(event) => {
             event.stopPropagation();
           }}
             onPointerDown={(e) => {
@@ -40,12 +57,9 @@ const EffectCard = ({ className = "", name, width, canRemove = true, id, childre
             <Icon icon={IconType.Eye} interactable />
           </button>
           <button className='effect__header_button muteBT'
+            onClick={onToggleMute}
             onMouseDown={(event) => {
               event.stopPropagation();
-            }}
-            onClick={(event) => {
-              event.stopPropagation();
-              dispatch(toggleIsEffectMuted({id}))
             }}
             onPointerDown={(e) => {
               e.stopPropagation();
@@ -53,9 +67,7 @@ const EffectCard = ({ className = "", name, width, canRemove = true, id, childre
             <Icon icon={IconType.Power} interactable />
           </button>
           <button className='effect__header_button'
-            onClick={(event) => {
-              dispatch(removeEffect(id))
-            }}
+            onClick={onRemove}
             onPointerDown={(e) => {
               e.stopPropagation();
             }}>

@@ -1,5 +1,4 @@
 import { useDispatch } from 'react-redux';
-import { AnyAction } from '@reduxjs/toolkit';
 import { Icon } from 'src/shared/icons/Icon';
 import { IconType } from 'src/shared/icons/IconMap';
 import './KnobInput.scss';
@@ -53,34 +52,44 @@ const KnobInput = ({
     dispatch(setIsDragging(true));
     const knobElement = e.currentTarget as HTMLElement;
     let startValue = value ?? min;
-    
+
     if (knobElement.requestPointerLock && lockMouse) {
       knobElement.requestPointerLock();
     }
 
+    let lastCall = 0;
+    const THROTTLE_MS = 10; // 0.01 секунды
+
+
     const handleMouseMove = (moveEvent: MouseEvent) => {
-      
+
+
+
       //need to check for movement only when mouse is locked
 
       const deltaX = moveEvent.movementX || 0;
-      const deltaY = -(moveEvent.movementY || 0); 
-      
+      const deltaY = -(moveEvent.movementY || 0);
+
       const delta = deltaX + deltaY;
       const range = max - min;
       const sensitivity = 300;
       const valueChange = (delta / sensitivity) * range;
 
-      if(Math.abs(valueChange) > range ) return;
+      if (Math.abs(valueChange) > range) return;
 
       let newValue = startValue + valueChange;
-      
+
       newValue = Math.min(max, Math.max(min, newValue));
-      
+
       const stepDecimalPlaces = step.toString().split('.')[1]?.length || 0;
       const roundedValue = Math.round(newValue / step) * step;
       const formattedValue = Number(roundedValue.toFixed(stepDecimalPlaces));
-      
-      setValue(formattedValue);
+
+      // const now = Date.now();
+      // if (now - lastCall < THROTTLE_MS) return; // пропускаем вызов
+      // lastCall = now;
+
+      if (startValue !== formattedValue) setValue(formattedValue);
       startValue = formattedValue;
     };
 
@@ -106,8 +115,8 @@ const KnobInput = ({
   return value !== null ? (
     <div className="knob__element">
       <button className="knob__bt" onMouseDown={handleMouseDown} >
-        <Icon className='knob__icon' icon={IconType.Knob} 
-          style={{ transform: `rotate(${getRotationAngle()}deg)` }} 
+        <Icon className='knob__icon' icon={IconType.Knob}
+          style={{ transform: `rotate(${getRotationAngle()}deg)` }}
         />
       </button>
       <p className="knob__name">{label}</p>

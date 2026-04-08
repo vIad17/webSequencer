@@ -3,12 +3,15 @@ import * as d3 from 'd3';
 import './FXBitcrush.scss';
 
 import { RootState } from 'src/shared/redux/store/store';
-import { useSelector, useDispatch } from 'react-redux';
+import { useSelector, useDispatch, shallowEqual } from 'react-redux';
 
 import { graphSIN } from 'src/shared/functions/waveforms';
 import EffectCard from '../EffectCard';
 import KnobInput from '../../KnobInput/KnobInput';
-import { EffectParamsBits, setEffectParams } from 'src/shared/redux/slices/effectsSlice';
+import { GetChain } from 'src/app/SoundManager';
+import { BitCrusher, Tremolo } from 'tone';
+import { selectEffectById, selectEffectParamsById } from 'src/shared/hooks/selectors';
+import { EffectParamsBits, setEffectParams } from 'src/shared/redux/slices/effectsParamsSlice';
 
 interface FXBitcrushProps {
   className?: string;
@@ -20,11 +23,15 @@ const FXBitcrush = ({ name = '', className, id }: FXBitcrushProps) => {
   const svgRef = useRef<SVGSVGElement>(null);
   const dispatch = useDispatch();
 
-  const effect = useSelector((state: RootState) => state.effects.effects).find(el => el.id === id);
+  const effect = useSelector((state: RootState) => selectEffectParamsById(state, id), shallowEqual);
   const effectParams = effect?.params as EffectParamsBits;
 
   const setBits = (value: number) => {
     dispatch(setEffectParams({ id, params: { ...effectParams, bits: value } }));
+    const fxNode = GetChain().getFX(id)?.node;
+    if (fxNode instanceof BitCrusher) {
+      fxNode.bits.value = value;
+    }
   }
 
   const drawSketch = (

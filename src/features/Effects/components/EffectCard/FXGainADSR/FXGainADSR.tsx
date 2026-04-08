@@ -7,7 +7,8 @@ import { useSelector, useDispatch } from 'react-redux';
 
 import EffectCard from '../EffectCard';
 import KnobInput from '../../KnobInput/KnobInput';
-import { EffectParamsADSR, setEffectParams } from 'src/shared/redux/slices/effectsSlice';
+import { setAttack, setDecay, setRelease, setSustain } from 'src/shared/redux/slices/soundSettingsSlice';
+import { EffectType } from 'src/shared/redux/slices/effectsSlice';
 
 interface FXGainADSRProps {
   className?: string;
@@ -19,23 +20,32 @@ const FXGainADSR = ({ name = '', className, id }: FXGainADSRProps) => {
   const svgRef = useRef<SVGSVGElement>(null);
   const dispatch = useDispatch();
 
-  const effect = useSelector((state: RootState) => state.effects.effects).find(el => el.id === id);
-  const effectParams = effect?.params as EffectParamsADSR;
+  const soundSettings = useSelector((state: RootState) => state.soundSettings);
+  const effects = useSelector((state: RootState) => state.effects.effects.filter(el => el.type === EffectType.ADSR));
 
-  const setAttack = (value: number) => {
-    dispatch(setEffectParams({ id, params: { ...effectParams, attack: value } }));
+  console.log(effects);
+
+  useEffect(() => {
+    
+    return () => {
+      console.log("end", effects);
+    };
+  }, []);
+
+  const setA = (value: number) => {
+    dispatch(setAttack(value));
   }
 
-  const setDecay = (value: number) => {
-    dispatch(setEffectParams({ id, params: { ...effectParams, decay: value } }));
+  const setD = (value: number) => {
+    dispatch(setDecay(value));
   }
 
-  const setSustain = (value: number) => {
-    dispatch(setEffectParams({ id, params: { ...effectParams, sustain: value } }));
+  const setS = (value: number) => {
+    dispatch(setSustain(value));
   }
 
-  const setRelease = (value: number) => {
-    dispatch(setEffectParams({ id, params: { ...effectParams, release: value } }));
+  const setR = (value: number) => {
+    dispatch(setRelease(value));
   }
 
   const drawSketch = (
@@ -74,10 +84,10 @@ const FXGainADSR = ({ name = '', className, id }: FXGainADSRProps) => {
       .attr('x2', width)
       .attr('y2', (d) => yScale(d));
 
-    const attack = Math.max((effectParams.attack ?? 0) / 2.0, 0.0001);
-    const decay = Math.max((effectParams.decay ?? 0) / 2.0, 0.0001);
-    const sustain = effectParams.sustain ?? 1;
-    const release = Math.max((effectParams.release ?? 0) / 5.0, 0.0001);
+    const attack = Math.max((soundSettings.attack ?? 0) / 2.0, 0.0001);
+    const decay = Math.max((soundSettings.decay ?? 0) / 2.0, 0.0001);
+    const sustain = soundSettings.sustain ?? 1;
+    const release = Math.max((soundSettings.release ?? 0) / 5.0, 0.0001);
 
     // Define key ADSR points in data space (x: time, y: amplitude)
     const points = [
@@ -138,32 +148,32 @@ const FXGainADSR = ({ name = '', className, id }: FXGainADSRProps) => {
         const constrainedX = Math.max(0, Math.min(cols, xData));
         const constrainedY = Math.max(0, Math.min(rows, yData));
 
-        let newAttack = effectParams.attack ?? 0;
-        let newDecay = effectParams.decay ?? 0;
-        let newSustain = effectParams.sustain ?? 1;
-        let newRelease = effectParams.release ?? 0;
+        let newAttack = soundSettings.attack ?? 0;
+        let newDecay = soundSettings.decay ?? 0;
+        let newSustain = soundSettings.sustain ?? 1;
+        let newRelease = soundSettings.release ?? 0;
 
         if (d.id === 'attack') {
           newAttack = Math.min(Math.max(0, constrainedX * 2), 2);
           d.x = constrainedX;
           d.y = 1;
-          setAttack(newAttack);
+          setA(newAttack);
         } else if (d.id === 'decay') {
           newSustain = Math.min(Math.max(0, Math.min(1, constrainedY / 4)), 1);
           newDecay = Math.min(Math.max(0, (constrainedX - attack) * 2), 2);
           d.x = constrainedX;
           d.y = newSustain;
-          setDecay(newDecay);
-          setSustain(newSustain);
+          setD(newDecay);
+          setS(newSustain);
         } else if (d.id === 'sustain') {
           newSustain = Math.max(0, Math.min(1, constrainedY / 4));
           d.y = newSustain;
-          setSustain(newSustain);
+          setS(newSustain);
         } else if (d.id === 'release') {
           newRelease = Math.min(Math.max(0, (constrainedX - (attack + decay + 1)) * 5), 5);
           d.x = constrainedX;
           d.y = 0;
-          setRelease(newRelease);
+          setR(newRelease);
         }
 
         // Update visual position
@@ -187,7 +197,7 @@ const FXGainADSR = ({ name = '', className, id }: FXGainADSRProps) => {
       .attr('height', height);
 
     drawSketch(svg, width, height);
-  }, [effectParams.attack, effectParams.decay, effectParams.sustain, effectParams.release]);
+  }, [soundSettings.attack, soundSettings.decay, soundSettings.sustain, soundSettings.release]);
 
   return (
     <EffectCard name={'Gain ADSR'} width={280} id={id} children={
@@ -195,8 +205,8 @@ const FXGainADSR = ({ name = '', className, id }: FXGainADSRProps) => {
         <svg ref={svgRef} className="synth__graph" />
         <div className="Effect_knobs_horizontal">
           <KnobInput
-            value={effectParams.attack ?? 1}
-            setValue={setAttack}
+            value={soundSettings.attack ?? 1}
+            setValue={setA}
             min={0}
             max={2}
             step={0.01}
@@ -205,8 +215,8 @@ const FXGainADSR = ({ name = '', className, id }: FXGainADSRProps) => {
             lockMouse={true}
           />
           <KnobInput
-            value={effectParams.decay ?? 1}
-            setValue={setDecay}
+            value={soundSettings.decay ?? 1}
+            setValue={setD}
             min={0}
             max={2}
             step={0.01}
@@ -215,8 +225,8 @@ const FXGainADSR = ({ name = '', className, id }: FXGainADSRProps) => {
             lockMouse={true}
           />
           <KnobInput
-            value={effectParams.sustain ?? 1}
-            setValue={setSustain}
+            value={soundSettings.sustain ?? 1}
+            setValue={setS}
             min={0}
             max={1}
             step={0.01}
@@ -225,8 +235,8 @@ const FXGainADSR = ({ name = '', className, id }: FXGainADSRProps) => {
             lockMouse={true}
           />
           <KnobInput
-            value={effectParams.release ?? 1}
-            setValue={setRelease}
+            value={soundSettings.release ?? 1}
+            setValue={setR}
             min={0}
             max={5}
             step={0.01}

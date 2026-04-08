@@ -9,7 +9,10 @@ import { graphSAW, graphSIN, graphSQR, graphTRI } from 'src/shared/functions/wav
 import EffectCard from '../EffectCard';
 import KnobInput from '../../KnobInput/KnobInput';
 import { clamp } from 'src/shared/functions/math';
-import { EffectParamsDistortion, setEffectParams } from 'src/shared/redux/slices/effectsSlice';
+import { selectEffectById, selectEffectParamsById } from 'src/shared/hooks/selectors';
+import { EffectParamsDistortion, setEffectParams } from 'src/shared/redux/slices/effectsParamsSlice';
+import { GetChain } from 'src/app/SoundManager';
+import { Distortion } from 'tone';
 
 interface FXDistortionProps {
   className?: string;
@@ -21,11 +24,15 @@ const FXDistortion = ({ name = '', className, id }: FXDistortionProps) => {
   const svgRef = useRef<SVGSVGElement>(null);
   const dispatch = useDispatch();
 
-  const effect = useSelector((state: RootState) => state.effects.effects).find(el => el.id === id);
+  const effect = useSelector((state: RootState) => selectEffectParamsById(state, id));
   const effectParams = effect?.params as EffectParamsDistortion;
 
   const setDistortion = (value: number) => {
     dispatch(setEffectParams({ id, params: { ...effectParams, distortion: value } }));
+    const fxNode = GetChain().getFX(id)?.node;
+    if (fxNode instanceof Distortion) {
+      fxNode.distortion = value;
+    }
   }
 
   const drawSketch = (

@@ -12,6 +12,7 @@ import { soundSettingsSlice } from 'src/shared/redux/slices/soundSettingsSlice';
 import { drawableFieldSlice } from '../slices/drawableFieldSlice';
 import { copiedObjectsSlise } from '../slices/copiedObjectsSlise';
 import { effectsSidebarSlice } from '../slices/effectsSidebarSlice';
+import { effectsParamsSlice } from '../slices/effectsParamsSlice';
 import { effectsSlice } from '../slices/effectsSlice';
 import { userSlice } from 'src/shared/redux/slices/userSlice';
 
@@ -25,6 +26,7 @@ const store = configureStore({
     [drawableFieldSlice.name]: drawableFieldSlice.reducer,
     [copiedObjectsSlise.name]: copiedObjectsSlise.reducer,
     [effectsSidebarSlice.name]: effectsSidebarSlice.reducer,
+    [effectsParamsSlice.name]: effectsParamsSlice.reducer,
     [effectsSlice.name]: effectsSlice.reducer,
     [progressSlice.name]: progressSlice.reducer,
     [userSlice.name]: userSlice.reducer,

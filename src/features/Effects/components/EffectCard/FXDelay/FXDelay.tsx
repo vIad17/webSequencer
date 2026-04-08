@@ -7,7 +7,10 @@ import { useSelector, useDispatch } from 'react-redux';
 
 import EffectCard from '../EffectCard';
 import KnobInput from '../../KnobInput/KnobInput';
-import { EffectParamsDelay, setEffectParams } from 'src/shared/redux/slices/effectsSlice';
+import { selectEffectParamsById } from 'src/shared/hooks/selectors';
+import { EffectParamsDelay, setEffectParams } from 'src/shared/redux/slices/effectsParamsSlice';
+import { GetChain } from 'src/app/SoundManager';
+import { FeedbackDelay } from 'tone';
 
 interface FXDelayProps {
   className?: string;
@@ -19,15 +22,23 @@ const FXDelay = ({ name = '', className, id }: FXDelayProps) => {
   const svgRef = useRef<SVGSVGElement>(null);
   const dispatch = useDispatch();
 
-  const effect = useSelector((state: RootState) => state.effects.effects).find(el => el.id === id);
+  const effect = useSelector((state: RootState) => selectEffectParamsById(state, id));
   const effectParams = effect?.params as EffectParamsDelay;
 
   const setDelayTime = (value: number) => {
     dispatch(setEffectParams({ id, params: { ...effectParams, delayTime: value } }));
+    const fxNode = GetChain().getFX(id)?.node;
+    if (fxNode instanceof FeedbackDelay) {
+      fxNode.delayTime.value = value;
+    }
   }
 
   const setFeedback = (value: number) => {
     dispatch(setEffectParams({ id, params: { ...effectParams, feedback: value } }));
+        const fxNode = GetChain().getFX(id)?.node;
+    if (fxNode instanceof FeedbackDelay) {
+      fxNode.feedback.value = value;
+    }
   }
 
   const drawSketch = (

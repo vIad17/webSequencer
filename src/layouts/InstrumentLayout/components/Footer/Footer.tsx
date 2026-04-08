@@ -1,17 +1,17 @@
 import MySketch from 'src/components/Scetch/Sketch';
 import SynthCard from 'src/features/Effects/components/SynthCard/SynthCard';
 
-import './Footer.scss';
 import clsx from 'clsx';
 
 import { useDroppable } from '@dnd-kit/core';
 import { horizontalListSortingStrategy, SortableContext } from '@dnd-kit/sortable';
 
-import { useEffect, useMemo } from 'react';
 import { SortableItem } from './SortableItem';
 
-import { useDispatch, useSelector } from 'react-redux';
+import { useSelector } from 'react-redux';
 import type { RootState } from 'src/shared/redux/store/store';
+
+import './Footer.scss';
 
 export const FOOTER_DROP_ID = 'footer-dropzone';
 
@@ -20,14 +20,10 @@ interface FooterProps {
 }
 
 const Footer = ({ className = '' }: FooterProps) => {
-  const effects = useSelector((state: RootState) => state.effects.effects);
 
-  const dispatch = useDispatch();
-  const effectsById = useMemo(() => {
-    const map: Record<string, (typeof effects)[number]> = {};
-    for (const e of effects) map[e.id] = e;
-    return map;
-  }, [effects]);
+  const effects = useSelector((state: RootState) => 
+    state.effects.effects
+  );
 
   const { setNodeRef: setFooterDropRef, active } = useDroppable({ id: FOOTER_DROP_ID });
 

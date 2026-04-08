@@ -5,10 +5,13 @@ import './FXTremolo.scss';
 import { RootState } from 'src/shared/redux/store/store';
 import { useSelector, useDispatch } from 'react-redux';
 
-import { graphSAW, graphSIN, graphSQR, graphTRI } from 'src/shared/functions/waveforms';
+import { graphSIN } from 'src/shared/functions/waveforms';
 import EffectCard from '../EffectCard';
 import KnobInput from '../../KnobInput/KnobInput';
-import { EffectParamsTremollo, setEffectParams } from 'src/shared/redux/slices/effectsSlice';
+import { selectEffectById, selectEffectParamsById } from 'src/shared/hooks/selectors';
+import { EffectParamsTremollo, setEffectParams } from 'src/shared/redux/slices/effectsParamsSlice';
+import { GetChain } from 'src/app/SoundManager';
+import { Tremolo } from 'tone';
 
 interface FXTremoloProps {
   className?: string;
@@ -20,15 +23,23 @@ const FXTremolo = ({ name = '', className, id }: FXTremoloProps) => {
   const svgRef = useRef<SVGSVGElement>(null);
   const dispatch = useDispatch();
 
-  const effect = useSelector((state: RootState) => state.effects.effects).find(el => el.id === id);
+  const effect = useSelector((state: RootState) => selectEffectParamsById(state, id));
   const effectParams = effect?.params as EffectParamsTremollo;
 
   const setTremoloFrequency = (value: number) => {
-    dispatch(setEffectParams({ id, params: {...effectParams, tremoloFrequency: value} }));
+    dispatch(setEffectParams({ id, params: { ...effectParams, tremoloFrequency: value } }));
+    const fxNode = GetChain().getFX(id)?.node;
+    if (fxNode instanceof Tremolo) {
+      fxNode.frequency.value = value;
+    }
   }
 
   const setTremoloDepth = (value: number) => {
-    dispatch(setEffectParams({ id, params: {...effectParams, tremoloDepth: value} }));
+    dispatch(setEffectParams({ id, params: { ...effectParams, tremoloDepth: value } }));
+    const fxNode = GetChain().getFX(id)?.node;
+    if (fxNode instanceof Tremolo) {
+      fxNode.depth.value = value;
+    }
   }
 
   const drawSketch = (
