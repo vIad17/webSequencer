@@ -1,6 +1,12 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { NonCustomOscillatorType } from 'tone/build/esm/source/oscillator/OscillatorInterface';
 
+export interface ADSR {
+  attack: number,
+  decay: number,
+  sustain: number,
+  release: number
+};
 export interface SoundSettingsState {
   volume: number | null;
   attack: number | null;
@@ -101,10 +107,21 @@ export const soundSettingsSlice = createSlice({
       ...state,
       lowFilter: action.payload
     }),
+    // resetADSTChanges(state, action: PayloadAction<{attack: number, decay: number, sustain: number, release: number}>) => ({
+    //   ...state,
+    //   highFilter: action.payload
+    // })
     setHighFilter: (state, action: PayloadAction<number>) => ({
       ...state,
       highFilter: action.payload
-    })
+    }),
+    resetADSRChanges: (state, action: PayloadAction<void>) => ({
+      ...state,
+      attack: null,
+      decay: null,
+      sustain: null,
+      release: null
+    }),
   }
 });
 export const {
@@ -123,5 +140,6 @@ export const {
   setPitchShift,
   setWave,
   setLowFilter,
-  setHighFilter
+  setHighFilter,
+  resetADSRChanges
 } = soundSettingsSlice.actions;

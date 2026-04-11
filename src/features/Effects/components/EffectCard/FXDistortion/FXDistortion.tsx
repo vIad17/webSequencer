@@ -27,6 +27,15 @@ const FXDistortion = ({ name = '', className, id }: FXDistortionProps) => {
   const effect = useSelector((state: RootState) => selectEffectParamsById(state, id));
   const effectParams = effect?.params as EffectParamsDistortion;
 
+  useEffect(() => {
+    if (effectParams != null) {
+      const fxNode = GetChain().getFX(id)?.node;
+      if (fxNode instanceof Distortion) {
+        fxNode.distortion = effectParams.distortion;
+      }
+    }
+  }, []);
+
   const setDistortion = (value: number) => {
     dispatch(setEffectParams({ id, params: { ...effectParams, distortion: value } }));
     const fxNode = GetChain().getFX(id)?.node;

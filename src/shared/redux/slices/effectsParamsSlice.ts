@@ -70,6 +70,9 @@ export const effectsParamsSlice = createSlice({
   name: 'effectsParams',
   initialState,
   reducers: {
+    setEffectsParams: (state, action: PayloadAction<EffectParamsData[]>) => {
+      state.effects = action.payload
+    },    
     setEffectParams: (state, action: PayloadAction<EffectParamsData>) => {
       const effect = state.effects.find(e => e.id === action.payload.id);
       if (effect) {
@@ -84,4 +87,4 @@ export const effectsParamsSlice = createSlice({
   }
 });
 
-export const { setEffectParams, removeEffectParam } = effectsParamsSlice.actions;
+export const { setEffectsParams, setEffectParams, removeEffectParam } = effectsParamsSlice.actions;

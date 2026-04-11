@@ -45,12 +45,12 @@ export const effectPreviewByType: Record<EffectType, EffectPreviewData> = {
     createEffectObject: () => new Tone.Distortion(0),
     defaultParams: { distortion: 0 }
   },
-  [EffectType.FILTER]: { // TODO: not ready yet
-    icon: IconType.EffectFilter,
-    name: 'Filter',
-    createEffectObject: () => new Tone.Filter(20, 'lowpass'),
-    defaultParams: { lowFilter: 20, highFilter: 8000 }
-  },
+  // [EffectType.FILTER]: { // TODO: not ready yet
+  //   icon: IconType.EffectFilter,
+  //   name: 'Filter',
+  //   createEffectObject: () => new Tone.Filter(20, 'lowpass'),
+  //   defaultParams: { lowFilter: 20, highFilter: 8000 }
+  // },
   [EffectType.PITCH_SHIFT]: {
     icon: IconType.EffectPitchShift,
     name: 'Pitch shift',

@@ -26,6 +26,15 @@ const FXBitcrush = ({ name = '', className, id }: FXBitcrushProps) => {
   const effect = useSelector((state: RootState) => selectEffectParamsById(state, id), shallowEqual);
   const effectParams = effect?.params as EffectParamsBits;
 
+  useEffect(() => {
+    if (effectParams != null) {
+      const fxNode = GetChain().getFX(id)?.node;
+      if (fxNode instanceof BitCrusher) {
+        fxNode.bits.value = effectParams.bits;
+      }
+    }
+  }, []);
+
   const setBits = (value: number) => {
     dispatch(setEffectParams({ id, params: { ...effectParams, bits: value } }));
     const fxNode = GetChain().getFX(id)?.node;

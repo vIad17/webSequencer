@@ -25,21 +25,31 @@ const FXDelay = ({ name = '', className, id }: FXDelayProps) => {
   const effect = useSelector((state: RootState) => selectEffectParamsById(state, id));
   const effectParams = effect?.params as EffectParamsDelay;
 
+  useEffect(() => {
+    if (effectParams != null) {
+      const fxNode = GetChain().getFX(id)?.node;
+      if (fxNode instanceof FeedbackDelay) {
+        fxNode.delayTime.value = effectParams.delayTime;
+        fxNode.feedback.value = effectParams.feedback;
+      }
+    }
+  }, []);
+
   const setDelayTime = (value: number) => {
     dispatch(setEffectParams({ id, params: { ...effectParams, delayTime: value } }));
     const fxNode = GetChain().getFX(id)?.node;
     if (fxNode instanceof FeedbackDelay) {
       fxNode.delayTime.value = value;
     }
-  }
+  };
 
   const setFeedback = (value: number) => {
     dispatch(setEffectParams({ id, params: { ...effectParams, feedback: value } }));
-        const fxNode = GetChain().getFX(id)?.node;
+    const fxNode = GetChain().getFX(id)?.node;
     if (fxNode instanceof FeedbackDelay) {
       fxNode.feedback.value = value;
     }
-  }
+  };
 
   const drawSketch = (
     svg: d3.Selection<SVGSVGElement | null, unknown, null, undefined>,

@@ -15,11 +15,12 @@ interface EffectCardProps {
   name: string;
   width: number;
   canRemove?: boolean;
+  onRemoveEffect?: () => void;
   id: string;
   children: ReactNode;
 }
 
-const EffectCard = ({ className = "", name, width, canRemove = true, id, children }: EffectCardProps) => {
+const EffectCard = ({ className = "", name, width, canRemove = true, onRemoveEffect = () => { }, id, children }: EffectCardProps) => {
   const dispatch = useDispatch();
 
   const effect = useSelector((state: RootState) => selectEffectById(state, id));
@@ -38,9 +39,11 @@ const EffectCard = ({ className = "", name, width, canRemove = true, id, childre
 
   const onRemove = (event: React.MouseEvent<HTMLButtonElement>) => {
     event.stopPropagation();
+    onRemoveEffect();
     dispatch(removeEffect(id));
     dispatch(removeEffectParam(id));
     GetChain().removeFX(id);
+    // var adsrEffectsCount = e
   }
 
   return (

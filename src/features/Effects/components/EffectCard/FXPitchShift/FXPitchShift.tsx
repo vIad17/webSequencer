@@ -26,14 +26,20 @@ const FXPitchShift = ({ name = '', className, id }: FXPitchShiftProps) => {
   const effect = useSelector((state: RootState) => selectEffectParamsById(state, id));
   const effectParams = effect?.params as EffectParamsPitchShift;
 
-  const setPitchShift = (value: number) => {
-    dispatch(setEffectParams({ id, params: { ...effectParams, pitchShift: value } }));
-    const setDistortion = (value: number) => {
-      dispatch(setEffectParams({ id, params: { ...effectParams, distortion: value } }));
+  useEffect(() => {
+    if (effectParams != null) {
       const fxNode = GetChain().getFX(id)?.node;
       if (fxNode instanceof PitchShift) {
-        fxNode.pitch = value;
+        fxNode.pitch = effectParams.pitchShift;
       }
+    }
+  }, []);
+
+  const setPitchShift = (value: number) => {
+    dispatch(setEffectParams({ id, params: { ...effectParams, pitchShift: value } }));
+    const fxNode = GetChain().getFX(id)?.node;
+    if (fxNode instanceof PitchShift) {
+      fxNode.pitch = value;
     }
   }
 
@@ -132,8 +138,8 @@ const FXPitchShift = ({ name = '', className, id }: FXPitchShiftProps) => {
           <KnobInput
             value={effectParams.pitchShift}
             setValue={setPitchShift}
-            min={-24}
-            max={24}
+            min={-12}
+            max={12}
             step={0.2}
             label="shift"
             showValue={true}

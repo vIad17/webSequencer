@@ -118,7 +118,6 @@ export class FXChain {
   }
 
   public appendFX(newFX: Tone.ToneAudioNode, uID?: string): FXChainNode{
-    console.log("ABOBA");
     return this.addFX(newFX, this.effectsChain.length, uID);
   }
 

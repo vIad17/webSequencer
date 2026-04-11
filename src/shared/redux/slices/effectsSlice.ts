@@ -6,8 +6,8 @@ export enum EffectType {
   DELAY,
   DISTORTION,
   BITS,
-  PITCH_SHIFT,
-  FILTER
+  // FILTER,
+  PITCH_SHIFT
 }
 
 export interface Effect {

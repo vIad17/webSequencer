@@ -1,14 +1,14 @@
-import MySketch from 'src/components/Scetch/Sketch';
-import SynthCard from 'src/features/Effects/components/SynthCard/SynthCard';
-
+import { useSelector } from 'react-redux';
 import clsx from 'clsx';
-
 import { useDroppable } from '@dnd-kit/core';
 import { horizontalListSortingStrategy, SortableContext } from '@dnd-kit/sortable';
 
+
+import MySketch from 'src/components/Scetch/Sketch';
+import SynthCard from 'src/features/Effects/components/SynthCard/SynthCard';
+
 import { SortableItem } from './SortableItem';
 
-import { useSelector } from 'react-redux';
 import type { RootState } from 'src/shared/redux/store/store';
 
 import './Footer.scss';

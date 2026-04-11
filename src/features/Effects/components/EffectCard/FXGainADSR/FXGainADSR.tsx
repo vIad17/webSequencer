@@ -7,7 +7,7 @@ import { useSelector, useDispatch } from 'react-redux';
 
 import EffectCard from '../EffectCard';
 import KnobInput from '../../KnobInput/KnobInput';
-import { setAttack, setDecay, setRelease, setSustain } from 'src/shared/redux/slices/soundSettingsSlice';
+import { resetADSRChanges, setAttack, setDecay, setRelease, setSustain } from 'src/shared/redux/slices/soundSettingsSlice';
 import { EffectType } from 'src/shared/redux/slices/effectsSlice';
 
 interface FXGainADSRProps {
@@ -23,15 +23,6 @@ const FXGainADSR = ({ name = '', className, id }: FXGainADSRProps) => {
   const soundSettings = useSelector((state: RootState) => state.soundSettings);
   const effects = useSelector((state: RootState) => state.effects.effects.filter(el => el.type === EffectType.ADSR));
 
-  console.log(effects);
-
-  useEffect(() => {
-    
-    return () => {
-      console.log("end", effects);
-    };
-  }, []);
-
   const setA = (value: number) => {
     dispatch(setAttack(value));
   }
@@ -46,6 +37,11 @@ const FXGainADSR = ({ name = '', className, id }: FXGainADSRProps) => {
 
   const setR = (value: number) => {
     dispatch(setRelease(value));
+  }
+
+  const onRemoveEffect = () => {
+    if (effects.length == 1)
+      dispatch(resetADSRChanges());
   }
 
   const drawSketch = (
@@ -200,12 +196,12 @@ const FXGainADSR = ({ name = '', className, id }: FXGainADSRProps) => {
   }, [soundSettings.attack, soundSettings.decay, soundSettings.sustain, soundSettings.release]);
 
   return (
-    <EffectCard name={'Gain ADSR'} width={280} id={id} children={
+    <EffectCard onRemoveEffect={onRemoveEffect} name={'Gain ADSR'} width={280} id={id} children={
       <div className="effect__content_inner">
         <svg ref={svgRef} className="synth__graph" />
         <div className="Effect_knobs_horizontal">
           <KnobInput
-            value={soundSettings.attack ?? 1}
+            value={soundSettings.attack ?? 0}
             setValue={setA}
             min={0}
             max={2}
@@ -215,7 +211,7 @@ const FXGainADSR = ({ name = '', className, id }: FXGainADSRProps) => {
             lockMouse={true}
           />
           <KnobInput
-            value={soundSettings.decay ?? 1}
+            value={soundSettings.decay ?? 0}
             setValue={setD}
             min={0}
             max={2}
@@ -225,7 +221,7 @@ const FXGainADSR = ({ name = '', className, id }: FXGainADSRProps) => {
             lockMouse={true}
           />
           <KnobInput
-            value={soundSettings.sustain ?? 1}
+            value={soundSettings.sustain ?? 0}
             setValue={setS}
             min={0}
             max={1}
@@ -235,7 +231,7 @@ const FXGainADSR = ({ name = '', className, id }: FXGainADSRProps) => {
             lockMouse={true}
           />
           <KnobInput
-            value={soundSettings.release ?? 1}
+            value={soundSettings.release ?? 0}
             setValue={setR}
             min={0}
             max={5}

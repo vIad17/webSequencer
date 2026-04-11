@@ -26,6 +26,16 @@ const FXTremolo = ({ name = '', className, id }: FXTremoloProps) => {
   const effect = useSelector((state: RootState) => selectEffectParamsById(state, id));
   const effectParams = effect?.params as EffectParamsTremollo;
 
+  useEffect(() => {
+    if (effectParams != null) {
+      const fxNode = GetChain().getFX(id)?.node;
+      if (fxNode instanceof Tremolo) {
+        fxNode.frequency.value = effectParams.tremoloFrequency;
+        fxNode.depth.value = effectParams.tremoloDepth;
+      }
+    }
+  }, []);
+
   const setTremoloFrequency = (value: number) => {
     dispatch(setEffectParams({ id, params: { ...effectParams, tremoloFrequency: value } }));
     const fxNode = GetChain().getFX(id)?.node;

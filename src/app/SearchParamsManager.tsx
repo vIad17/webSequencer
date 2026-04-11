@@ -25,6 +25,9 @@ import {
   fetchProjectUserId
 } from 'src/shared/redux/thunks/projectThunks';
 import { Effect, setEffects } from 'src/shared/redux/slices/effectsSlice';
+import { EffectParams, EffectParamsData, setEffectParams, setEffectsParams } from 'src/shared/redux/slices/effectsParamsSlice';
+import { GetChain } from './SoundManager';
+import { effectPreviewByType } from 'src/features/Effects/components/EffectPreview/EffectPreview';
 
 const INITIAL_SETTINGS: SoundSettingsState = {
   volume: 0,
@@ -51,6 +54,8 @@ interface LoadableData {
   soundSettings?: SoundSettingsState;
   settings?: SettingsState;
   effects?: Effect[];
+  effectsParams?: EffectParamsData[];
+  effectsArray?: (EffectParamsData & Effect)[];
 }
 
 const SearchParamsManager = () => {
@@ -63,6 +68,7 @@ const SearchParamsManager = () => {
   const soundSettings = useSelector((state: RootState) => state.soundSettings);
   const settings = useSelector((state: RootState) => state.settings);
   const effects = useSelector((state: RootState) => state.effects.effects);
+  const effectsParams = useSelector((state: RootState) => state.effectsParams.effects);
   const notesArray = useSelector(
     (state: RootState) => state.notesArray.notesArray
   );
@@ -99,12 +105,18 @@ const SearchParamsManager = () => {
     const safeNotes = Array.isArray(obj?.notesArray) ? obj.notesArray : [];
     const safeSound = obj?.soundSettings ?? INITIAL_SETTINGS;
     const safeSettings = obj?.settings ?? DEFAULT_MAIN_SETTINGS;
-    const safeEffects = obj?.effects ?? [];
+    const safeEffects = obj?.effectsArray ?? [];
+    // const safeEffectsParams = obj?.effectsParams ?? [];
 
     dispatch(setNotes(safeNotes));
     dispatch(setSoundSettings(safeSound));
     dispatch(setSettings(safeSettings));
     dispatch(setEffects(safeEffects));
+    dispatch(setEffectsParams(safeEffects));
+
+    for (var i = 0; i < safeEffects.length; i++) {
+      GetChain().appendFX(effectPreviewByType[safeEffects[i].type].createEffectObject(), safeEffects[i].id);
+    }
   };
 
   const initializePage = async () => {
@@ -156,7 +168,9 @@ const SearchParamsManager = () => {
         }))
       : [];
 
-    const obj = { notesArray: storedNotesArray, settings, soundSettings, effects };
+    const effectsArray = effects.map((el) =>({...el, params: effectsParams.find(param => param.id === el.id)?.params}));
+
+    const obj = { notesArray: storedNotesArray, settings, soundSettings, effectsArray };
     const compressed = compress(obj);
     
     let compressedImage: string | undefined;

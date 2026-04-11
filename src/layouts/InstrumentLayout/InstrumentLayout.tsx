@@ -16,6 +16,7 @@ import { addEffect, EffectType, removeEffect, setEffects } from 'src/shared/redu
 import { effectPreviewByType } from 'src/features/Effects/components/EffectPreview/EffectPreview';
 import { removeEffectParam, setEffectParams } from 'src/shared/redux/slices/effectsParamsSlice';
 import { GetChain } from 'src/app/SoundManager';
+import { resetADSRChanges } from 'src/shared/redux/slices/soundSettingsSlice';
 
 const collisionDetection: CollisionDetection = (args) => {
   if (args.pointerCoordinates) return pointerWithin(args);
@@ -59,7 +60,6 @@ const InstrumentLayout = () => {
     }
 
     const effectType = data.effectType as EffectType
-    console.log(event);
 
     const id = String(event.active.id);
     const isFromSidebar = data?.from === 'sidebar';
@@ -71,6 +71,7 @@ const InstrumentLayout = () => {
     if (isFromSidebar) {
       dispatch(setEffectParams({ id, params: effectPreviewByType[effectType].defaultParams }));
       dispatch(addEffect({ id, type: effectType }));
+      GetChain().appendFX(effectPreviewByType[effectType].createEffectObject(), id);
     }
   }
 
@@ -87,6 +88,12 @@ const InstrumentLayout = () => {
     const overEffect = over ? effects.find(effect => effect.id === over.id) : undefined;
 
     if (!isOverFooter && !!activeEffect) {
+      //hack for removing ADSR
+      const adsrEffectsCount = effects.filter(el => el.type === EffectType.ADSR).length;
+      if (activeEffect.type === EffectType.ADSR && adsrEffectsCount === 1) {
+        dispatch(resetADSRChanges());
+      }
+
       dispatch(removeEffect(activeEffect.id));
       dispatch(removeEffectParam(activeEffect.id));
       GetChain().removeFX(activeEffect.id);
