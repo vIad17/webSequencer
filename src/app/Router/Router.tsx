@@ -6,6 +6,7 @@ import Layout from 'src/layouts/Layout/Layout';
 import InstrumentPage from 'src/pages/InstrumentPage/InstrumentPage';
 import Main from 'src/pages/Main/OldMain';
 import PreviewPage from 'src/pages/PreviewPage/PreviewPage';
+import ProjectPage from 'src/pages/ProjectPage/ProjectPage';
 
 const Router = () => (
   <BrowserRouter basename="/webSequencer">
@@ -13,10 +14,11 @@ const Router = () => (
       <Route path="" element={<Layout />}>
         <Route path=":id/preview" element={<PreviewPage />} />
         <Route path="preview" element={<PreviewPage />} />
+        <Route path=":id" element={<ProjectPage />} />
         <Route path="" element={<InstrumentLayout />}>
           <Route path="old" element={<Main />} />
           <Route index element={<InstrumentPage />} />
-          <Route path=":id" element={<InstrumentPage />} />
+          <Route path=":id/:num" element={<InstrumentPage />} />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Route>
       </Route>

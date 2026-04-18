@@ -180,9 +180,15 @@ const SearchParamsManager = () => {
         console.error('Error for updating project');
       }
     } else {
-      setSearchParams('params=' + compressed);
+      const nextSearchParams = new URLSearchParams(searchParams);
+
+      nextSearchParams.set('params', compressed);
+
+      if (nextSearchParams.toString() !== searchParams.toString()) {
+        setSearchParams(nextSearchParams, { replace: true });
+      }
     }
-  }, [isDragging, notesArray, settings, soundSettings]);
+  }, [isDragging, notesArray, settings, soundSettings, searchParams, setSearchParams]);
 
   return <></>;
 };
