@@ -41,12 +41,12 @@
     transition: background-color 0.2s ease;
 
     &_hover-enabled:hover {
-        background-color: rgba(255, 255, 255, 0.1);
+      background-color: var(--colors-text-primary);
     }
 
     &_editable {
       cursor: text;
-      background-color: rgba(255, 255, 255, 0.1);
+      background-color: var(--colors-text-primary);
     }
   }
 
@@ -61,7 +61,7 @@
   &__project-input {
     background: none;
     border: none;
-    color: white;
+    color: var(--colors-text-primary);
     font-family: var(--lato);
     font-size: 20px;
     outline: none;
@@ -84,7 +84,7 @@
   }
 
   &__settings {
-    color: #fff;
+    color: var(--colors-text-primary);
   }
 
   &__buttons {
@@ -104,9 +104,7 @@
   &__icon {
     width: 32px;
     height: 32px;
-    & * {
-      color: aqua;
-    }
+    color: var(--colors-text-primary);
   }
 
   &__icon-pause {
@@ -222,7 +220,7 @@
     background: transparent;
     display: flex;
     border: none;
-    color: white;
+    color: var(--colors-text-primary);
     gap: 16px;
     cursor: pointer;
   }
