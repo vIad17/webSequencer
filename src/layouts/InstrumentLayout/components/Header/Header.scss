@@ -41,12 +41,12 @@
     transition: background-color 0.2s ease;
 
     &_hover-enabled:hover {
-      background-color: var(--colors-text-primary);
+      background-color: #FFFFFF1A;
     }
 
     &_editable {
       cursor: text;
-      background-color: var(--colors-text-primary);
+      background-color: #FFFFFF1A;
     }
   }
 
