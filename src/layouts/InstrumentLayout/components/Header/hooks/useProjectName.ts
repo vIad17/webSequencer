@@ -21,6 +21,13 @@ export const useProjectName = (initialName: string) => {
 
   const { toastError } = useToast();
 
+  const userId = useSelector((state: RootState) => state.user.id);
+  const projectUserId = useSelector(
+    (state: RootState) => state.project_user_id.userId
+  );
+
+  const isOwner = userId === projectUserId;
+
   useEffect(() => {
     if (id) {
       dispatch(fetchProjectName(id));
@@ -59,11 +66,21 @@ export const useProjectName = (initialName: string) => {
   const handleNameBlur = useCallback(async () => {
     const validation = handleNameValidation(tempName);
 
+    const userId = useSelector((state: RootState) => state.user.id);
+    const projectUserId = useSelector(
+      (state: RootState) => state.project_user_id.userId
+    );
+
+    const isOwner = userId === projectUserId;
+
     if (!validation.isValid) {
-      toastError(validation.error!);
+      toastError(validation.error || 'Validation failed');
       setTempName(name);
     } else if (tempName.trim() === '') {
       toastError('Project name cannot be empty');
+      setTempName(name);
+    } else if (tempName.trim().length < 3 && isOwner) {
+      toastError('Project name must be at least 3 characters long');
       setTempName(name);
     } else if (tempName.trim() !== name && id) {
       try {
@@ -72,11 +89,10 @@ export const useProjectName = (initialName: string) => {
         });
         dispatch(setProjectName(tempName.trim()));
       } catch (error) {
-        toastError('Failed to update project name');
+        toastError("You can't modify project name");
         setTempName(name);
       }
     }
-
     setIsEditing(false);
   }, [tempName, name, id, handleNameValidation, toastError]);
 
