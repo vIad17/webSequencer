@@ -41,7 +41,7 @@ export const useProjectName = (initialName: string) => {
   const handleNameValidation = useCallback(
     (name: string): { isValid: boolean; error?: string } => {
       try {
-        projectNameSchema.parse(name.trim());
+        projectNameSchema(isOwner).parse(name.trim());
         return { isValid: true };
       } catch (error) {
         if (error instanceof z.ZodError) {
@@ -53,7 +53,7 @@ export const useProjectName = (initialName: string) => {
         return { isValid: false, error: 'Invalid project name' };
       }
     },
-    []
+    [isOwner]
   );
 
   const handleNameClick = useCallback(() => {
@@ -66,21 +66,8 @@ export const useProjectName = (initialName: string) => {
   const handleNameBlur = useCallback(async () => {
     const validation = handleNameValidation(tempName);
 
-    const userId = useSelector((state: RootState) => state.user.id);
-    const projectUserId = useSelector(
-      (state: RootState) => state.project_user_id.userId
-    );
-
-    const isOwner = userId === projectUserId;
-
     if (!validation.isValid) {
       toastError(validation.error || 'Validation failed');
-      setTempName(name);
-    } else if (tempName.trim() === '') {
-      toastError('Project name cannot be empty');
-      setTempName(name);
-    } else if (tempName.trim().length < 3 && isOwner) {
-      toastError('Project name must be at least 3 characters long');
       setTempName(name);
     } else if (tempName.trim() !== name && id) {
       try {
@@ -89,7 +76,7 @@ export const useProjectName = (initialName: string) => {
         });
         dispatch(setProjectName(tempName.trim()));
       } catch (error) {
-        toastError("You can't modify project name");
+        toastError("Failed to update project name");
         setTempName(name);
       }
     }
