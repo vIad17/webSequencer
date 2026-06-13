@@ -14,14 +14,14 @@ import {
   addPlayingNote,
   removePlayingNote,
   setActiveNote,
-  removeActiveNotes
+  removeActiveNotes,
+  setNotes
 } from 'src/shared/redux/slices/notesArraySlice';
 import store, { RootState } from 'src/shared/redux/store/store';
 
 import * as lamejs from '@breezystack/lamejs';
 
 import { parseArrayBuffer } from 'midi-json-parser';
-import { addNote } from 'src/shared/redux/slices/notesArraySlice';
 import { setBpm, setTacts } from 'src/shared/redux/slices/settingsSlice';
 
 import { FXChain } from 'src/features/Effects/FXChain';
@@ -162,67 +162,63 @@ export function openMIDI(arrayBuffer: ArrayBuffer) {
       }
 
       const ticksPerBeat = (json.division || 480) / 4; // Default to 480 if missing
-      const mainTrack = json.tracks[0];
-      let currentTick = 0;
-      const activeNotes: Map<number, MIDINote> = new Map();
       const completedNotes: MIDINote[] = [];
 
       // First pass: Process all events
-      for (const event of mainTrack) {
-        const e = event as MidiEvent;
-        currentTick += event.delta || 0;
-        if (e.setTempo) {
-          const bpm = mpqToBpm(e.setTempo.microsecondsPerQuarter);
-          console.log(`Tempo change: ${bpm.toFixed(1)} BPM`);
-          store.dispatch(setBpm(bpm));
-        } else if (e.noteOn && e.noteOn.velocity > 0) {
-          // Note ON event
-          const noteData = {
-            note: convertMIDInoteToSequencer(e.noteOn.noteNumber),
-            attackTime: Math.round(currentTick / ticksPerBeat), // Convert ticks to beats
-            duration: 0 // Will be calculated later
-          };
-          activeNotes.set(e.noteOn.noteNumber, noteData);
-        } else if (e.noteOff || (e.noteOn && e.noteOn.velocity === 0)) {
-          // Note OFF event (explicit or zero-velocity noteOn)
-          const noteNumber = e.noteOff?.noteNumber || e.noteOn?.noteNumber;
-          if (noteNumber === undefined) continue;
-
-          const noteStart = activeNotes.get(noteNumber);
-          if (noteStart) {
-            const durationBeats =
-              (currentTick - noteStart.attackTime * ticksPerBeat) /
-              ticksPerBeat;
-            completedNotes.push({
-              ...noteStart,
-              duration: Math.max(durationBeats, 0.1) // Ensure minimal duration
+      json.tracks.forEach((track) => {
+        let currentTick = 0;
+        const activeNotes: Map<number, MIDINote> = new Map();
+        for (const event of track) {
+          const e = event as MidiEvent;
+          currentTick += event.delta || 0;
+          if (e.setTempo) {
+            const bpm = mpqToBpm(e.setTempo.microsecondsPerQuarter);
+            console.log(`Tempo change: ${bpm.toFixed(1)} BPM`);
+            store.dispatch(setBpm(bpm));
+          } else if (e.noteOn && e.noteOn.velocity > 0) {
+            activeNotes.set(e.noteOn.noteNumber, {
+              note: convertMIDInoteToSequencer(e.noteOn.noteNumber),
+              attackTime: Math.round(currentTick / ticksPerBeat),
+              duration: 0
             });
-            activeNotes.delete(noteNumber);
+          } else if (e.noteOff || (e.noteOn && e.noteOn.velocity === 0)) {
+            // Note OFF event (explicit or zero-velocity noteOn)
+            const noteNumber = e.noteOff?.noteNumber || e.noteOn?.noteNumber;
+            if (noteNumber === undefined) continue;
+
+            const noteStart = activeNotes.get(noteNumber);
+            if (noteStart) {
+              const durationBeats =
+                (currentTick - noteStart.attackTime * ticksPerBeat) /
+                ticksPerBeat;
+              completedNotes.push({
+                ...noteStart,
+                duration: Math.max(durationBeats, 0.1) // Ensure minimal duration
+              });
+              activeNotes.delete(noteNumber);
+            }
           }
         }
-      }
+      });
+
+      completedNotes.sort(
+        (a, b) => a.attackTime - b.attackTime || a.note - b.note
+      );
 
       if (completedNotes.length > 0) {
+        const lastNote = completedNotes[completedNotes.length - 1];
+
         store.dispatch(
           setTacts(
-            Math.ceil(
-              (completedNotes[completedNotes.length - 1].attackTime ??
-                0 + completedNotes[completedNotes.length - 1].duration) / 16
+            Math.max(
+              1,
+              Math.ceil((lastNote.attackTime + lastNote.duration) / 16)
             )
           )
         );
       }
 
-      // Second pass: Dispatch notes to Redux
-      completedNotes.forEach((note) => {
-        store.dispatch(
-          addNote({
-            note: note.note,
-            attackTime: note.attackTime,
-            duration: note.duration
-          })
-        );
-      });
+      store.dispatch(setNotes(completedNotes));
 
       console.log(`Imported ${completedNotes.length} notes from MIDI`);
     })
