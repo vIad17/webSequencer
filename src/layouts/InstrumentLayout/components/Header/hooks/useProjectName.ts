@@ -76,7 +76,7 @@ export const useProjectName = (initialName: string) => {
         });
         dispatch(setProjectName(tempName.trim()));
       } catch (error) {
-        toastError("You can't modify project name");
+        toastError('Failed to update project name');
         setTempName(name);
       }
     }
@@ -109,7 +109,7 @@ export const useProjectName = (initialName: string) => {
             });
             dispatch(setProjectName(tempName.trim()));
           } catch (error) {
-            toastError("You can't modify project name");
+            toastError('Failed to update project name');
             return;
           }
         }
