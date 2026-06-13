@@ -72,8 +72,6 @@ function playMusic(time: number) {
   const tactsCounter = store.getState().settings.tacts ?? 8;
   const notesArray = store.getState().notesArray.notesArray;
 
-  console.log('time', time);
-
   notesArray.forEach((note, index) => {
     if (note.attackTime === currentBit) {
       store.dispatch(setActiveNote({ index, isActive: true }));
@@ -113,7 +111,6 @@ export function stopMusic() {
 // Tone.Transport.start();
 
 export function rewindMusic(bit: number) {
-  //console.log("Rewinding to: "+ bit)
   store.dispatch(removeActiveNotes());
   store.dispatch(setCurrentBit(bit));
 }

@@ -17,9 +17,7 @@ const ProgressModal = ({ className = '' }: ProgressModalProps) => {
 
   if (!progressSelector?.currentStep || progressSelector.progress === null)
     return null;
-
-  console.log(progressSelector);
-
+  
   return (
     <div className="modal-overlay" onClick={() => {}}>
       <div className="modal" onClick={(e) => e.stopPropagation()}>

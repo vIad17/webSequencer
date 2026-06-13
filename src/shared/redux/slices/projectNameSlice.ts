@@ -1,26 +1,30 @@
-import { createSlice } from '@reduxjs/toolkit';
+import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
-const initialState = {
+export interface ProjectNameState {
+  name: string;
+  isLoading: boolean;
+}
+
+const initialState: ProjectNameState = {
   name: '',
   isLoading: false
 };
 
 export const projectNameSlice = createSlice({
-  name: 'project_name',
+  name: 'projectName',
   initialState,
   reducers: {
-    setProjectName: (state, action) => {
-      const name = action.payload;
-      state.name = name;
+    setProjectName: (state, action: PayloadAction<string>) => {
+      state.name = action.payload;
     },
     clearProjectName: (state) => {
       state.name = '';
     },
-    setProjectNameLoading: (state, action) => {
+    setProjectNameLoading: (state, action: PayloadAction<boolean>) => {
       state.isLoading = action.payload;
     }
   }
 });
 
-export const { setProjectName, setProjectNameLoading } =
+export const { setProjectName, clearProjectName, setProjectNameLoading } =
   projectNameSlice.actions;

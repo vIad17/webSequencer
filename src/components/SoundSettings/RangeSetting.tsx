@@ -2,6 +2,7 @@ import { useDispatch } from 'react-redux';
 import { AnyAction } from '@reduxjs/toolkit';
 
 import './SoundSettings.scss';
+import { setIsDragging } from 'src/shared/redux/slices/userSlice';
 
 interface RangeSettingProps {
   value: number | null;
@@ -34,6 +35,8 @@ const RangeSetting = ({
           max={max}
           step={step}
           defaultValue={value}
+          onMouseDown={() => dispatch(setIsDragging(true))}
+          onMouseUp={() => dispatch(setIsDragging(false))}
           onChange={(event) => dispatch(setValue(event.target.valueAsNumber))}
         />
         <p className="sound-settings__range-value">{value}</p>

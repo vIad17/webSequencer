@@ -6,6 +6,7 @@ import { AxiosError } from 'axios';
 
 import { apiClient } from 'src/shared/api/apiClient';
 import { compress, decompress } from 'src/shared/functions/compress';
+import { generatePreview } from 'src/shared/functions/generatePreview';
 import {
   NotesArrayState,
   setNotes
@@ -19,7 +20,10 @@ import {
   SoundSettingsState
 } from 'src/shared/redux/slices/soundSettingsSlice';
 import { RootState, SequencerDispatch } from 'src/shared/redux/store/store';
-import { fetchProjectLink } from 'src/shared/redux/thunks/projectThunks';
+import {
+  fetchProjectLink,
+  fetchProjectUserId
+} from 'src/shared/redux/thunks/projectThunks';
 
 const INITIAL_SETTINGS: SoundSettingsState = {
   volume: 0,
@@ -59,22 +63,32 @@ const SearchParamsManager = () => {
   const notesArray = useSelector(
     (state: RootState) => state.notesArray.notesArray
   );
-  const { id: user_id } = useSelector((state: RootState) => state.user);
+  const userId = useSelector((state: RootState) => state.user.id);
   const { link: projectLink } = useSelector(
-    (state: RootState) => state.project_link
+    (state: RootState) => state.projectLink
   );
 
-  const { userId } = useSelector((state: RootState) => state.project_user_id);
-
-  async function updateLink(link: string) {
-    await apiClient.put(`/projects/${id}`, {
-      link
-    });
+  const projectUserId = useSelector((state: RootState) => state.projectUserId.userId);
+  const isDragging = useSelector((state: RootState) => state.user.isDragging);
+  
+  async function updateProject({ link, image }: { link: string; image?: string }) {
+    const payload: Record<string, string> = { link };
+    if (image) {
+      payload.image = image;
+    }
+    
+    await apiClient.put(`/projects/${id}`, payload);
   }
 
   useEffect(() => {
     if (id) {
       dispatch(fetchProjectLink(id));
+    }
+  }, [dispatch, id]);
+
+  useEffect(() => {
+    if (id) {
+      dispatch(fetchProjectUserId(id));
     }
   }, [dispatch, id]);
 
@@ -127,6 +141,7 @@ const SearchParamsManager = () => {
 
   useEffect(() => {
     if (pageIsStarted) return;
+    if (isDragging) return;
 
     const storedNotesArray = Array.isArray(notesArray)
       ? notesArray.map((note) => ({
@@ -137,16 +152,24 @@ const SearchParamsManager = () => {
       : [];
 
     const obj = { notesArray: storedNotesArray, settings, soundSettings };
-    const compressed = compress(obj);
+    const compressed = compress(JSON.stringify(obj));
+    
+    let compressedImage: string | undefined;
+    try {
+      const previewSvg = generatePreview(notesArray);
+      compressedImage = compress(previewSvg);
+    } catch (err) {
+      console.warn('Preview generation failed, sending without image', err);
+    }
 
     if (id) {
       try {
-        if (user_id !== userId) {
+        if (userId !== projectUserId) {
           console.error("You haven't permissions to modify the project");
           return;
         }
 
-        updateLink(compressed);
+        updateProject({ link: compressed, image: compressedImage });
       } catch (e: unknown) {
         const error = e as AxiosError;
         if (error.response?.status === 403) {
@@ -154,12 +177,12 @@ const SearchParamsManager = () => {
           return;
         }
 
-        console.error('Error for updating link');
+        console.error('Error for updating project');
       }
     } else {
       setSearchParams('params=' + compressed);
     }
-  }, [notesArray, settings, soundSettings]);
+  }, [isDragging, notesArray, settings, soundSettings]);
 
   return <></>;
 };

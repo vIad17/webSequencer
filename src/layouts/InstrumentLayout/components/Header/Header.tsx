@@ -48,7 +48,6 @@ interface Project {
   autosave: boolean;
 }
 const Header = ({ className = '' }: HeaderProps) => {
-  const { id } = useParams();
   const [myBpm, setMyBpm] = useState(120);
   const [myTacts, setMyTacts] = useState(8);
   const [fileOpen, setFileOpen] = useState(false);
@@ -56,6 +55,7 @@ const Header = ({ className = '' }: HeaderProps) => {
   const [inputModalOpen, setInputModalOpen] = useState(false);
   const [profileDropdown, setProfileDropdown] = useState(false);
   const [isAutosaveEnabled, setIsAutosaveEnabled] = useState(false);
+  const { id } = useParams();
 
   const nameInputRef = useRef<HTMLInputElement>(null);
 
@@ -77,7 +77,12 @@ const Header = ({ className = '' }: HeaderProps) => {
 
   const { username } = useSelector((state: RootState) => state.user);
 
-  const { isLoading } = useSelector((state: RootState) => state.project_name);
+  const { isLoading } = useSelector((state: RootState) => state.projectName);
+
+  const userId = useSelector((state: RootState) => state.user.id);
+  const projectUserId = useSelector(
+    (state: RootState) => state.projectUserId.userId
+  );
 
   const {
     name,
@@ -89,11 +94,11 @@ const Header = ({ className = '' }: HeaderProps) => {
     handleNameKeyDown
   } = useProjectName('Untitled Project');
 
-
+  const isMyProject = isEditing && userId === projectUserId;
 
   const getAutosaveStatus = async () => {
-  const { data } = await apiClient.get<Project>(`/projects/${id}`);
-  return data.autosave;
+    const { data } = await apiClient.get<Project>(`/projects/${id}`);
+    return data.autosave;
   };
 
   const updateAutosaveStatus = async (autosave: boolean) => {
@@ -212,26 +217,26 @@ const Header = ({ className = '' }: HeaderProps) => {
     },
 
     {
-  text: 'Autosave',
-  callback: async () => {
-    const newAutosaveStatus = !isAutosaveEnabled;
+      text: 'Autosave',
+      callback: async () => {
+        const newAutosaveStatus = !isAutosaveEnabled;
 
-    try {
-      await updateAutosaveStatus(newAutosaveStatus);
-      setIsAutosaveEnabled(newAutosaveStatus);
-    } catch (error) {
-      console.error('Failed to update autosave status:', error);
+        try {
+          await updateAutosaveStatus(newAutosaveStatus);
+          setIsAutosaveEnabled(newAutosaveStatus);
+        } catch (error) {
+          console.error('Failed to update autosave status:', error);
+        }
+
+        setFileOpen(false);
+      },
+      sideContent: isAutosaveEnabled ? (
+        <Icon
+          icon={IconType.Check}
+          className={clsx('modal__side-icon', 'modal__check-icon')}
+        />
+      ) : null
     }
-
-    setFileOpen(false);
-  },
-  sideContent: isAutosaveEnabled ? (
-    <Icon
-      icon={IconType.Check}
-      className={clsx('modal__side-icon', 'modal__check-icon')}
-    />
-  ) : null
-}
   ];
 
   const EditData: ModalItem[] = [
@@ -243,13 +248,13 @@ const Header = ({ className = '' }: HeaderProps) => {
       },
       sideContent: <span className="modal__hotkey">Ctrl+S</span>
     }
-  ]
+  ];
 
   const ProfileData: ModalItem[] = [
     {
       text: 'Profile',
       callback: () => {
-        window.location.href = '/main/myprojects';
+        window.location.href = '/me';
       }
     },
     {
@@ -308,17 +313,19 @@ const Header = ({ className = '' }: HeaderProps) => {
         </div>
 
         <div className="header__center">
-          {localStorage.getItem('accessToken') && (
+          {id ? (
             <div className="header__logo-container">
               <img src={logo} alt="Project Logo" className="header__logo" />
               <div
                 className={clsx('header__project-name-container', {
-                  'header__project-name-container_editable': isEditing,
-                  'header__project-name-container_loading': isLoading
+                  'header__project-name-container_editable': isMyProject,
+                  'header__project-name-container_loading': isLoading,
+                  'header__project-name-container_hover-enabled':
+                    userId === projectUserId
                 })}
                 onClick={handleNameClick}
               >
-                {isEditing ? (
+                {isMyProject ? (
                   <input
                     ref={nameInputRef}
                     type="text"
@@ -336,7 +343,7 @@ const Header = ({ className = '' }: HeaderProps) => {
                 )}
               </div>
             </div>
-          )}
+          ) : null}
 
           <div className="header__controls">
             {!!settings.bpm || !!settings.tacts ? (

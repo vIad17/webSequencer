@@ -77,7 +77,7 @@ export const projectHandler = [
     }
 
     return HttpResponse.json(
-      { name: projects[id].userId ?? null },
+      { userId: projects[id].userId ?? null },
       { status: 200 }
     );
   }),
@@ -92,10 +92,23 @@ export const projectHandler = [
       );
     }
 
-    const { name = '', link = '' , autosave = ''} =
-      (await request.json()) as UpdateRequestBody;
-    return HttpResponse.json({
-      status: 200
-    });
+    const body = await request.json() as UpdateRequestBody;
+
+    projects[id] = {
+      ...projects[id],
+      ...(!!body.name && { name: body.name }),
+      ...(!!body.link && { link: body.link }),
+      ...(!!body.autosave && { autosave: body.autosave }),
+      ...(!!body.image && { image: body.image })
+    };
+
+    return HttpResponse.json(
+      { 
+        status: 200,
+        message: 'Project updated',
+        data: projects[id]
+      },
+      { status: 200 }
+    );
   })
 ];

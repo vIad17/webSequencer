@@ -1,102 +1,96 @@
 .header {
-  color: #fff;
-  display: flex;
+  color: var(--colors-text-primary);
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
   align-items: start;
-  gap: 40px;
+  column-gap: 2.5rem;
   width: 100%;
-  z-index: 2;
   box-sizing: border-box;
 
   &__left {
-    flex: 1;
-    margin-left: 80px;
     display: flex;
-    gap: 24px;
+    gap: 1.2rem;
   }
 
   &__center {
-    flex: 1;
-    left: 50%;
-    transform: translateX(-50%);
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 10px;
+    gap: 0.5rem;
   }
 
   &__logo-container {
     display: flex;
     align-items: center;
-    gap: 12px;
+    gap: 0.6rem;
   }
 
   &__logo {
-    width: 40px;
-    height: 40px;
+    width: 2rem;
+    height: 2rem;
     object-fit: contain;
   }
 
   &__project-name-container {
     cursor: pointer;
-    min-height: 32px;
+    min-height: 1.6rem;
     display: flex;
     align-items: center;
-    padding: 4px 8px;
-    border-radius: 4px;
+    padding: 0.2rem 0.4rem;
+    border-radius: 0.2rem;
     transition: background-color 0.2s ease;
 
-    &:hover {
-      background-color: rgba(255, 255, 255, 0.1);
+    &_hover-enabled:hover {
+      background-color: #FFFFFF1A;
     }
 
     &_editable {
       cursor: text;
-      background-color: rgba(255, 255, 255, 0.1);
+      background-color: #FFFFFF1A;
     }
   }
 
   &__project-name {
     font-family: var(--lato);
-    font-size: 20px;
+    font-size: 1rem;
     display: flex;
     align-items: center;
-    gap: 6px;
+    gap: 0.3rem;
   }
 
   &__project-input {
     background: none;
     border: none;
-    color: white;
+    color: var(--colors-text-primary);
     font-family: var(--lato);
-    font-size: 20px;
+    font-size: 1rem;
     outline: none;
-    padding: 4px 8px;
+    padding: 0.2rem 0.4rem;
     margin: 0;
-    width: 200px;
+    width: 10rem;
     text-align: center;
     transition: all 0.2s ease;
   }
 
   &__controls {
     display: flex;
-    gap: 36px;
+    gap: 1.8rem;
   }
 
   &__right {
     display: flex;
     justify-content: flex-end;
-    margin-right: 80px;
-    gap: 12px;
+    gap: 0.6rem;
   }
 
   &__settings {
-    color: #fff;
+    color: var(--colors-text-primary);
   }
 
   &__buttons {
     display: flex;
     align-items: center;
-    gap: 24px;
+    gap: 1.2rem;
   }
 
   &__button {
@@ -108,40 +102,38 @@
   }
 
   &__icon {
-    width: 32px;
-    height: 32px;
-    & * {
-      color: aqua;
-    }
+    width: 1.6rem;
+    height: 1.6rem;
+    color: var(--colors-text-primary);
   }
 
   &__icon-pause {
-    width: 50px;
+    width: 2.5rem;
   }
 
   &__inputs {
     display: flex;
-    gap: 20px;
+    gap: 1rem;
   }
 
   &__input-form {
     display: flex;
     align-items: center;
     text-transform: uppercase;
-    font-size: 16px;
+    font-size: 0.8rem;
     color: var(--colors-ui-tertiary);
   }
 
   &__input {
     color: var(--colors-text-primary);
     background-color: var(--colors-bg-secondary);
-    font-size: 20px;
+    font-size: 1rem;
     border: none;
-    border-radius: 8px;
-    max-width: 40px;
-    padding: 6px 12px;
+    border-radius: 0.4rem;
+    max-width: 2rem;
+    padding: 0.3rem 0.6rem;
     text-align: center;
-    margin-left: 16px;
+    margin-left: 0.8rem;
   }
 
   &__left-item {
@@ -154,7 +146,7 @@
     padding: 0;
     border: none;
     color: var(--colors-text-secondary);
-    font-size: 24px;
+    font-size: 1.2rem;
 
     transition: color 0.1s ease;
 
@@ -169,12 +161,11 @@
   }
 
   &__left-button-modal {
-    top: 40px;
+    top: 2rem;
     left: 0;
-    min-width: 170px;
+    min-width: 8.5rem;
     z-index: 50;
   }
-
 
   &__second_left-item {
     width: fit-content;
@@ -186,7 +177,7 @@
     padding: 0;
     border: none;
     color: var(--colors-text-secondary);
-    font-size: 24px;
+    font-size: 1.2rem;
 
     transition: color 0.1s ease;
 
@@ -201,41 +192,41 @@
   }
 
   &__second_left-button-modal {
-    top: 40px;
+    top: 2rem;
     left: 0;
-    min-width: 170px;
+    min-width: 8.5rem;
     z-index: 50;
   }
 
   &__right-button-modal {
-    top: 50px;
+    top: 2.5rem;
     right: 0;
-    min-width: 170px;
+    min-width: 8.5rem;
     z-index: 50;
   }
 
   &__inputs-left-button-sub-modal {
-    width: 280px;
+    width: 14rem;
   }
 
   &__left-button-sub-modal {
     top: 0;
     left: 100%;
-    margin-left: 20px;
-    min-width: 170px;
+    margin-left: 1rem;
+    min-width: 8.5rem;
   }
 
   &__right_profile {
     background: transparent;
     display: flex;
     border: none;
-    color: white;
-    gap: 16px;
+    color: var(--colors-text-primary);
+    gap: 0.8rem;
     cursor: pointer;
   }
 
   &__right_avatar {
-    outline: 2px solid #041d32;
+    outline: 0.1rem solid #041d32;
     width: 1.6rem;
     height: 1.6rem;
     border-radius: 0.5rem;
@@ -249,7 +240,6 @@
 
 .modal__hotkey {
   color: #888;
-  font-size: 12px;
-  margin-left: 8px;
+  font-size: 0.6rem;
+  margin-left: 0.4rem;
 }
-

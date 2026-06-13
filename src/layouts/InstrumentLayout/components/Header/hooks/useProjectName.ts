@@ -17,13 +17,13 @@ export const useProjectName = (initialName: string) => {
   const [tempName, setTempName] = useState(initialName);
   const dispatch = useDispatch<SequencerDispatch>();
 
-  const { name } = useSelector((state: RootState) => state.project_name);
+  const { name } = useSelector((state: RootState) => state.projectName);
 
   const { toastError } = useToast();
 
   const userId = useSelector((state: RootState) => state.user.id);
   const projectUserId = useSelector(
-    (state: RootState) => state.project_user_id.userId
+    (state: RootState) => state.projectUserId.userId
   );
 
   const isOwner = userId === projectUserId;
@@ -76,7 +76,7 @@ export const useProjectName = (initialName: string) => {
         });
         dispatch(setProjectName(tempName.trim()));
       } catch (error) {
-        toastError("Failed to update project name");
+        toastError("You can't modify project name");
         setTempName(name);
       }
     }
@@ -109,7 +109,7 @@ export const useProjectName = (initialName: string) => {
             });
             dispatch(setProjectName(tempName.trim()));
           } catch (error) {
-            toastError('Failed to update project name');
+            toastError("You can't modify project name");
             return;
           }
         }

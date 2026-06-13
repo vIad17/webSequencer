@@ -1,7 +1,7 @@
 import pako from 'pako';
 
-export function compress(object: unknown) {
-  const zippedObject = pako.gzip(JSON.stringify(object));
+export function compress(object: string) {
+  const zippedObject = pako.gzip((object));
   const codedToCharObject = String.fromCharCode.apply(
     null,
     Array.from(zippedObject)
@@ -12,7 +12,7 @@ export function compress(object: unknown) {
 
 export function decompress(codedBase64Object: string) {
   try {
-    const decodedBase64Object = atob(codedBase64Object);
+    const decodedBase64Object = atob(codedBase64Object.replaceAll('%2b', '+'));
     const decodedToCharObject = decodedBase64Object
       .split('')
       .map((el) => el.charCodeAt(0));

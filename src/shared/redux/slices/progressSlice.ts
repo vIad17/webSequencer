@@ -15,7 +15,7 @@ export const progressSlice = createSlice({
   initialState,
   reducers: {
     setProgress(state, action: PayloadAction<number | null>) {
-      state.progress = action.payload; // OK with immer (RTK auto-creates new state)
+      state.progress = action.payload;
     },
     setCurrentStep(state, action: PayloadAction<string | null>) {
       state.currentStep = action.payload;
