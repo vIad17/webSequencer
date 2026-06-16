@@ -60,6 +60,13 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           envs: GITHUB_REF_NAME,GITHUB_REPOSITORY
           script: |
+            set -euo pipefail
+            
+            # TODO: Удалить зависимость от deploy_websequencer_back
+            # Настройка SSH
+            eval "$(ssh-agent -s)"
+            ssh-add ~/.ssh/deploy_websequencer_back
+            
             # Конфигурация проекта
             PROJECT_DIR="$HOME/webSequencer"
             REPO="git@github.com:${GITHUB_REPOSITORY}.git"
