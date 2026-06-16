@@ -21,6 +21,13 @@ export const useProjectName = (initialName: string) => {
 
   const { toastError } = useToast();
 
+  const userId = useSelector((state: RootState) => state.user.id);
+  const projectUserId = useSelector(
+    (state: RootState) => state.projectUserId.userId
+  );
+
+  const isOwner = userId === projectUserId;
+
   useEffect(() => {
     if (id) {
       dispatch(fetchProjectName(id));
@@ -34,7 +41,7 @@ export const useProjectName = (initialName: string) => {
   const handleNameValidation = useCallback(
     (name: string): { isValid: boolean; error?: string } => {
       try {
-        projectNameSchema.parse(name.trim());
+        projectNameSchema(isOwner).parse(name.trim());
         return { isValid: true };
       } catch (error) {
         if (error instanceof z.ZodError) {
@@ -46,7 +53,7 @@ export const useProjectName = (initialName: string) => {
         return { isValid: false, error: 'Invalid project name' };
       }
     },
-    []
+    [isOwner]
   );
 
   const handleNameClick = useCallback(() => {
@@ -60,10 +67,7 @@ export const useProjectName = (initialName: string) => {
     const validation = handleNameValidation(tempName);
 
     if (!validation.isValid) {
-      toastError(validation.error!);
-      setTempName(name);
-    } else if (tempName.trim() === '') {
-      toastError('Project name cannot be empty');
+      toastError(validation.error || 'Validation failed');
       setTempName(name);
     } else if (tempName.trim() !== name && id) {
       try {
@@ -72,11 +76,10 @@ export const useProjectName = (initialName: string) => {
         });
         dispatch(setProjectName(tempName.trim()));
       } catch (error) {
-        toastError("You can't modify project name");
+        toastError('Failed to update project name');
         setTempName(name);
       }
     }
-
     setIsEditing(false);
   }, [tempName, name, id, handleNameValidation, toastError]);
 
@@ -106,7 +109,7 @@ export const useProjectName = (initialName: string) => {
             });
             dispatch(setProjectName(tempName.trim()));
           } catch (error) {
-            toastError("You can't modify project name");
+            toastError('Failed to update project name');
             return;
           }
         }
