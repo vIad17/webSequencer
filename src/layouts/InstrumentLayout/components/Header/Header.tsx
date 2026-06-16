@@ -183,7 +183,7 @@ const Header = ({ className = '' }: HeaderProps) => {
   }));
 
   const FileData: ModalItem[] = [
-    { text: 'Export to mp3', callback: exportMp3 },
+    { text: 'Export to mp3', callback: () => void exportMp3() },
     {
       text: 'Import MIDI File',
       callback: handleButtonClick,

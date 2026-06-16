@@ -359,7 +359,19 @@ function audioBufferToMp3(buffer: AudioBuffer): Promise<Blob> {
   }).then((blob) => blob);
 }
 
-export async function exportMp3() {
+function getExportFileName(fileName?: string) {
+  const rawName = fileName ?? store.getState().projectName.name ?? '';
+  const normalizedName = rawName.trim().replace(/\.mp3$/i, '');
+  const sanitizedName = normalizedName
+    .replace(/[<>:"/\\|?*]/g, '_')
+    .split('')
+    .map((char) => (char.charCodeAt(0) < 32 ? '_' : char))
+    .join('');
+
+  return `${sanitizedName || 'untitled'}.mp3`;
+}
+
+export async function exportMp3(fileName?: string) {
   const buffer = await exportToBuffer();
   if (buffer) {
     const mp3Blob = await audioBufferToMp3(buffer);
@@ -370,7 +382,7 @@ export async function exportMp3() {
     const url = URL.createObjectURL(mp3Blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = 'untitledf1.mp3';
+    a.download = getExportFileName(fileName);
     a.click();
     URL.revokeObjectURL(url);
     store.dispatch(setProgress(100));
