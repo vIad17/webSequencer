@@ -1,14 +1,14 @@
-FROM node:22-alpine3.21 AS builder
-
+# ---------- builder ----------
+FROM node:26.8.2-alpine3.24 AS builder
 WORKDIR /app
 COPY package.json yarn.lock ./
+RUN npm install -g yarn
 RUN yarn install --frozen-lockfile
-
-FROM node:22-alpine3.21
-
-WORKDIR /app
-
-COPY --from=builder /app/node_modules ./node_modules
 COPY . .
+RUN yarn build
 
-CMD ["yarn", "start", "--host", "0.0.0.0", "--port", "5174"]
+# ---------- runtime ----------
+FROM nginx:1.31.5-alpine3.24-perl
+COPY --from=builder /app/dist /usr/share/nginx/html/webSequencer
+COPY nginx.conf /etc/nginx/conf.d/default.conf
+EXPOSE 5174
