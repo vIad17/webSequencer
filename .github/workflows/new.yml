@@ -1,7 +1,9 @@
 name: NEW Deploy
 
 on:
-  workflow_dispatch:
+  push:
+    branches:
+      - 'feature/deploy'
 
 jobs:
   build:
