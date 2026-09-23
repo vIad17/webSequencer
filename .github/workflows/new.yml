@@ -3,7 +3,7 @@ name: NEW Deploy
 on:
   push:
     branches:
-      - 'feature/deploy'
+      - 'feat/docker-nginx-deploy'
 
 jobs:
   build:
