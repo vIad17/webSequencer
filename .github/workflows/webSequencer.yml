@@ -52,6 +52,7 @@ jobs:
       SSH_HOST: ${{ secrets.HOST }}
       SSH_PORT: ${{ secrets.PORT }}
       SSH_USER: ${{ secrets.USERNAME }}
+      KNOWN_HOSTS: ${{ secrets.KNOWN_HOSTS }}
       REPO_NAME: ${{ github.event.repository.name }}
 
     steps:
@@ -70,9 +71,9 @@ jobs:
 
           echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_ed25519
           chmod 600 ~/.ssh/id_ed25519
-
-          ssh-keyscan -p "$SSH_PORT" -H "$SSH_HOST" >> ~/.ssh/known_hosts
-          chmod 644 ~/.ssh/known_hosts
+          
+          echo "$KNOWN_HOSTS" > ~/.ssh/known_hosts
+          chmod 600 ~/.ssh/known_hosts
 
       - name: Get remote home path
         id: remote
